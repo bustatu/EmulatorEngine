@@ -3,3 +3,6 @@ build/
 
 # Ignore vscode config
 .vscode/
+
+# Ignore DLLs
+*.dll
