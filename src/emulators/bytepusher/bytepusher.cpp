@@ -3,11 +3,9 @@
 // Sets surface pixel
 void set_pixel(SDL_Surface *surface, int x, int y, uint32_t pixel)
 {
-  uint32_t *const target_pixel = (Uint32*)(
-      (Uint8*) surface -> pixels + y * surface -> pitch
-                                             + x * surface->format->BytesPerPixel);
-  *target_pixel = pixel;
-}
+    uint32_t *const target_pixel = (uint32_t*)((uint8_t*) surface -> pixels + y * surface -> pitch + x * surface->format->BytesPerPixel);
+    *target_pixel = pixel;
+}   
 
 // Get value from the memory
 uint32_t BytePusherEmu::getVal(uint32_t pc, uint32_t length)
@@ -36,6 +34,9 @@ BytePusherEmu::BytePusherEmu()
     // These pixels are black
     for(int i = 216; i <= 255; i++)
         pallete[i] = 0xFF000000;
+
+    // Init sound
+    sound = new Audio();
 }
 
 void BytePusherEmu::load(std::string path)
@@ -104,11 +105,14 @@ void BytePusherEmu::updateKey(SDL_Keycode key, int value)
 
 void BytePusherEmu::input(SDL_Event event)
 {
-    // Set or unset keys
-    if(event.type == SDL_KEYDOWN)
-        updateKey(event.key.keysym.sym, 1);
-    else if(event.type == SDL_KEYUP)
-        updateKey(event.key.keysym.sym, 0);
+    if(!isQuit)
+    {
+        // Set or unset keys
+        if(event.type == SDL_KEYDOWN)
+            updateKey(event.key.keysym.sym, 1);
+        else if(event.type == SDL_KEYUP)
+            updateKey(event.key.keysym.sym, 0);
+    }
 }
 
 void BytePusherEmu::innerLoop()
@@ -147,6 +151,9 @@ void BytePusherEmu::update(float dt)
                     set_pixel(result, i, j, pallete[frame[(j << 8) | i]]);
             }
 
+            // Push audio section to the sound engine
+            sound -> push((int8_t*)(memory + (getVal(6, 2) << 8)), 256);
+
             // 60 Hz, forced
             counter -= 1.0 / 60;
         }       
@@ -158,6 +165,6 @@ void BytePusherEmu::draw(Window* win)
     if(!isQuit)
     {
         // Copy the surface to the screen
-        SDL_BlitSurface(result, NULL, win -> getSurface(), NULL);
+        win -> getRenderer() -> render(result);
     }
 }

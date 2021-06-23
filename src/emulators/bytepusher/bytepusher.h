@@ -2,6 +2,7 @@
 #define BYTEPUSHER_H
 
 #include "../emulator.h"
+#include "../../window/audio.h"
 #include "../../window/window.h"
 #include <SDL.h>
 #include <iostream>
@@ -22,6 +23,7 @@ private:
     // Output
     SDL_Surface* result = SDL_CreateRGBSurface(0, 256, 256, 32, 0, 0, 0, 0);
     uint32_t pallete[256];
+    Audio* sound;
 
     // Input
     SDL_Keycode keys[0x10] = {

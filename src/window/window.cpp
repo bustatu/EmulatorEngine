@@ -10,6 +10,8 @@ Window::Window()
 
     window = SDL_CreateWindow("EmuEngine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256, 256, 0);
 
+    renderer = new SoftwareRenderer(window);
+
     deltaTime = 0;
     NOW = SDL_GetPerformanceCounter();
     LAST = 0;
@@ -18,6 +20,11 @@ Window::Window()
 SDL_Window* Window::getWin()
 {
     return window;
+}
+
+Renderer* Window::getRenderer()
+{
+    return renderer;
 }
 
 SDL_Surface* Window::getSurface()

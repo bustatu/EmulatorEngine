@@ -10,6 +10,8 @@ project(EmuEngine)
 set(SOURCE_FILES
     src/main.cpp
     src/window/window.cpp
+    src/window/audio.cpp
+    src/window/renderer.cpp
     src/emulators/bytepusher/bytepusher.cpp
 )
 

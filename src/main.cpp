@@ -45,14 +45,15 @@ int main(int argc, char* argv[])
 
             // Update the emu
             emu -> update(window -> getDelta());
-            emu -> draw(window);
 
             // If emu stopped, close everything
             if(!emu -> isRunning())
                 window -> quit();
 
             // Update the window
-            SDL_UpdateWindowSurface(window -> getWin());
+            window -> getRenderer() -> drawStart();
+            emu -> draw(window);
+            window -> getRenderer() -> drawEnd();
 
             // Wait a bit so CPU usage is not high
             SDL_Delay(2);
