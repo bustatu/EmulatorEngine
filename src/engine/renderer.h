@@ -35,7 +35,7 @@ public:
     void drawStart() override;
     void drawEnd() override;
     AcceleratedRenderer(SDL_Window* win) : Renderer(win) {
-        renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_TEXTUREACCESS_STREAMING);
         if(renderer == nullptr)
             printf("{E}: SDL_CreateRenderer Error: %s\n", SDL_GetError());
     }   

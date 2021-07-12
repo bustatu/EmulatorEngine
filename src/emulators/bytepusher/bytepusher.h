@@ -2,13 +2,13 @@
 #define BYTEPUSHER_H
 
 #include "../emulator.h"
-#include "../../window/audio.h"
-#include "../../window/window.h"
+#include "../../engine/audio.h"
+#include "../../engine/window.h"
 #include <SDL.h>
 #include <iostream>
 #include <fstream>
 
-class BytePusherEmu : public UnthreadedEmulator
+class BytePusherEmu : public Emulator
 {
 private:
     // VM memory
@@ -44,7 +44,6 @@ public:
     BytePusherEmu();
     bool isRunning() override;
     void quit() override;
-    void input(SDL_Event event) override;
     void load(std::string path) override;
     void update(float deltaTime) override;
     void draw(Window* win) override;

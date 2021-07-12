@@ -51,7 +51,7 @@ void BytePusherEmu::load(std::string path)
     if(fin.good())
     {
         // Starting ROM load
-        printf("{I}: Loading ROM at: %s!\n", path.c_str());
+        printf("{I}: Loading BytePusher ROM at: %s!\n", path.c_str());
 
         // Get file size
         fin.seekg(0, std::ios::end);
@@ -95,24 +95,12 @@ void BytePusherEmu::quit()
 void BytePusherEmu::updateKey(SDL_Keycode key, int value)
 {
     // Go trough all the keys and set / unset the good one.
-    for(int i = 0; i <= 0x10; i++)
+    for(int i = 0; i < 0x10; i++)
         if(keys[i] == key)
             // Unset key
             if(value == 0) memory[1 - i / 8] &= ~(1 << (i % 8));
             // Set key
             else memory[1 - i / 8] |= (1 << (i % 8)); 
-}
-
-void BytePusherEmu::input(SDL_Event event)
-{
-    if(!isQuit)
-    {
-        // Set or unset keys
-        if(event.type == SDL_KEYDOWN)
-            updateKey(event.key.keysym.sym, 1);
-        else if(event.type == SDL_KEYUP)
-            updateKey(event.key.keysym.sym, 0);
-    }
 }
 
 void BytePusherEmu::innerLoop()
@@ -156,7 +144,15 @@ void BytePusherEmu::update(float dt)
 
             // 60 Hz, forced
             counter -= 1.0 / 60;
-        }       
+        }
+
+        // Go trough all the keys and set / unset the good one.
+        for(int i = 0; i < 0x10; i++)
+        {
+            // If key is down mark it as such
+            if(Window::get() -> isKeyDown[keys[i]]) memory[1 - i / 8] |= (1 << (i % 8));
+            else memory[1 - i / 8] &= ~(1 << (i % 8));
+        }
     }
 }
 
