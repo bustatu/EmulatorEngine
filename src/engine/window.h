@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <map>
 #include "renderer.h"
 
@@ -36,7 +36,8 @@ public:
             instance = new Window;
         return instance;
     }
-        // Key maps
+    
+    // Key maps
     std::map<SDL_Keycode, bool> isKeyDown, isKeyReleased, isKeyPressed;
 
     bool isQuit();

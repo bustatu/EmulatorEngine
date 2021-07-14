@@ -1,10 +1,10 @@
-#ifndef BYTEPUSHER_H
-#define BYTEPUSHER_H
+#ifndef EMU_BYTEPUSHER_H
+#define EMU_BYTEPUSHER_H
 
 #include "../emulator.h"
 #include "../../engine/audio.h"
 #include "../../engine/window.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <fstream>
 

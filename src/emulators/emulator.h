@@ -2,7 +2,7 @@
 #define EMULATOR_H
 
 #include <iostream>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "../engine/window.h"
 
 // Template for any emulator to be able to interact with the UI

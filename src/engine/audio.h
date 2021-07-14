@@ -1,7 +1,7 @@
 #ifndef ENGINE_AUDIO_H
 #define ENGINE_AUDIO_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <iostream>
 
 class Audio

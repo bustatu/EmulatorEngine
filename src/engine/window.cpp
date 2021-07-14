@@ -18,7 +18,7 @@ Window::Window()
 
     window = SDL_CreateWindow("<windowname>", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256, 256, 0);
 
-    renderer = new SoftwareRenderer(window);
+    renderer = new AcceleratedRenderer(window);
 
     deltaTime = 0;
     NOW = SDL_GetPerformanceCounter();

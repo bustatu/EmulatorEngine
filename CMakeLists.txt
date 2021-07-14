@@ -15,7 +15,7 @@ add_executable(EmuEngine ${SOURCE_FILES})
 # Dependencies
 
 # Use this on Windows to set the SDL path
-# set(SDL2_DIR "D:/Frameworks/SDL2/")
+# set(SDL2_DIR "<path>")
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})

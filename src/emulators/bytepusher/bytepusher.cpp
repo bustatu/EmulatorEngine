@@ -97,10 +97,12 @@ void BytePusherEmu::updateKey(SDL_Keycode key, int value)
     // Go trough all the keys and set / unset the good one.
     for(int i = 0; i < 0x10; i++)
         if(keys[i] == key)
+        {
             // Unset key
             if(value == 0) memory[1 - i / 8] &= ~(1 << (i % 8));
             // Set key
             else memory[1 - i / 8] |= (1 << (i % 8)); 
+        }
 }
 
 void BytePusherEmu::innerLoop()
