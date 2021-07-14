@@ -9,6 +9,13 @@ Window *Window::instance = 0;
 
 Window::Window()
 {
+    // Initialise SDL
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("{E}: SDL_Init video error: %s\n", SDL_GetError());
+        exit(-1);
+    }
+
     window = SDL_CreateWindow("<windowname>", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256, 256, 0);
 
     renderer = new SoftwareRenderer(window);

@@ -1,3 +1,4 @@
+
 #include "renderer.h"
 
 void SoftwareRenderer::drawStart()

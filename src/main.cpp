@@ -4,10 +4,9 @@
 
 int main(int argc, char* argv[])
 {
-
     // Get ROM name
     std::string rom_name;
-    std::cout << "Please write the ROM name.\nRoms can be found in the roms/bytepusher/ folder.\nROM: ";
+    std::cout << "{S}: Please write the ROM name.\n{S}: Roms can be found in the roms/bytepusher/ folder.\n{Q}: ROM: ";
     std::cin >> rom_name;
     if(rom_name == "") rom_name = "nyan.bp";
 
@@ -17,36 +16,41 @@ int main(int argc, char* argv[])
     // Load the ROM
     emu -> load("roms/bytepusher/" + rom_name);
 
-    // Get window pointer for easier usage
-    Window* window = Window::get();
-
-    // Set the window title
-    window -> setTitle("Bytepusher");
-
-    // Main loop
-    while(!window -> isQuit())
+    // If emu did not fail
+    if(emu -> isRunning())
     {
-        // Update delta timings
-        window -> updateDelta();
+        // Get window pointer for easier usage
+        Window* window = Window::get();
 
-        // Poll events (updates input)
-        window -> pollEvents();
+        // Set the window title
+        window -> setTitle("Bytepusher"); 
 
-        // Update the emu
-        emu -> update(window -> getDelta());
+        // Main loop
+        while(!window -> isQuit())
+        {
+            // Update delta timings
+            window -> updateDelta();
 
-        // If emu stopped, close everything
-        if(!emu -> isRunning())
-            window -> quit();
+            // Poll events (updates input)
+            window -> pollEvents();
 
-        // Start drawing
-        window -> getRenderer() -> drawStart();
+            // Update the emu
+            emu -> update(window -> getDelta());
 
-        // Draw to the screen
-        emu -> draw(window);
+            // If emu stopped, close everything
+            if(!emu -> isRunning())
+                window -> quit();
 
-        // End drawing
-        window -> getRenderer() -> drawEnd();
+            // Start drawing
+            window -> getRenderer() -> drawStart();
+
+            // Draw to the screen
+            emu -> draw(window);
+
+            // End drawing
+            window -> getRenderer() -> drawEnd();
+        }
     }
+
     return EXIT_SUCCESS;
 }

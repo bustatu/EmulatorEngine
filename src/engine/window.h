@@ -1,5 +1,5 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#ifndef ENGINE_WINDOW_H
+#define ENGINE_WINDOW_H
 
 #include <cstdlib>
 #include <iostream>
@@ -27,8 +27,6 @@ private:
  
     // Private constructor
     Window();
-
-
 
 public:
     // Returns the window instance
