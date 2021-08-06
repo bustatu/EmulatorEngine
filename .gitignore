@@ -1,8 +1,8 @@
-# Ignore build
+# Ignore built files
 build/
 
-# Ignore vscode config
-.vscode/
+# Ignore ROMs and stuff
+data/
 
-# Ignore DLLs
-*.dll
+# Ignore VSCode workflows
+.vscode/

@@ -1,14 +1,5 @@
-# Force the usage of the clang compiler
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
-
-# Build using ninja generator
-cmake -Bbuild -G Ninja
-
-# Make the files
+mkdir build
 cd build
-
+cmake .. -G "Ninja"
 ninja all
-
-# Run the resulting file
 ./EmuEngine
