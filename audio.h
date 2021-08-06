@@ -11,7 +11,7 @@ private:
     SDL_AudioSpec wanted;
 
     // If audio is paused
-    bool paused = false;
+    bool paused = true;
     
 public:
     // Constructor
