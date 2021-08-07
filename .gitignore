@@ -2,7 +2,9 @@
 build/
 
 # Ignore ROMs and stuff
-data/
+bytepusher/
+chip8/
+ps1/
 
 # Ignore VSCode workflows
 .vscode/

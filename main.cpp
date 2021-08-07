@@ -1,5 +1,6 @@
 #include "window.h"
 #include "state.h"
+#include "menus/main_menu.h"
 #include "emulators/chip8/chip8.h"
 #include "emulators/bytepusher/bytepusher.h"
 
@@ -17,14 +18,18 @@ int main()
     // Get window handler
     window = stateManager.getWindow();
 
-    // TODO: make an actual selection, for now uncomment the one you want to use and change ROM path by hand and recompile.
+    // Create menu state
+    State* menuState = new MenuState();
+
+    // Push the menu state
+    stateManager.pushState(menuState);
 
     /*CHIP8_EMU* state = new CHIP8_EMU();
-    state -> load("data/chip8/roms/PONG1");
+    state -> load("data/chip8/roms/MAZE");
     stateManager.pushState(state);*/
 
     /*BYTEPUSHER_EMU* state = new BYTEPUSHER_EMU();
-    state -> load("data/bytepusher/audio_test.bp");
+    state -> load("data/bytepusher/roms/audio_test.bp");
     stateManager.pushState(state);*/
 
     // Event and main loop

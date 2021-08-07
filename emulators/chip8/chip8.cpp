@@ -56,19 +56,15 @@ void CHIP8_EMU::init()
     // Create audio specs for this emu
     SDL_AudioSpec wanted;
     SDL_zero(wanted);
-    wanted.freq = 75000;
-    wanted.samples = 512;
+    wanted.freq = 45500;
+    wanted.samples = 256;
     wanted.format = AUDIO_S8;
     wanted.channels = 1;
     // Sine wave callback function
-    wanted.callback = [](void* userdata, Uint8* stream, int length)
+    wanted.callback = [](void* userdata, uint8_t* stream, int length)
     {
-        int8_t *waveData = new int8_t[length];
-
         for (int i = 0; i < length; i++)
-            waveData[i] = (int8_t)(127 * sin(i * M_PI * 2 * 604.1 / 75000));
-
-        memcpy(stream, waveData, length);
+            stream[i] = (uint8_t)(127 * sin(2.0 * M_PI * i * 604.1 / 45500));
     };
 
     // Prepare audio for usage

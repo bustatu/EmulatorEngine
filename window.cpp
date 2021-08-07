@@ -8,13 +8,18 @@ Window::Window()
         printf("\033[1;31m{E}: An error occured while initialising SDL! %s\n\033[0m", SDL_GetError());
         exit(0);
     }
+    if(TTF_Init() != 0)
+    {
+        printf("\033[1;31m{E}: An error occured while initialising SDL_ttf! %s\n\033[0m", SDL_GetError());
+        exit(0);
+    }
 
     // Create audio
     audio = new Audio();
 
     // Create window with default sizes and title
-    window = SDL_CreateWindow("<title>", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 256, 256, SDL_WINDOW_RESIZABLE);
-    size_x = size_y = 256;
+    window = SDL_CreateWindow("<title>", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 960, 540, SDL_WINDOW_RESIZABLE);
+    size_x = 960;   size_y = 540;
 
     if(window == NULL)
     {

@@ -581,7 +581,7 @@ void CHIP8_VM::update(double dt)
         }
 
         // Execution loop
-        while(execTimer >= 1.0 / frequency && state == 1)
+        while(execTimer >= 1.0 / frequency)
         {
             // Fetch and move forward
             opcode = (ram[PC] << 8) | ram[PC + 1];
