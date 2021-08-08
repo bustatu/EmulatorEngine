@@ -63,6 +63,7 @@ private:
     // Output
     uint16_t screen_w, screen_h;
     uint8_t* gfx;
+    bool draw_flag;
 
 public:
     // Constructor

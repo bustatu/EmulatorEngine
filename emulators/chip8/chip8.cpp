@@ -43,6 +43,10 @@ void CHIP8_EMU::update(double dt)
     // Toggle running state if escape has been pressed
     if(window -> getKeyPressed(SDLK_ESCAPE))
         is_running = !is_running;
+
+    // Debug mode display
+    if(window -> getKeyPressed(SDLK_F12))
+        debug = !debug;
 }
 
 void CHIP8_EMU::init()
@@ -68,6 +72,18 @@ void CHIP8_EMU::init()
 
     // Pause the sound, only gets resumed when the sound counter is positive
     window -> getAudio() -> pauseAudio();
+
+    // Load the debug font
+    debugFont.setPath("data/fonts/Alef.ttf");
+    debugFont.setSize(60);
+
+    // Load the debug text
+    for(int32_t i = 0; i <= 0xF; i++)
+    {
+        debugKeyText[i].setFont(&debugFont);
+        debugKeyText[i].setText(std::to_string(i));
+        debugKeyText[i].setRenderer(window -> getRenderer());
+    }
 }
 
 
@@ -93,28 +109,47 @@ void CHIP8_EMU::draw()
     // Do the drawing internally
     vm -> draw(output, window -> getRenderer());
 
-    // Update the screen output (correct the aspect ratio)
-    SDL_Rect* rect = new SDL_Rect();
-    rect -> h = window -> getSize().second;
-    rect -> w = rect -> h * 2;
-
-    if(window -> getSize().first >= rect -> w)
+    // If not in debug mode
+    if(!debug)
     {
-        rect -> x = (window -> getSize().first - rect -> w) / 2;
-        rect -> y = 0;
+        // Update the screen output (correct the aspect ratio)
+        SDL_Rect* rect = new SDL_Rect();
+        rect -> h = window -> getSize().second;
+        rect -> w = rect -> h * 2;
+
+        if(window -> getSize().first >= rect -> w)
+        {
+            rect -> x = (window -> getSize().first - rect -> w) / 2;
+            rect -> y = 0;
+        }
+        else {
+            rect -> w = window -> getSize().first;
+            rect -> h = rect -> w / 2;
+            rect -> y = (window -> getSize().second - rect -> h) / 2;
+            rect -> x = 0;
+        }
+
+        // Update the screen output
+        SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
+
+        // Delete the allocated rect
+        delete rect;
     }
-    else {
-        rect -> w = window -> getSize().first;
-        rect -> h = rect -> w / 2;
-        rect -> y = (window -> getSize().second - rect -> h) / 2;
+    else
+    {
+        // Draw the keys of the VM
+        drawVMKeys();
+
+        // Draw in the upper left corner
+        SDL_Rect* rect = new SDL_Rect();
+        rect -> h = window -> getSize().second / 2;
+        rect -> w = window -> getSize().first / 2;  
         rect -> x = 0;
+        rect -> y = 20;
+
+        // Update the screen output
+        SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
     }
-
-    // Update the screen output
-    SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
-
-    // Delete the allocated rect
-    delete rect;
 }
 
 void CHIP8_EMU::load(std::string path)
@@ -162,5 +197,50 @@ void CHIP8_EMU::load(std::string path)
 
         // Deallocate data from memory
         delete[] data;
+    }
+}
+
+void CHIP8_EMU::drawVMKeys()
+{
+    Window* window = stateM -> getWindow();
+
+    for(int32_t i = 0; i < 0x4; i++)
+    {
+        for(int32_t j = 0; j < 0x4; j++)
+        {
+            // Set position
+            SDL_Rect *rect = new SDL_Rect();
+            rect -> w = (window -> getSize().second / 2 - 40) / 4;
+            rect -> h = (window -> getSize().second / 2 - 40) / 4;
+            rect -> x = window -> getSize().first / 2 + j * rect -> w + (window -> getSize().first / 2 - 4 * rect -> w) / 2;
+            rect -> y = 20 + rect -> h * i;
+
+            if(vm -> get_key(debugKeyIndexes[i * 4 + j]))
+            {
+                SDL_SetRenderDrawColor(window -> getRenderer(), 0x00, 0xFF, 0x00, 0xFF);
+                SDL_RenderFillRect(window -> getRenderer(), rect);
+                debugKeyText[debugKeyIndexes[i * 4 + j]].setColor({0xFF, 0xFF, 0xFF});
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(window -> getRenderer(), 0xFF, 0xFF, 0xFF, 0xFF);
+                SDL_RenderDrawRect(window -> getRenderer(), rect);
+                debugKeyText[debugKeyIndexes[i * 4 + j]].setColor({0xFF, 0xFF, 0xFF});
+            }
+
+            // Calculate text rect
+            SDL_Rect *rect1 = new SDL_Rect();
+            rect1 -> w = debugKeyText[debugKeyIndexes[i * 4 + j]].getSize().first;
+            rect1 -> h = debugKeyText[debugKeyIndexes[i * 4 + j]].getSize().second;
+            rect1 -> x = rect -> x + (rect -> w - rect1 -> w) / 2;
+            rect1 -> y = rect -> y + (rect -> h - rect1 -> h) / 2;
+
+            // Draw text
+            SDL_RenderCopy(window -> getRenderer(), debugKeyText[debugKeyIndexes[i * 4 + j]].getTexture(), NULL, rect1);
+
+            // Delete the rects
+            delete rect;
+            delete rect1;
+        }
     }
 }

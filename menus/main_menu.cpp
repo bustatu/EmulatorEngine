@@ -4,7 +4,7 @@ void MenuState::init()
 {
     Window* window = stateM -> getWindow();
     menuFont.setPath("data/fonts/Alef.ttf");
-    menuFont.setSize(30);
+    menuFont.setSize(60);
 
     // Set emu text
     chooseEmu.setFont(&menuFont);
@@ -39,7 +39,7 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8_EMU* state = new CHIP8_EMU();
-            state -> load("data/chip8/roms/TETRIS");
+            state -> load("data/chip8/roms/KEYBOARD_TEST");
             stateM -> pushState(state);
         }
         else if(index == 2)
@@ -85,19 +85,19 @@ void MenuState::draw()
     SDL_Rect* rect = new SDL_Rect();
     rect -> x = 30;
     rect -> y = 30;
-    rect -> w = chooseEmu.getSize().first;
-    rect -> h = chooseEmu.getSize().second;
+    rect -> w = chooseEmu.getSize().first / 2;
+    rect -> h = chooseEmu.getSize().second / 2;
     SDL_RenderCopy(window -> getRenderer(), chooseEmu.getTexture(), NULL, rect);
 
     rect -> x = 60;
     rect -> y = 70;
-    rect -> w = chipText.getSize().first;
-    rect -> h = chipText.getSize().second;
+    rect -> w = chipText.getSize().first / 2;
+    rect -> h = chipText.getSize().second / 2;
     SDL_RenderCopy(window -> getRenderer(), chipText.getTexture(), NULL, rect);
 
     rect -> x = 60;
     rect -> y = 110;
-    rect -> w = bytepusherText.getSize().first;
-    rect -> h = bytepusherText.getSize().second;
+    rect -> w = bytepusherText.getSize().first / 2;
+    rect -> h = bytepusherText.getSize().second / 2;
     SDL_RenderCopy(window -> getRenderer(), bytepusherText.getTexture(), NULL, rect);
 }

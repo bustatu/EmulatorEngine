@@ -54,20 +54,24 @@ uint16_t CHIP8_VM::get_rom_start()
 
 void CHIP8_VM::draw(SDL_Texture* target, SDL_Renderer* tool)
 {
-    SDL_SetRenderTarget(tool, target);
-    for(uint32_t x = 0; x < screen_w; x++)
+    // Do the drawing only if the screen actually needs to be updated
+    if(draw_flag)
     {
-        for(uint32_t y = 0; y < screen_h; y++)
+        SDL_SetRenderTarget(tool, target);
+        for(uint32_t x = 0; x < screen_w; x++)
         {
-            if(gfx[y * screen_w + x])
-                SDL_SetRenderDrawColor(tool, frg.r, frg.g, frg.b, frg.a);
-            else
-                SDL_SetRenderDrawColor(tool, bkg.r, bkg.g, bkg.b, bkg.a);
+            for(uint32_t y = 0; y < screen_h; y++)
+            {
+                if(gfx[y * screen_w + x])
+                    SDL_SetRenderDrawColor(tool, frg.r, frg.g, frg.b, frg.a);
+                else
+                    SDL_SetRenderDrawColor(tool, bkg.r, bkg.g, bkg.b, bkg.a);
 
-            SDL_RenderDrawPoint(tool, x, y);
+                SDL_RenderDrawPoint(tool, x, y);
+            }
         }
+        SDL_SetRenderTarget(tool, NULL);
     }
-    SDL_SetRenderTarget(tool, NULL);
 }
 
 uint8_t CHIP8_VM::get_state()
@@ -140,6 +144,9 @@ void CHIP8_VM::boot()
 
     // Clear stack
     sp = 0;
+
+    // Do not update the screen
+    draw_flag = false;
     
     // Clear timers (0 - delay, 1 - sound)
     timers[0] = timers[1] = 0;
@@ -158,6 +165,9 @@ void CHIP8_VM::DRW(uint8_t va, uint8_t vb, uint8_t vc)
 
     //Set the F register to 0
     V[0xF] = 0;
+
+    // Set the draw flag
+    draw_flag = true;
 
     //Go trough the sprite lines
     for(int32_t yline = 0; yline < n; yline++)

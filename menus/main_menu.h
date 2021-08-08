@@ -3,8 +3,7 @@
 
 #include <SDL2/SDL_ttf.h>
 #include "../state.h"
-#include "../gui/font.h"
-#include "../gui/text.h"
+#include "../gui/gui.h"
 #include "../emulators/chip8/chip8.h"
 #include "../emulators/bytepusher/bytepusher.h"
 
