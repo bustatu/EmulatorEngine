@@ -49,10 +49,6 @@ void CHIP8_EMU::init()
 {
     Window* window = stateM -> getWindow();
 
-    // Resize the window to match the emu
-    // TODO: find a better way to do this
-    window -> resize(640, 320);
-
     // Create audio specs for this emu
     SDL_AudioSpec wanted;
     SDL_zero(wanted);

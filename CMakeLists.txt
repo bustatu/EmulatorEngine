@@ -20,6 +20,7 @@ endif()
 
 # Compile the main engine stuff
 add_subdirectory("./menus")
+add_subdirectory("./gui")
 add_executable(EmuEngine
     "main.cpp"
     "state.cpp"
@@ -27,6 +28,7 @@ add_executable(EmuEngine
     "audio.cpp"
 )
 target_link_libraries(EmuEngine Menus)
+target_link_libraries(EmuEngine GUI)
 
 # Link the currently implemented emulators
 if(EMU_CHIP8)

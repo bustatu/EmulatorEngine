@@ -3,12 +3,17 @@
 
 #include <SDL2/SDL_ttf.h>
 #include "../state.h"
+#include "../gui/font.h"
+#include "../gui/text.h"
+#include "../emulators/chip8/chip8.h"
+#include "../emulators/bytepusher/bytepusher.h"
 
 class MenuState : public State
 {
 private:
-    TTF_Font* menuFont = nullptr;
-    SDL_Texture* message;
+    Font menuFont;
+    Text chooseEmu, chipText, bytepusherText;
+    int32_t index = 0;
 public:
     // Init the menu
     virtual void init();

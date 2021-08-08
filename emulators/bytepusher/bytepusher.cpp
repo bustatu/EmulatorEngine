@@ -53,10 +53,6 @@ void BYTEPUSHER_EMU::init()
 {
     Window* window = stateM -> getWindow();
 
-    // Resize the window to match the emu
-    // TODO: find a better way to do this
-    window -> resize(512, 512);
-
     // Create audio specs for this emu
     SDL_AudioSpec wanted;
     SDL_zero(wanted);
