@@ -24,14 +24,6 @@ int main()
     // Push the menu state
     stateManager.pushState(menuState);
 
-    /*CHIP8_EMU* state = new CHIP8_EMU();
-    state -> load("data/chip8/roms/MAZE");
-    stateManager.pushState(state);*/
-
-    /*BYTEPUSHER_EMU* state = new BYTEPUSHER_EMU();
-    state -> load("data/bytepusher/roms/audio_test.bp");
-    stateManager.pushState(state);*/
-
     // Event and main loop
     SDL_Event event;
     while(stateManager.isRunning())
