@@ -1,8 +1,6 @@
 #include "window.h"
 #include "state.h"
 #include "menus/main_menu.h"
-#include "emulators/chip8/chip8.h"
-#include "emulators/bytepusher/bytepusher.h"
 
 // State manager
 StateManager stateManager;

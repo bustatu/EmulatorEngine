@@ -4,14 +4,13 @@
 #include <SDL2/SDL_ttf.h>
 #include "../state.h"
 #include "../gui/gui.h"
-#include "../emulators/chip8/chip8.h"
-#include "../emulators/bytepusher/bytepusher.h"
+#include "../emulators/emulators.h"
 
 class MenuState : public State
 {
 private:
     Font menuFont;
-    Text chooseEmu, chipText, bytepusherText;
+    Text textArray[4];
     int32_t index = 0;
 public:
     // Init the menu

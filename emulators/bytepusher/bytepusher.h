@@ -19,19 +19,19 @@ public:
     void load(std::string path);
 
     // Init the emulator on new state
-    virtual void init();
+    void init();
 
     // Resume the emulator
-    virtual void resume();
+    void resume();
 
     // Stop the emulator
-    virtual void pause();
+    void pause();
 
     // Main update function
-    virtual void update(double dt);
+    void update(double dt);
 
     // Main draw function
-    virtual void draw();
+    void draw();
 };
 
 #endif

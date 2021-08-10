@@ -6,12 +6,17 @@ project(EmuEngine)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
 
 # Enable currently implemented emulators
+set(EMU_GAMEBOY true)
 set(EMU_CHIP8 true)
 set(EMU_BYTEPUSHER true)
 
 # Compile the currently implemented emulators
 if(EMU_BYTEPUSHER)
     add_subdirectory("./emulators/bytepusher")
+endif()
+
+if(EMU_GAMEBOY)
+    add_subdirectory("./emulators/gameboy")
 endif()
 
 if(EMU_CHIP8)
@@ -33,6 +38,10 @@ target_link_libraries(EmuEngine GUI)
 # Link the currently implemented emulators
 if(EMU_CHIP8)
     target_link_libraries(EmuEngine CHIP8)
+endif()
+
+if(EMU_GAMEBOY)
+    target_link_libraries(EmuEngine Gameboy)
 endif()
 
 if(EMU_BYTEPUSHER)

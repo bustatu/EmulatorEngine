@@ -1,7 +1,7 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include "font.h"
-#include "text.h"
+#include "text/font.h"
+#include "text/text.h"
 
 #endif
