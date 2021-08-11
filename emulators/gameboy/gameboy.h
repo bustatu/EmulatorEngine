@@ -11,6 +11,7 @@ private:
     Gameboy_Bus* bus = nullptr;
     Gameboy_CPU* cpu = nullptr;
     Gameboy_BIOS* bios = nullptr;
+    Gameboy_RAM* ram = nullptr;
 
 public:
     // Load the BIOS

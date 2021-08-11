@@ -1,7 +1,8 @@
 add_library(Gameboy
     "gameboy.cpp"
-    "components/cpu/cpu.cpp"
     "components/bus/bus.cpp"
+    "components/cpu/cpu.cpp"
+    "components/ram/ram.cpp"
     "components/rom/bios.cpp"
 )
 

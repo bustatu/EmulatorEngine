@@ -18,6 +18,12 @@ public:
 
     // Load BIOS from the location
     void load(std::string path);
+
+    // Reads a byte from the specified offset
+    uint8_t readByte(uint16_t addr);
+
+    // Read a word from the specified offset
+    uint16_t readWord(uint16_t addr);
 };
 
 #endif

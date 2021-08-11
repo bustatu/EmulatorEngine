@@ -6,6 +6,16 @@ Gameboy_BIOS::Gameboy_BIOS()
     data = new uint8_t[0x100];
 }
 
+uint16_t Gameboy_BIOS::readWord(uint16_t addr)
+{
+    return (data[addr + 1] << 8) | data[addr];
+}
+
+uint8_t Gameboy_BIOS::readByte(uint16_t addr)
+{
+    return data[addr];
+}
+
 void Gameboy_BIOS::load(std::string path)
 {
     // Open file for reading
