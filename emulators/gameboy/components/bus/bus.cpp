@@ -10,6 +10,11 @@ void Gameboy_Bus::attachRAM(Gameboy_RAM* newRAM)
     ram = newRAM;
 }
 
+void Gameboy_Bus::attachGPU(Gameboy_GPU* newGPU)
+{
+    gpu = newGPU;
+}
+
 void Gameboy_Bus::attachROM(Gameboy_ROM* newROM)
 {
     rom = newROM;
@@ -30,7 +35,11 @@ uint8_t Gameboy_Bus::readByte(uint16_t addr)
     }
     else
     {
-        return ram -> readByte(addr);
+        // RAM and GPU area
+        if(addr <= 0x9FFF && addr >= 0x8000)
+            return gpu -> readByte(addr - 0x8000);
+        else           
+            return ram -> readByte(addr);
     }
 
     // Not implemented
@@ -64,7 +73,12 @@ uint16_t Gameboy_Bus::readWord(uint16_t addr)
 void Gameboy_Bus::writeByte(uint16_t addr, uint8_t val)
 {
     if(addr > 0x7FFF)
-        ram -> writeByte(addr, val);
+    {
+        if(addr <= 0x9FFF && addr >= 0x8000)
+            gpu -> writeByte(addr - 0x8000, val);
+        else
+            ram -> writeByte(addr, val);
+    }
     else
         printf("\033[1;31m{E}: Unimplemented writeByte at address %04X, value %04X \033[0m\n", addr, val);
 }

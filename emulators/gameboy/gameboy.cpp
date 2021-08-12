@@ -13,11 +13,14 @@ void GAMEBOY_EMU::init()
         ram = new Gameboy_RAM();
     if(rom == nullptr)
         rom = new Gameboy_ROM();
+    if(gpu == nullptr)
+        gpu = new Gameboy_GPU();
 
     // Attach the components to their place
     bus -> attachBIOS(bios);
     bus -> attachRAM(ram);
     bus -> attachROM(rom);
+    bus -> attachGPU(gpu);
     cpu -> attachBus(bus);
 }
 

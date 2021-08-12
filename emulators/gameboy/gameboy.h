@@ -12,6 +12,7 @@ private:
     Gameboy_CPU* cpu = nullptr;
     Gameboy_BIOS* bios = nullptr;
     Gameboy_RAM* ram = nullptr;
+    Gameboy_GPU* gpu = nullptr;
     Gameboy_ROM* rom = nullptr;
 
 public:
