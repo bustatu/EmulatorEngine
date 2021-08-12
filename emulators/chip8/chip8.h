@@ -4,6 +4,7 @@
 #include "../../state.h"
 #include "../../gui/gui.h"
 #include "components/vm.h"
+#include "components/input.h"
 #include <fstream>
 
 namespace CHIP8

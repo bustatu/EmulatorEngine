@@ -15,20 +15,13 @@ namespace CHIP8
         ram = new uint8_t[ram_size];
         V = new uint8_t[0x10];
         stack = new uint16_t[stack_size];
-        key = new uint8_t[0x10];
         user_flags = new uint8_t[0x10];
 
-        // Create output
-        screen_w = 64;
-        screen_h = 32;
-        gfx = new uint8_t[64 * 32];
+        // Set the default screen size
+        graphics.resize(64, 32);
 
         // Reset timers
         deltaTimer = execTimer = 0;
-
-        // Set default colors
-        frg.r = 0x88, frg.g = 0x88, frg.b = 0x88, frg.a = 0xFF;
-        bkg.r = 0x10, bkg.g = 0x10, bkg.b = 0x10, bkg.a = 0xFF;
 
         // Stopped
         state = 0;
@@ -39,7 +32,7 @@ namespace CHIP8
 
     std::pair<int, int> VM::getSize()
     {
-        return std::make_pair(screen_w, screen_h);
+        return graphics.getSize();
     }
 
     VM::~VM()
@@ -54,26 +47,9 @@ namespace CHIP8
         return rom_start;
     }
 
-    void VM::draw(SDL_Texture* target, SDL_Renderer* tool)
+    void VM::draw(SDL_Texture* &target, SDL_Renderer* tool)
     {
-        // Do the drawing only if the screen actually needs to be updated
-        if(draw_flag)
-        {
-            SDL_SetRenderTarget(tool, target);
-            for(uint32_t x = 0; x < screen_w; x++)
-            {
-                for(uint32_t y = 0; y < screen_h; y++)
-                {
-                    if(gfx[y * screen_w + x])
-                        SDL_SetRenderDrawColor(tool, frg.r, frg.g, frg.b, frg.a);
-                    else
-                        SDL_SetRenderDrawColor(tool, bkg.r, bkg.g, bkg.b, bkg.a);
-
-                    SDL_RenderDrawPoint(tool, x, y);
-                }
-            }
-            SDL_SetRenderTarget(tool, NULL);
-        }
+        graphics.draw(target, tool);
     }
 
     uint8_t VM::get_state()
@@ -100,25 +76,15 @@ namespace CHIP8
         I = what;
     }
 
-    uint8_t VM::get_key(uint8_t who)
-    {
-        return key[who];
-    }
-
-    void VM::set_key(uint8_t who, uint8_t what)
-    {
-        key[who] = what;
-    }
-
     void VM::boot()
     {
         // Clear everything
-        memset(gfx, 0, screen_h * screen_w);
         memset(stack, 0, stack_size);
         memset(ram, 0, ram_size);
-        memset(key, 0, 0x10);
         memset(V, 0, 0x10);
         memset(user_flags, 0, 0x10);
+        input.resetKeys();
+        graphics.clear();
 
         // Load font
         uint8_t font[] = {
@@ -141,14 +107,26 @@ namespace CHIP8
         };
         memcpy(ram, font, 5 * 16);
 
+        // Load high-res font
+        uint8_t highFont[] = {
+            0xff, 0xff, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0xff, // 0
+            0x0c, 0x0c, 0x3c, 0x3c, 0x0c, 0x0c, 0x0c, 0x0c, 0x3f, 0x3f, // 1
+            0xff, 0xff, 0x03, 0x03, 0xff, 0xff, 0xc0, 0xc0, 0xff, 0xff, // 2
+            0xff, 0xff, 0x03, 0x03, 0xff, 0xff, 0x03, 0x03, 0xff, 0xff, // 3
+            0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0xff, 0x03, 0x03, 0x03, 0x03, // 4
+            0xff, 0xff, 0xc0, 0xc0, 0xff, 0xff, 0x03, 0x03, 0xff, 0xff, // 5
+            0xff, 0xff, 0xc0, 0xc0, 0xff, 0xff, 0xc3, 0xc3, 0xff, 0xff, // 6
+            0xff, 0xff, 0x03, 0x03, 0x0c, 0x0c, 0x30, 0x30, 0x30, 0x30, // 7
+            0xff, 0xff, 0xc3, 0xc3, 0xff, 0xff, 0xc3, 0xc3, 0xff, 0xff, // 8
+            0xff, 0xff, 0xc3, 0xc3, 0xff, 0xff, 0x03, 0x03, 0xff, 0xff  // 9
+        };
+        memcpy(ram + 5 * 16, highFont, 10 * 10);
+
         // Set PC to the start of the ROM
         PC = rom_start;
 
         // Clear stack
         sp = 0;
-
-        // Do not update the screen
-        draw_flag = false;
         
         // Clear timers (0 - delay, 1 - sound)
         timers[0] = timers[1] = 0;
@@ -164,34 +142,28 @@ namespace CHIP8
         uint8_t y = V[N0(opcode)];
         uint8_t n = N(opcode);
         uint8_t pixel;
+        std::pair<uint8_t, uint8_t> size = graphics.getSize();
 
         //Set the F register to 0
         V[0xF] = 0;
 
-        // Set the draw flag
-        draw_flag = true;
-
-        //Go trough the sprite lines
-        for(int32_t yline = 0; yline < n; yline++)
+        //Go trough the sprite lines, n if n is not 0 or 16 else
+        for(int32_t yline = 0; yline < (n != 0) * n + (n == 0) * 16; yline++)
         {
             //Read pixel from memory
             pixel = ram[I + yline];
 
             //Go trough the sprite columns
-            for(int32_t xline = 0; xline < 8; xline++)
+            for(int32_t xline = 0; xline < (n != 0) * 8 + (n == 0) * 16; xline++)
             {
                 //If the pixel needs to be set
                 if((pixel & (0x80 >> xline)) != 0)
                 {
                     // Position in the array
-                    int32_t pos = (x + xline + ((y + yline) * screen_w)) % (screen_w * screen_h);
+                    int32_t pos = (x + xline + ((y + yline) * size.first)) % (size.first * size.second);
 
-                    //If the pixel was already set, set VF to 1
-                    if(gfx[pos] == 1)
-                        V[0xF] = 1;
-
-                    //XOR the pixel
-                    gfx[pos] ^= 1;
+                    // Update the pixel and update V[0xF] if necessary
+                    V[0xF] = graphics.xorPixel(pos) ? 1 : V[0xF];
                 }
             }
         }
@@ -215,10 +187,13 @@ namespace CHIP8
                 switch(NN(opcode))
                 {
                     case 0xE0:
-                        memset(gfx, 0, screen_h * screen_w);
+                        graphics.clear();
                         break;
                     case 0xEE:
                         PC = stack[sp--];
+                        break;
+                    case 0xFF:
+                        graphics.resize(128, 64);
                         break;
                     default:
                         unknown(opcode);
@@ -325,11 +300,11 @@ namespace CHIP8
                 switch(NN(opcode))
                 {
                     case 0x9E:
-                        if(get_key(V[N00(opcode)]) == true)
+                        if(input.getKey(V[N00(opcode)]))
                             PC += 2;
                         break;
                     case 0xA1:
-                        if(get_key(V[N00(opcode)]) != true)
+                        if(!input.getKey(V[N00(opcode)]))
                             PC += 2;
                         break;
                     default:
@@ -344,11 +319,9 @@ namespace CHIP8
                         V[N00(opcode)] = get_timer(0);
                         break;
                     case 0x0A:
-                        key_found = false;
-                        for(uint32_t i = 0; i <= 0xF && !key_found; i++)
-                            if(key[i])  V[N00(opcode)] = i, key_found = true;
-
-                        PC -= 2 * (!key_found);
+                        if(input.getKeyCounter() != 0)
+                            V[N00(opcode)] = input.getLastPressed();
+                        PC -= 2 * (input.getKeyCounter() == 0);
                         break;
                     case 0x15:
                         set_timer(0, V[N00(opcode)]);
@@ -362,6 +335,9 @@ namespace CHIP8
                         break;
                     case 0x29:
                         I = 5 * V[N00(opcode)];
+                        break;
+                    case 0x30:
+                        I = 5 * 16 + 10 * V[N00(opcode)];
                         break;
                     case 0x33:
                         ram[I] = (V[N00(opcode)] / 100) % 10;
@@ -533,7 +509,7 @@ namespace CHIP8
                         result << "LD F, V" << N00(opcode);
                         break;
                     case 0x30:
-                        result << "LD F(S-8), V" << N00(opcode);
+                        result << "LD HF, V" << N00(opcode);
                         break;
                     case 0x33:
                         result << "LD B, V" << N00(opcode);
@@ -567,7 +543,7 @@ namespace CHIP8
     {
         // Update keys
         for(uint32_t i = 0; i < 0x10; i++)
-            key[i] = win -> getKey(keys[i]);
+            input.setKey(i, win -> getKey(input.getMappedKey(i)));
     }
 
     void VM::update(double dt)

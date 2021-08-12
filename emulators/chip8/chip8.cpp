@@ -88,34 +88,35 @@ namespace CHIP8
     {
         Window* window = stateM -> getWindow();
 
-        if(output == nullptr)
-            output = SDL_CreateTexture(window -> getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, vm -> getSize().first, vm -> getSize().second);
-
         // Do the drawing internally
         vm -> draw(output, window -> getRenderer());
 
-        // Update the screen output (correct the aspect ratio)
-        SDL_Rect* rect = new SDL_Rect();
-        rect -> h = window -> getSize().second;
-        rect -> w = rect -> h * 2;
-
-        if(window -> getSize().first >= rect -> w)
+        // Update only if the output exists
+        if(output != nullptr)
         {
-            rect -> x = (window -> getSize().first - rect -> w) / 2;
-            rect -> y = 0;
-        }
-        else {
-            rect -> w = window -> getSize().first;
-            rect -> h = rect -> w / 2;
-            rect -> y = (window -> getSize().second - rect -> h) / 2;
-            rect -> x = 0;
-        }
+            // Update the screen output (correct the aspect ratio)
+            SDL_Rect* rect = new SDL_Rect();
+            rect -> h = window -> getSize().second;
+            rect -> w = rect -> h * 2;
 
-        // Update the screen output
-        SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
+            if(window -> getSize().first >= rect -> w)
+            {
+                rect -> x = (window -> getSize().first - rect -> w) / 2;
+                rect -> y = 0;
+            }
+            else {
+                rect -> w = window -> getSize().first;
+                rect -> h = rect -> w / 2;
+                rect -> y = (window -> getSize().second - rect -> h) / 2;
+                rect -> x = 0;
+            }
 
-        // Delete the allocated rect
-        delete rect;
+            // Update the screen output
+            SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
+
+            // Delete the allocated rect
+            delete rect;
+        }
     }
 
     void Emu::load(std::string path)

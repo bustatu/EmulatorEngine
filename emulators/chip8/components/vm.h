@@ -2,6 +2,8 @@
 #define CHIP8_VM_H
 
 #include "../../../window.h"
+#include "input.h"
+#include "graphics.h"
 #include <SDL2/SDL.h>
 #include <cstring>
 #include <sstream>
@@ -12,6 +14,12 @@ namespace CHIP8
     class VM
     {
     private:
+        // Input handler
+        Input input;
+
+        // Graphics handler
+        Graphics graphics;
+
         // 4096 bytes of storage
         uint16_t ram_size = 0x1000;
         
@@ -46,26 +54,8 @@ namespace CHIP8
         void DRW(uint8_t va, uint8_t vb, uint8_t vc);
         void unknown(uint16_t opcode);
 
-        // Keys' status
-        SDL_Keycode keys[0x10] = {
-            SDLK_x, SDLK_1, SDLK_2, SDLK_3,
-            SDLK_q, SDLK_w, SDLK_e, SDLK_a,
-            SDLK_s, SDLK_d, SDLK_z, SDLK_c,
-            SDLK_4, SDLK_r, SDLK_f, SDLK_v
-        };
-        uint8_t* key;
-        bool key_found;
-
         // User flags
         uint8_t* user_flags;
-
-        // Background and foreground colors
-        SDL_Color bkg, frg;
-
-        // Output
-        uint16_t screen_w, screen_h;
-        uint8_t* gfx;
-        bool draw_flag;
 
     public:
         // Constructor
@@ -85,9 +75,6 @@ namespace CHIP8
 
         // Gets current ROM start location
         uint16_t get_rom_start();
-
-        // Gets status of a key
-        uint8_t get_key(uint8_t who);
 
         // Sets status of a key
         void set_key(uint8_t who, uint8_t what);
@@ -123,7 +110,7 @@ namespace CHIP8
         void updateKeys(Window* win);
 
         // Draws to a texture using a renderer
-        void draw(SDL_Texture* target, SDL_Renderer* tool);
+        void draw(SDL_Texture* &target, SDL_Renderer* tool);
 
         // Disassemblies one opcode
         std::string disassembly(uint16_t opcode);
