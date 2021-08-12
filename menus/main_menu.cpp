@@ -42,7 +42,7 @@ void MenuState::update(double dt)
     {
         if(index == 1)
         {
-            CHIP8_EMU* state = new CHIP8_EMU();
+            CHIP8::Emu* state = new CHIP8::Emu();
             state -> load("data/chip8/roms/TETRIS");
             stateM -> pushState(state);
         }

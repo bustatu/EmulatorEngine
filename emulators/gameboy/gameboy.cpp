@@ -15,6 +15,7 @@ void GAMEBOY_EMU::init()
         rom = new Gameboy_ROM();
     if(gpu == nullptr)
         gpu = new Gameboy_GPU();
+    output = SDL_CreateTexture(stateM -> getWindow() -> getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 160, 144);
 
     // Attach the components to their place
     bus -> attachBIOS(bios);
@@ -50,5 +51,7 @@ void GAMEBOY_EMU::update(double dt)
 
 void GAMEBOY_EMU::draw()
 {
-
+    Window* window = stateM -> getWindow();
+    gpu -> draw(output, window -> getRenderer());
+    SDL_RenderCopy(window -> getRenderer(), output, NULL, NULL);
 }

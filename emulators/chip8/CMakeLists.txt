@@ -1,5 +1,6 @@
 add_library(CHIP8
     "chip8.cpp"
+    "components/input.cpp"
     "components/vm.cpp"
 )
 

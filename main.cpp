@@ -13,7 +13,7 @@ int main()
     // Initialise everything
     stateManager.init();
 
-    // Get window handler
+    // Get window handler for easier usage
     window = stateManager.getWindow();
 
     // Create menu state

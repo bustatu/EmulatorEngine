@@ -11,6 +11,25 @@ uint8_t Gameboy_GPU::readByte(uint16_t addr)
     return vram[addr];
 }
 
+void Gameboy_GPU::draw(SDL_Texture* output, SDL_Renderer* tool)
+{
+    SDL_SetRenderTarget(tool, output);
+
+    for(int i = 0; i < 8; i++)
+    {
+        for(int j = 0; j < 8; j++)
+        {
+            for(int k = 0; k < 8; k++)
+            {
+                SDL_SetRenderDrawColor(tool, 0x55 * tile[i][j][k], 0x55 * tile[i][j][k], 0x55 * tile[i][j][k], 0xFF);
+                SDL_RenderDrawPoint(tool, j * 8, i * 8 + k);
+            }
+        }
+    }
+
+    SDL_SetRenderTarget(tool, NULL);
+}
+
 void Gameboy_GPU::writeByte(uint16_t addr, uint8_t val)
 {
     // Normal write

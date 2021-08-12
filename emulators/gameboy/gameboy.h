@@ -15,6 +15,9 @@ private:
     Gameboy_GPU* gpu = nullptr;
     Gameboy_ROM* rom = nullptr;
 
+    // Output texture
+    SDL_Texture* output;
+
 public:
     // Load the BIOS
     void loadBIOS(std::string path);

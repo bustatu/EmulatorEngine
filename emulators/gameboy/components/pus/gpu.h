@@ -1,6 +1,7 @@
 #ifndef GAMEBOY_GPU_H
 #define GAMEBOY_GPU_H
 
+#include <SDL2/SDL.h>
 #include <iostream>
 
 class Gameboy_GPU
@@ -14,6 +15,9 @@ private:
 public:
     // Constructor
     Gameboy_GPU();
+
+    // Draw whatever it's in the tiles RAM
+    void draw(SDL_Texture* output, SDL_Renderer* tool);
 
     // Reads a byte from the VRAM
     uint8_t readByte(uint16_t addr);
