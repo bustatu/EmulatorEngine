@@ -4,6 +4,7 @@
 #include "cpu/cpu.h"
 #include "bus/bus.h"
 #include "ram/ram.h"
+#include "rom/rom.h"
 #include "rom/bios.h"
 
 #endif

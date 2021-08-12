@@ -32,7 +32,7 @@ private:
 
     // Sets a flag to a value (7 - zero, 6 - sub, 5 - half carry, 4 - carry)
     void set_flag(uint8_t who, uint8_t what);
-    // Sets a flag to a value (7 - zero, 6 - sub, 5 - half carry, 4 - carry)
+    // Gets the value of a flag (7 - zero, 6 - sub, 5 - half carry, 4 - carry)
     uint8_t get_flag(uint8_t who);
 
 public:

@@ -2,9 +2,10 @@
 build/
 
 # Ignore ROMs and stuff
-bytepusher/
-chip8/
-ps1/
+data/bytepusher/
+data/chip8/
+data/gameboy/
+data/ps1/
 
 # Ignore VSCode workflows
 .vscode/

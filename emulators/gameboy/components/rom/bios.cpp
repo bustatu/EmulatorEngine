@@ -22,7 +22,7 @@ void Gameboy_BIOS::load(std::string path)
     std::ifstream file(path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 
     // Write info
-    printf("{I}: Gameboy BIOS %s is being loaded...\n", path.c_str());
+    printf("{I}: Gameboy ROM %s is being loaded...\n", path.c_str());
 
     // Get file size
     file.seekg(0, std::ios::end);
@@ -44,7 +44,7 @@ void Gameboy_BIOS::load(std::string path)
         // Read the BIOS
         file.read(reinterpret_cast<char*>(data), fileSize);
 
-        printf("{I}: BIOS with size %d loaded successfully!\n", fileSize);
+        printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
         loaded = true;
     }
 }

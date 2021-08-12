@@ -12,10 +12,14 @@ private:
     Gameboy_CPU* cpu = nullptr;
     Gameboy_BIOS* bios = nullptr;
     Gameboy_RAM* ram = nullptr;
+    Gameboy_ROM* rom = nullptr;
 
 public:
     // Load the BIOS
     void loadBIOS(std::string path);
+
+    // Load the ROM
+    void loadROM(std::string path);
 
     // Init the emulator on new state
     void init();
