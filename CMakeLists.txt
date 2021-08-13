@@ -25,7 +25,7 @@ target_link_libraries(EmuEngine GUI)
 # Link the currently implemented emulators
 target_link_libraries(EmuEngine CHIP8)
 target_link_libraries(EmuEngine Gameboy)
-target_link_libraries(EmuEngine BytePusher)
+target_link_libraries(EmuEngine Bytepusher)
 
 # Link SDL2 stuff
 find_package(SDL2 REQUIRED)

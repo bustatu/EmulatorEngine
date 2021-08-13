@@ -13,7 +13,7 @@ namespace CHIP8
     {
         private:
             // VM handling
-            CHIP8::VM* vm = nullptr;
+            VM* vm = nullptr;
 
             // Texture which is going to be drawn to the screen
             SDL_Texture* output = nullptr;

@@ -124,7 +124,7 @@ namespace CHIP8
         // Create new VM
         if(vm != nullptr)
             delete vm;
-        vm = new CHIP8::VM();
+        vm = new VM();
 
         // Start VM
         vm -> boot();

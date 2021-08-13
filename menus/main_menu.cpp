@@ -45,12 +45,12 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
-            state -> load("data/chip8/roms/WIPEOFF");
+            state -> load("data/chip8/roms/DIVISION_TEST");
             stateM -> pushState(state);
         }
         else if(index == 2)
         {
-            BYTEPUSHER_EMU* state = new BYTEPUSHER_EMU();
+            Bytepusher::Emu* state = new Bytepusher::Emu();
             state -> load("data/bytepusher/roms/audio_test.bp");
             stateM -> pushState(state);
         }
