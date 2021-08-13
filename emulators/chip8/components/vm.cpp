@@ -138,29 +138,37 @@ namespace CHIP8
     // Draws sprite at position (va, vb) that has the height of vc
     void VM::DRW(uint8_t va, uint8_t vb, uint8_t vc)
     {
-        uint8_t x = V[N00(opcode)];
-        uint8_t y = V[N0(opcode)];
-        uint8_t n = N(opcode);
-        uint8_t pixel;
+        uint16_t pixel;
+        uint8_t offset = 1;
         std::pair<uint8_t, uint8_t> size = graphics.getSize();
+
+        // 0 height means 16 height
+        if(vc == 0)
+        {
+            vc = 16;
+        
+            // If in SCHIP8, sprites are double the normal size
+            if(graphics.getState() == 1)
+                offset = 2;
+        }
 
         //Set the F register to 0
         V[0xF] = 0;
 
-        //Go trough the sprite lines, n if n is not 0 or 16 else
-        for(int32_t yline = 0; yline < (n != 0) * n + (n == 0) * 16; yline++)
+        //Go trough the sprite lines
+        for(int32_t yline = 0; yline < vc; yline++)
         {
             //Read pixel from memory
-            pixel = ram[I + yline];
+            pixel = (ram[I + offset * yline] << 8) | ram[I + offset * yline + 1];
 
             //Go trough the sprite columns
-            for(int32_t xline = 0; xline < (n != 0) * 8 + (n == 0) * 16; xline++)
+            for(int32_t xline = 0; xline < 8 * offset; xline++)
             {
                 //If the pixel needs to be set
-                if((pixel & (0x80 >> xline)) != 0)
+                if((pixel & ((1 << 15) >> xline)) != 0)
                 {
                     // Position in the array
-                    int32_t pos = (x + xline + ((y + yline) * size.first)) % (size.first * size.second);
+                    int32_t pos = (va + xline + ((vb + yline) * size.first)) % (size.first * size.second);
 
                     // Update the pixel and update V[0xF] if necessary
                     V[0xF] = graphics.xorPixel(pos) ? 1 : V[0xF];
@@ -194,6 +202,7 @@ namespace CHIP8
                         break;
                     case 0xFF:
                         graphics.resize(128, 64);
+                        graphics.setState(1);
                         break;
                     default:
                         unknown(opcode);
@@ -294,7 +303,7 @@ namespace CHIP8
                 V[N00(opcode)] = rand() & NN(opcode);
                 break;
             case 0xD:
-                DRW(N00(opcode), N0(opcode), N(opcode));
+                DRW(V[N00(opcode)], V[N0(opcode)], N(opcode));
                 break;
             case 0xE:
                 switch(NN(opcode))

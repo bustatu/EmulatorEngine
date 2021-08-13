@@ -43,7 +43,7 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
-            state -> load("data/chip8/roms/DVN8");
+            state -> load("data/chip8/roms/WIPEOFF");
             stateM -> pushState(state);
         }
         else if(index == 2)

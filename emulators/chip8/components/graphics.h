@@ -21,6 +21,9 @@ namespace CHIP8
         // Resize flag
         bool resize_flag = false;
 
+        // State flag
+        uint8_t state = 0;
+
         // Display colors
         SDL_Color foreground = {0x88, 0x88, 0x88, 0xFF}, background = {0x10, 0x10, 0x10, 0xFF};
 
@@ -30,6 +33,12 @@ namespace CHIP8
 
         // Clear the display
         void clear();
+
+        // Sets the display state (0 - normal, 1 - SCHIP)
+        void setState(uint8_t newState);
+
+        // Gets display state
+        uint8_t getState();
 
         // Get the size of the display
         std::pair<uint8_t, uint8_t> getSize();

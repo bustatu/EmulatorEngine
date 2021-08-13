@@ -34,7 +34,7 @@ namespace CHIP8
         uint16_t stack_size = 16, sp;
 
         // Clock execution timings and speeds
-        uint32_t frequency = 400; // in instructions per second
+        uint32_t frequency = 420; // in instructions per second
         double execTimer, deltaTimer;
 
         // Timers

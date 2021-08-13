@@ -48,6 +48,18 @@ namespace CHIP8
         memset(gfx, 0, screen_w * screen_h);
     }
 
+    void Graphics::setState(uint8_t newState)
+    {
+        // Update the state
+        state = newState;
+    }
+
+    uint8_t Graphics::getState()
+    {
+        // Return the GFX state
+        return state;
+    }
+
     void Graphics::draw(SDL_Texture *&target, SDL_Renderer* tool)
     {
         // If the resize flag has been set, resize the output texture
