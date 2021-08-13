@@ -1,19 +1,23 @@
-#ifndef GAMEBOY_ROM_H
-#define GAMEBOY_ROM_H
+#ifndef GAMEBOY_BIOS_H
+#define GAMEBOY_BIOS_H
 
 #include <fstream>
 
-// TODO: IMPLEMENT MORE MBCs
-
 namespace Gameboy
 {
-    class ROM
+    class BIOS
     {
     private:
-        // ROM data
+        // BIOS data
         uint8_t* data;
 
+        // Flag if the BIOS has been loaded
+        bool loaded = false;
+
     public:
+        // Constructor
+        BIOS();
+
         // Load BIOS from the location
         void load(std::string path);
 

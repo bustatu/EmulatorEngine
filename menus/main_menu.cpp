@@ -26,12 +26,14 @@ void MenuState::init()
 
 void MenuState::resume()
 {
-    
+    // Resume
+    is_running = true;
 }
 
 void MenuState::pause()
 {
-    
+    // Pause
+    is_running = false;
 }
 
 void MenuState::update(double dt)
@@ -54,7 +56,7 @@ void MenuState::update(double dt)
         }
         else if(index == 3)
         {
-            GAMEBOY_EMU* state = new GAMEBOY_EMU();
+            Gameboy::Emu* state = new Gameboy::Emu();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
             stateM -> pushState(state);
         }

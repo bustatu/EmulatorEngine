@@ -4,41 +4,45 @@
 #include "../../state.h"
 #include "components/components.h"
 
-class GAMEBOY_EMU : public State
+namespace Gameboy
 {
-private:
-    // Emulator components
-    Gameboy_Bus* bus = nullptr;
-    Gameboy_CPU* cpu = nullptr;
-    Gameboy_BIOS* bios = nullptr;
-    Gameboy_RAM* ram = nullptr;
-    Gameboy_GPU* gpu = nullptr;
-    Gameboy_ROM* rom = nullptr;
+    class Emu : public State
+    {
+    private:
+        // Emulator components
+        Bus* bus = nullptr;
+        CPU* cpu = nullptr;
+        BIOS* bios = nullptr;
+        RAM* ram = nullptr;
+        GPU* gpu = nullptr;
+        ROM* rom = nullptr;
 
-    // Output texture
-    SDL_Texture* output;
+        // Output texture
+        SDL_Texture* output;
 
-public:
-    // Load the BIOS
-    void loadBIOS(std::string path);
+    public:
+        // Load the BIOS
+        void loadBIOS(std::string path);
 
-    // Load the ROM
-    void loadROM(std::string path);
+        // Load the ROM
+        void loadROM(std::string path);
 
-    // Init the emulator on new state
-    void init();
+        // Init the emulator on new state
+        void init();
 
-    // Resume the emulator
-    void resume();
+        // Resume the emulator
+        void resume();
 
-    // Stop the emulator
-    void pause();
+        // Stop the emulator
+        void pause();
 
-    // Main update function
-    void update(double dt);
+        // Main update function
+        void update(double dt);
 
-    // Main draw function
-    void draw();
-};
+        // Main draw function
+        void draw();
+    };
+}
+
 
 #endif

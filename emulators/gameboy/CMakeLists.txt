@@ -1,10 +1,10 @@
 add_library(Gameboy
     "gameboy.cpp"
+    "components/bios/bios.cpp"
     "components/bus/bus.cpp"
-    "components/pus/gpu.cpp"
-    "components/pus/cpu.cpp"
+    "components/cpu/cpu.cpp"
+    "components/gpu/gpu.cpp"
     "components/ram/ram.cpp"
-    "components/rom/bios.cpp"
     "components/rom/rom.cpp"
 )
 
