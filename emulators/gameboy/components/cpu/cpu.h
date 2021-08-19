@@ -13,6 +13,7 @@ namespace Gameboy
         uint16_t PC;
         uint16_t SP;
         uint8_t reg_a, reg_b, reg_c, reg_d, reg_e, reg_f, reg_h, reg_l;
+        bool ime_flag = false;
 
         // Flow handlers
         uint8_t instr_byte;

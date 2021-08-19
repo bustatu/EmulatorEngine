@@ -34,6 +34,13 @@ namespace Gameboy
         bios -> load(path);
     }
 
+    void Emu::loadROM(std::string path)
+    {
+        if(rom == nullptr)
+            rom = new ROM();
+        rom -> load(path);
+    }
+
     void Emu::resume()
     {
         printf("{I}: Gameboy emulator has resumed!\n");

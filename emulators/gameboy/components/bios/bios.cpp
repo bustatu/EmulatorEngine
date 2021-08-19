@@ -24,7 +24,7 @@ namespace Gameboy
         std::ifstream file(path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 
         // Write info
-        printf("{I}: Gameboy ROM %s is being loaded...\n", path.c_str());
+        printf("{I}: Gameboy BIOS %s is being loaded...\n", path.c_str());
 
         // Get file size
         file.seekg(0, std::ios::end);
@@ -46,7 +46,7 @@ namespace Gameboy
             // Read the BIOS
             file.read(reinterpret_cast<char*>(data), fileSize);
 
-            printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
+            printf("{I}: BIOS with size %d loaded successfully!\n", fileSize);
             loaded = true;
         }
     }

@@ -113,7 +113,7 @@ namespace CHIP8
         void draw(SDL_Texture* &target, SDL_Renderer* tool);
 
         // Disassemblies one opcode
-        std::string disassembly(uint16_t opcode);
+        static std::string disassembly(uint16_t opcode);
 
         // Executes one opcodeweeb art
         void execute(uint16_t opcode);

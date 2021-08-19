@@ -1,5 +1,17 @@
 #include "cpu.h"
 
+/// Macros for better usability
+#define op_push(val) \
+    bus -> writeWord(SP - 2, val); \
+    SP -= 2; \
+    waitTimer += 12; \
+    PC += 1;
+#define op_pop(val) \
+    val(bus -> readWord(SP)); \
+    SP += 2; \
+    waitTimer += 8; \
+    PC += 1; \
+
 namespace Gameboy
 {
     CPU::CPU()
@@ -7,7 +19,9 @@ namespace Gameboy
         // Initialise everything
         executionTimer = 0;
         waitTimer = 0;
-        PC = 0x0000;
+
+        // PC = 0x0000 for normal boot, 0x1000 for skipping the bios
+        PC = 0x0000;    // Skips bios
         reg_a = reg_b = reg_c = reg_d = reg_e = reg_f = reg_h = reg_l = 0;
     }
 
@@ -25,6 +39,12 @@ namespace Gameboy
         result << "\033[1;33m";
         switch(instr_byte)
         {
+            case 0x00:
+                result << "NOP";
+                break;
+            case 0x01:
+                result << "LD BC, " << bus -> readWord(PC + 1);
+                break;
             case 0x04:
                 result << "INC B";
                 break;
@@ -42,6 +62,9 @@ namespace Gameboy
                 break;
             case 0x0E:
                 result << "LD C, " << (uint32_t)(bus -> readByte(PC + 1));
+                break;
+            case 0x10:
+                result << "STOP";
                 break;
             case 0x11:
                 result << "LD DE, " << bus -> readWord(PC + 1);
@@ -76,6 +99,9 @@ namespace Gameboy
             case 0x28:
                 result << "JR Z, " << PC + 2 + (int8_t)(bus -> readByte(PC + 1));
                 break;
+            case 0x2A:
+                result << "LD A, (HL+)";
+                break;
             case 0x2E:
                 result << "LD L, " << (uint32_t)(bus -> readByte(PC + 1));
                 break;
@@ -106,11 +132,20 @@ namespace Gameboy
             case 0x7B:
                 result << "LD A, E";
                 break;
+            case 0x7C:
+                result << "LD A, H";
+                break;
+            case 0x7D:
+                result << "LD A, L";
+                break;
             case 0xAF:
                 result << "XOR A, A";
                 break;
             case 0xC1:
                 result << "POP BC";
+                break;
+            case 0xC3:
+                result << "JP " << bus -> readWord(PC + 1);
                 break;
             case 0xC5:
                 result << "PUSH BC";
@@ -138,14 +173,29 @@ namespace Gameboy
             case 0xE0:
                 result << "LD (FF00 + " << (uint32_t)(bus -> readByte(PC + 1)) << "), A";
                 break;
+            case 0xE1:
+                result << "POP HL";
+                break;
             case 0xE2:
                 result << "LD (FF00 + C), A";
+                break;
+            case 0xE5:
+                result << "PUSH HL";
                 break;
             case 0xEA:
                 result << "LD (" << bus -> readWord(PC + 1) << "), A";
                 break;
             case 0xF0:
                 result << "LD A, (FF00 + " << (uint32_t)(bus -> readByte(PC + 1)) << ")";
+                break;
+            case 0xF1:
+                result << "POP AF";
+                break;
+            case 0xF3:
+                result << "DI";
+                break;
+            case 0xF5:
+                result << "PUSH AF";
                 break;
             case 0xFE:
                 result << "CP A, " << (uint32_t)(bus -> readByte(PC + 1));
@@ -180,6 +230,11 @@ namespace Gameboy
 
     void CPU::execute()
     {
+        if (bus -> readByte(0xff02) == 0x81) {
+            char c = bus -> readByte(0xff01);
+            printf("%c\n", c);
+            bus -> writeByte(0xff02, 0x0);
+        }
         // If allowed to go
         if(waitTimer == 0)
         {
@@ -192,10 +247,18 @@ namespace Gameboy
             else
             {
                 instr_byte = bus -> readByte(PC);
-                //printf("%s %04X\n", dissasembly(instr_byte).c_str(), PC);
+                /*printf("%s %04X\n", dissasembly(instr_byte).c_str(), PC);*/
                 can_execute = false;
                 switch(instr_byte)
                 {
+                    case 0x00:
+                        PC += 1;
+                        break;
+                    case 0x01:
+                        set_bc(bus -> readWord(PC + 1));
+                        waitTimer += 8;
+                        PC += 3;                        
+                        break;
                     case 0x04:
                         reg_b++;
                         set_flag(7, (reg_b == 0)); 
@@ -233,6 +296,10 @@ namespace Gameboy
                         reg_c = bus -> readByte(PC + 1);
                         waitTimer += 4;
                         PC += 2;
+                        break;
+                    case 0x10:
+                        // TODO: Find out what STOP does
+                        PC += 1;
                         break;
                     case 0x11:
                         set_de(bus -> readWord(PC + 1));
@@ -301,6 +368,12 @@ namespace Gameboy
                             waitTimer += 4;
                         PC += 2;
                         break;
+                    case 0x2A:
+                        reg_a = bus -> readByte(get_hl());
+                        set_hl(get_hl() + 1);
+                        waitTimer += 4;
+                        PC += 1;
+                        break;
                     case 0x2E:
                         reg_l = bus -> readByte(PC + 1);
                         waitTimer += 4;
@@ -350,24 +423,26 @@ namespace Gameboy
                         reg_a = reg_e;
                         PC += 1;
                         break;
+                    case 0x7C:
+                        reg_a = reg_h;
+                        PC += 1;
+                        break;
+                    case 0x7D:
+                        reg_a = reg_l;
+                        PC += 1;
+                        break;
                     case 0xAF:
                         reg_f = 0;
                         op_xor(reg_a, reg_a);
                         set_flag(7, reg_a == 0);
                         PC += 1;
                         break;
-                    case 0xC1:
-                        set_bc(bus -> readWord(SP));
-                        SP += 2;
-                        waitTimer += 8;
-                        PC += 1;
-                        break;
-                    case 0xC5:
-                        bus -> writeWord(SP - 2, get_bc());
-                        SP -= 2;
+                    case 0xC1:  op_pop(set_bc); break;
+                    case 0xC3:
+                        PC = bus -> readWord(PC + 1);
                         waitTimer += 12;
-                        PC += 1;
                         break;
+                    case 0xC5:  op_push(get_bc());  break;
                     case 0xC9:
                         PC = bus -> readWord(SP);
                         SP += 2;
@@ -408,11 +483,13 @@ namespace Gameboy
                         waitTimer += 8;
                         PC += 2;
                         break;
+                    case 0xE1:  op_pop(set_hl); break;
                     case 0xE2:
                         bus -> writeByte(0xFF00 + reg_c, reg_a);
                         waitTimer += 4;
                         PC += 1;
                         break;
+                    case 0xE5:  op_push(get_hl());  break;
                     case 0xEA:
                         bus -> writeByte(bus -> readWord(PC + 1), reg_a);
                         waitTimer += 12;
@@ -423,6 +500,12 @@ namespace Gameboy
                         waitTimer += 8;
                         PC += 2;
                         break;
+                    case 0xF1:  op_pop(set_af); break;
+                    case 0xF3:
+                        ime_flag = false;
+                        PC += 1;
+                        break;
+                    case 0xF5:  op_push(get_af());  break;
                     case 0xFE:
                         set_flag(7, reg_a == bus -> readByte(PC + 1));
                         set_flag(6, 1);

@@ -22,6 +22,10 @@ void MenuState::init()
     textArray[3].setFont(&menuFont);
     textArray[3].setRenderer(window -> getRenderer());
     textArray[3].setText("3. Gameboy");
+
+    textArray[4].setFont(&menuFont);
+    textArray[4].setRenderer(window -> getRenderer());
+    textArray[4].setText("4. NES");
 }
 
 void MenuState::resume()
@@ -45,7 +49,7 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
-            state -> load("data/chip8/roms/DIVISION_TEST");
+            state -> load("data/chip8/roms/PONG2");
             stateM -> pushState(state);
         }
         else if(index == 2)
@@ -58,13 +62,20 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
+            state -> loadROM("data/gameboy/roms/tetris.gb");
+            stateM -> pushState(state);
+        }
+        else if(index == 4)
+        {
+            NES::Emu* state = new NES::Emu();
+            state -> load("data/nes/roms/nestest.nes");
             stateM -> pushState(state);
         }
     }
     
-    for(int32_t i = 1; i <= 3; i++)
+    for(int32_t i = 1; i <= 4; i++)
         textArray[i].setColor({255, 255, 255});
-    if(index >= 1 && index <= 3)
+    if(index >= 1 && index <= 4)
         textArray[index].setColor({255, 0, 0});
 
     if(window -> getKeyPressed(SDLK_s))
@@ -73,7 +84,7 @@ void MenuState::update(double dt)
         index--;
 
     index = std::max(1, index);
-    index = std::min(3, index);
+    index = std::min(4, index);
 }
 
 void MenuState::draw()
@@ -82,6 +93,8 @@ void MenuState::draw()
 
     SDL_SetRenderDrawColor(window -> getRenderer(), 0x00, 0x30, 0x99, 0xFF);
     SDL_RenderClear(window -> getRenderer());
+
+    // TODO: Change this, I hate it
 
     SDL_Rect* rect = new SDL_Rect();
     rect -> x = 30;
@@ -107,6 +120,12 @@ void MenuState::draw()
     rect -> w = textArray[3].getSize().first / 2;
     rect -> h = textArray[3].getSize().second / 2;
     SDL_RenderCopy(window -> getRenderer(), textArray[3].getTexture(), NULL, rect);
+
+    rect -> x = 60;
+    rect -> y = 190;
+    rect -> w = textArray[4].getSize().first / 2;
+    rect -> h = textArray[4].getSize().second / 2;
+    SDL_RenderCopy(window -> getRenderer(), textArray[4].getTexture(), NULL, rect);
 
     delete rect;
 }

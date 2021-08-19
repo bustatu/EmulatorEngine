@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
 add_subdirectory("./emulators/bytepusher")
 add_subdirectory("./emulators/gameboy")
 add_subdirectory("./emulators/chip8")
+add_subdirectory("./emulators/nes")
 
 # Compile the main engine stuff
 add_subdirectory("./menus")
@@ -23,6 +24,7 @@ target_link_libraries(EmuEngine Menus)
 target_link_libraries(EmuEngine GUI)
 
 # Link the currently implemented emulators
+target_link_libraries(EmuEngine NES)
 target_link_libraries(EmuEngine CHIP8)
 target_link_libraries(EmuEngine Gameboy)
 target_link_libraries(EmuEngine Bytepusher)

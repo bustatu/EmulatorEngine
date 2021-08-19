@@ -158,22 +158,16 @@ namespace CHIP8
         //Go trough the sprite lines
         for(int32_t yline = 0; yline < vc; yline++)
         {
+            
             //Read pixel from memory
             pixel = (ram[I + offset * yline] << 8) | ram[I + offset * yline + 1];
 
             //Go trough the sprite columns
             for(int32_t xline = 0; xline < 8 * offset; xline++)
-            {
                 //If the pixel needs to be set
                 if((pixel & ((1 << 15) >> xline)) != 0)
-                {
-                    // Position in the array
-                    int32_t pos = (va + xline + ((vb + yline) * size.first)) % (size.first * size.second);
-
                     // Update the pixel and update V[0xF] if necessary
-                    V[0xF] = graphics.xorPixel(pos) ? 1 : V[0xF];
-                }
-            }
+                    V[0xF] = graphics.xorPixel(va + xline + ((vb + yline) * size.first)) % (size.first * size.second) ? 1 : V[0xF];
         }
     }
 
@@ -229,7 +223,7 @@ namespace CHIP8
                     PC += 2;
                 break;
             case 0x6:
-                set_reg(N00(opcode), NN(opcode));
+                V[N00(opcode)] = NN(opcode);
                 break;
             case 0x7:
                 V[N00(opcode)] += NN(opcode);
@@ -354,20 +348,16 @@ namespace CHIP8
                         ram[I + 2] = V[N00(opcode)] % 10;
                         break;
                     case 0x55:
-                        for(int i = 0; i <= N00(opcode); i++)
-                            ram[I + i] = V[i];
+                        memcpy(ram + I, V, N00(opcode));
                         break;
                     case 0x65:
-                        for(int i = 0; i <= N00(opcode); i++)
-                            V[i] = ram[I + i];
+                        memcpy(V, ram + I, N00(opcode));
                         break;
                     case 0x75:
-                        for(int i = 0; i <= N00(opcode); i++)
-                            user_flags[i] = V[i];                    
+                        memcpy(user_flags, V, N00(opcode));           
                         break;
                     case 0x85:
-                        for(int i = 0; i <= N00(opcode); i++)
-                            V[i] = user_flags[i];                    
+                        memcpy(V, user_flags, N00(opcode));
                         break;                
                     default:
                         unknown(opcode);
