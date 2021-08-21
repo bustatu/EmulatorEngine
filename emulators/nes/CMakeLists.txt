@@ -1,5 +1,6 @@
 add_library(NES
     "nes.cpp"
+    "components/bus/bus.cpp"
     "components/cpu/cpu.cpp"
     "components/rom/rom.cpp"
 )

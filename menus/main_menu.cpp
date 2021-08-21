@@ -49,13 +49,13 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
-            state -> load("data/chip8/roms/PONG2");
+            state -> load("data/chip8/roms/TETRIS");
             stateM -> pushState(state);
         }
         else if(index == 2)
         {
             Bytepusher::Emu* state = new Bytepusher::Emu();
-            state -> load("data/bytepusher/roms/audio_test.bp");
+            state -> load("data/bytepusher/roms/nyan.bp");
             stateM -> pushState(state);
         }
         else if(index == 3)
@@ -90,9 +90,6 @@ void MenuState::update(double dt)
 void MenuState::draw()
 {
     Window* window = stateM -> getWindow();
-
-    SDL_SetRenderDrawColor(window -> getRenderer(), 0x00, 0x30, 0x99, 0xFF);
-    SDL_RenderClear(window -> getRenderer());
 
     // TODO: Change this, I hate it
 
