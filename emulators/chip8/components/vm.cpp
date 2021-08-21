@@ -358,16 +358,16 @@ namespace CHIP8
                         ram[I + 2] = V[N00(opcode)] % 10;
                         break;
                     case 0x55:
-                        memcpy(ram + I, V, N00(opcode));
+                        memcpy(ram + I, V, N00(opcode) + 1);
                         break;
                     case 0x65:
-                        memcpy(V, ram + I, N00(opcode));
+                        memcpy(V, ram + I, N00(opcode) + 1);
                         break;
                     case 0x75:
-                        memcpy(user_flags, V, N00(opcode));           
+                        memcpy(user_flags, V, N00(opcode) + 1);           
                         break;
                     case 0x85:
-                        memcpy(V, user_flags, N00(opcode));
+                        memcpy(V, user_flags, N00(opcode) + 1);
                         break;                
                     default:
                         unknown(opcode);
