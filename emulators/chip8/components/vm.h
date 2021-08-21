@@ -50,9 +50,11 @@ namespace CHIP8
         // Current fectched opcode
         uint16_t opcode;
 
-        // More complex opcodes
-        void DRW(uint8_t va, uint8_t vb, uint8_t vc);
+        // Unknown / unsupported opcode handling
         void unknown(uint16_t opcode);
+
+        // Draw opcode handling
+        void DRW(uint8_t va, uint8_t vb, uint8_t vc);
 
         // User flags
         uint8_t* user_flags;
@@ -69,6 +71,10 @@ namespace CHIP8
 
         // Update VM
         void update(double dt);
+
+        // Set colors
+        void setForeground(SDL_Color color);
+        void setBackground(SDL_Color color);
 
         // Returns state
         uint8_t get_state();

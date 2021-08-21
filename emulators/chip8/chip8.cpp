@@ -47,9 +47,56 @@ namespace CHIP8
             is_running = !is_running;
     }
 
+    void Emu::applyDefaultConfig()
+    {
+        // Read configs
+        std::ifstream fin("data/chip8/general.json");
+        if(!fin.is_open())
+        {
+            printf("\033[1;36m{I}: Default general CHIP8 config not found! Creating a new one...\n\033[0m");
+            createDefaultConfig();
+            fin.close();
+            fin = std::ifstream("data/chip8/general.json");
+        }
+
+        nlohmann::json j_file;
+
+        fin >> j_file;
+
+        if(j_file["color"]["r"] != nullptr && j_file["color"]["g"] != nullptr && j_file["color"]["b"] != nullptr)
+            vm -> setForeground({j_file["color"]["r"], j_file["color"]["g"], j_file["color"]["b"], 0xFF});
+
+        if(j_file["background"]["r"] != nullptr && j_file["background"]["g"] != nullptr && j_file["background"]["b"] != nullptr)
+            vm -> setBackground({j_file["background"]["r"], j_file["background"]["g"], j_file["background"]["b"], 0xFF});
+
+        fin.close();
+    }
+
+    void Emu::createDefaultConfig()
+    {
+        // Open output file
+        std::ofstream fout("data/chip8/general.json");
+
+        // The JSON data
+        nlohmann::json j_file;
+
+        // Set default background and foreground colors
+        j_file["color"]["r"] = j_file["color"]["g"] = j_file["color"]["b"] = 0x88;
+        j_file["background"]["r"] = j_file["background"]["g"] = j_file["background"]["b"] = 0x10;
+
+        // Write the JSON to the file
+        fout << j_file;
+
+        // Close the file
+        fout.close();
+    }
+
     void Emu::init()
     {
         Window* window = stateM -> getWindow();
+
+        // Apply default config
+        applyDefaultConfig();
 
         // Create audio specs for this emu
         SDL_AudioSpec wanted;
@@ -165,5 +212,8 @@ namespace CHIP8
             // Deallocate data from memory
             delete[] data;
         }
+
+        // Close the file
+        file.close();
     }
 };

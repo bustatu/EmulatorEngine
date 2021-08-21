@@ -6,6 +6,7 @@ data/bytepusher/
 data/chip8/
 data/gameboy/
 data/ps1/
+data/nes/
 
 # Ignore VSCode workflows
 .vscode/

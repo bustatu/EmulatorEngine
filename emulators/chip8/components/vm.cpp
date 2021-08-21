@@ -35,6 +35,16 @@ namespace CHIP8
         return graphics.getSize();
     }
 
+    void VM::setForeground(SDL_Color color)
+    {
+        graphics.setForegroundColor(color);
+    }
+
+    void VM::setBackground(SDL_Color color)
+    {
+        graphics.setBackgroundColor(color);
+    }
+
     VM::~VM()
     {
         // Free RAM
@@ -604,7 +614,7 @@ namespace CHIP8
         // Safety checks
         if(offset + size - 1 > ram_size)
         {
-            printf("{E}: File size is too big! Maximum is %d, got %d!\n", ram_size, offset + size - 1);
+            printf("\033[1;31m{E}: File size is too big! Maximum is %d, got %d!\n\033[0m", ram_size - offset + 1, size);
             return -1;
         }
 

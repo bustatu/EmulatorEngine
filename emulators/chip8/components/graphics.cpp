@@ -19,6 +19,16 @@ namespace CHIP8
         resize_flag = true;
     }
 
+    void Graphics::setForegroundColor(SDL_Color color)
+    {
+        foreground = color;
+    }
+
+    void Graphics::setBackgroundColor(SDL_Color color)
+    {
+        background = color;
+    }
+
     std::pair<uint8_t, uint8_t> Graphics::getSize()
     {
         return std::make_pair(screen_w, screen_h);

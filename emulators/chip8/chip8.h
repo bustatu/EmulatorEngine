@@ -1,11 +1,12 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
+#include <fstream>
 #include "../../state.h"
 #include "../../gui/gui.h"
 #include "components/vm.h"
 #include "components/input.h"
-#include <fstream>
+#include "../../external/json/single_include/nlohmann/json.hpp"
 
 namespace CHIP8
 {
@@ -17,6 +18,12 @@ namespace CHIP8
 
             // Texture which is going to be drawn to the screen
             SDL_Texture* output = nullptr;
+
+            // Create default json file config
+            static void createDefaultConfig();
+
+            // Apply default config
+            void applyDefaultConfig();
 
         public:
             // Load the ROM from a path
