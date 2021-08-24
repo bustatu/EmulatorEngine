@@ -25,9 +25,22 @@ namespace Gameboy
         // Initialise everything
         waitTimer = 0;
 
-        // PC = 0x0000 for normal boot, 0x1000 for skipping the bios
-        PC = 0x0000;    // Skips bios
-        reg_a = reg_b = reg_c = reg_d = reg_e = reg_f = reg_h = reg_l = 0;
+        // PC = 0x000 for normal boot, 0x100 for skipping the bios
+        PC = 0x000;    // Skips bios
+        if(PC == 0x100)
+        {
+            reg_a = 1;
+            reg_f = 0;
+            reg_b = 0xFF;
+            reg_c = 0x13;
+            reg_d = 0;
+            reg_e = 0xC1;
+            reg_h = 0x84;
+            reg_l = 0x03;
+            SP = 0xFFFE;
+        }
+        else
+            reg_a = reg_b = reg_c = reg_d = reg_e = reg_f = reg_h = reg_l = 0;
     }
 
     void CPU::unknown()
@@ -68,9 +81,6 @@ namespace Gameboy
             case 0x0E:
                 result << "LD C, " << (uint32_t)(bus -> readByte(PC + 1));
                 break;
-            case 0x10:
-                result << "STOP";
-                break;
             case 0x11:
                 result << "LD DE, " << bus -> readWord(PC + 1);
                 break;
@@ -79,6 +89,9 @@ namespace Gameboy
                 break;
             case 0x15:
                 result << "DEC D";
+                break;
+            case 0x16:
+                result << "LD D, " << (uint32_t)(bus -> readByte(PC + 1));
                 break;
             case 0x17:
                 result << "RLA";
@@ -143,6 +156,9 @@ namespace Gameboy
             case 0x77:
                 result << "LD (HL), A";
                 break;
+            case 0x78:
+                result << "LD A, B";
+                break;
             case 0x7B:
                 result << "LD A, E";
                 break;
@@ -152,11 +168,17 @@ namespace Gameboy
             case 0x7D:
                 result << "LD A, L";
                 break;
+            case 0x86:
+                result << "ADD A, (HL)";
+                break;
             case 0x90:
                 result << "SUB A, B";
                 break;
             case 0xAF:
                 result << "XOR A, A";
+                break;
+            case 0xBE:
+                result << "CP A, (HL)";
                 break;
             case 0xC1:
                 result << "POP BC";
@@ -259,11 +281,7 @@ namespace Gameboy
             else
             {
                 instr_byte = bus -> readByte(PC);
-                printf("%s %04X\n", dissasembly(instr_byte).c_str(), PC);
-                /*std::ofstream fout;
-                fout.open("trace.log", std::ios_base::app);
-                fout << dissasembly(instr_byte) << " " << PC << "\n";
-                fout.close();*/
+                //printf("%s %04X\n", dissasembly(instr_byte).c_str(), PC);
                 can_execute = false;
                 switch(instr_byte)
                 {
@@ -301,10 +319,6 @@ namespace Gameboy
                         waitTimer += 4;
                         PC += 2;
                         break;
-                    case 0x10:
-                        // TODO: Find out what STOP does
-                        PC += 1;
-                        break;
                     case 0x11:
                         set_de(bus -> readWord(PC + 1));
                         waitTimer += 8;
@@ -316,6 +330,11 @@ namespace Gameboy
                         PC += 1;
                         break;
                     case 0x15:  op_reg_dec(reg_d);  break;
+                    case 0x16:
+                        reg_d = bus -> readByte(PC + 1);
+                        waitTimer += 4;
+                        PC += 2;
+                        break;
                     case 0x17:
                         reg_f = 0;
                         set_flag(4, (reg_a & (1 << 7)) >> 7);
@@ -426,6 +445,10 @@ namespace Gameboy
                         waitTimer += 4;
                         PC += 1;
                         break;
+                    case 0x78:
+                        reg_a = reg_e;
+                        PC += 1;
+                        break;
                     case 0x7B:
                         reg_a = reg_e;
                         PC += 1;
@@ -436,6 +459,15 @@ namespace Gameboy
                         break;
                     case 0x7D:
                         reg_a = reg_l;
+                        PC += 1;
+                        break;
+                    case 0x86:
+                        set_flag(5, ((reg_a & 0b111) + (bus -> readByte(get_hl()) & 0b111)) > 0b111);
+                        set_flag(4, (reg_a + bus -> readByte(get_hl())) > 0xFFFF);
+                        reg_a += bus -> readByte(get_hl());
+                        set_flag(7, (reg_a == 0));
+                        set_flag(6, 0);
+                        waitTimer += 4;
                         PC += 1;
                         break;
                     case 0x90:
@@ -450,6 +482,13 @@ namespace Gameboy
                         reg_f = 0;
                         op_xor(reg_a, reg_a);
                         set_flag(7, reg_a == 0);
+                        PC += 1;
+                        break;
+                    case 0xBE:
+                        set_flag(7, reg_a == bus -> readByte(get_hl()));
+                        set_flag(6, 1);
+                        set_flag(5, (reg_a & 0xFF) < (bus -> readByte(get_hl()) & 0xFF));
+                        set_flag(4, reg_a < bus -> readByte(get_hl()));
                         PC += 1;
                         break;
                     case 0xC1:  op_pop(set_bc); break;
