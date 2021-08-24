@@ -10,14 +10,19 @@
     val(bus -> readWord(SP)); \
     SP += 2; \
     waitTimer += 8; \
-    PC += 1; \
+    PC += 1;
+#define op_reg_dec(reg) \
+    reg--; \
+    set_flag(7, (reg == 0)); \
+    set_flag(6, 1); \
+    set_flag(5, (reg & 0b111) == 0b111); \
+    PC += 1;
 
 namespace Gameboy
 {
     CPU::CPU()
     {
         // Initialise everything
-        executionTimer = 0;
         waitTimer = 0;
 
         // PC = 0x0000 for normal boot, 0x1000 for skipping the bios
@@ -72,6 +77,9 @@ namespace Gameboy
             case 0x13:
                 result << "INC DE";
                 break;
+            case 0x15:
+                result << "DEC D";
+                break;
             case 0x17:
                 result << "RLA";
                 break;
@@ -80,6 +88,9 @@ namespace Gameboy
                 break;
             case 0x1A:
                 result << "LD A, (DE)";
+                break;
+            case 0x1D:
+                result << "DEC E";
                 break;
             case 0x1E:
                 result << "LD E, " << (uint32_t)(bus -> readByte(PC + 1));
@@ -95,6 +106,9 @@ namespace Gameboy
                 break;
             case 0x23:
                 result << "INC HL";
+                break;
+            case 0x24:
+                result << "INC H";
                 break;
             case 0x28:
                 result << "JR Z, " << PC + 2 + (int8_t)(bus -> readByte(PC + 1));
@@ -137,6 +151,9 @@ namespace Gameboy
                 break;
             case 0x7D:
                 result << "LD A, L";
+                break;
+            case 0x90:
+                result << "SUB A, B";
                 break;
             case 0xAF:
                 result << "XOR A, A";
@@ -230,11 +247,6 @@ namespace Gameboy
 
     void CPU::execute()
     {
-        if (bus -> readByte(0xff02) == 0x81) {
-            char c = bus -> readByte(0xff01);
-            printf("%c\n", c);
-            bus -> writeByte(0xff02, 0x0);
-        }
         // If allowed to go
         if(waitTimer == 0)
         {
@@ -247,7 +259,11 @@ namespace Gameboy
             else
             {
                 instr_byte = bus -> readByte(PC);
-                /*printf("%s %04X\n", dissasembly(instr_byte).c_str(), PC);*/
+                printf("%s %04X\n", dissasembly(instr_byte).c_str(), PC);
+                /*std::ofstream fout;
+                fout.open("trace.log", std::ios_base::app);
+                fout << dissasembly(instr_byte) << " " << PC << "\n";
+                fout.close();*/
                 can_execute = false;
                 switch(instr_byte)
                 {
@@ -266,13 +282,7 @@ namespace Gameboy
                         set_flag(5, (reg_b & 0b111) == 0b000);                 
                         PC += 1;
                         break;
-                    case 0x05:
-                        reg_b--;
-                        set_flag(7, (reg_b == 0));
-                        set_flag(6, 1);
-                        set_flag(5, (reg_b & 0b111) == 0b111);
-                        PC += 1;
-                        break;
+                    case 0x05:  op_reg_dec(reg_b);   break;
                     case 0x06:
                         reg_b = bus -> readByte(PC + 1);
                         waitTimer += 4;
@@ -285,13 +295,7 @@ namespace Gameboy
                         set_flag(5, (reg_c & 0b111) == 0b000);                 
                         PC += 1;
                         break;
-                    case 0x0D:
-                        reg_c--;
-                        set_flag(7, (reg_c == 0));
-                        set_flag(6, 1);
-                        set_flag(5, (reg_c & 0b111) == 0b111);
-                        PC += 1;
-                        break;
+                    case 0x0D:  op_reg_dec(reg_c);  break;
                     case 0x0E:
                         reg_c = bus -> readByte(PC + 1);
                         waitTimer += 4;
@@ -311,6 +315,7 @@ namespace Gameboy
                         waitTimer += 4;
                         PC += 1;
                         break;
+                    case 0x15:  op_reg_dec(reg_d);  break;
                     case 0x17:
                         reg_f = 0;
                         set_flag(4, (reg_a & (1 << 7)) >> 7);
@@ -327,6 +332,7 @@ namespace Gameboy
                         waitTimer += 4;
                         PC += 1;
                         break;
+                    case 0x1D:  op_reg_dec(reg_e);  break;
                     case 0x1E:
                         reg_e = bus -> readByte(PC + 1);
                         waitTimer += 4;
@@ -356,6 +362,13 @@ namespace Gameboy
                     case 0x23:
                         set_hl(get_hl() + 1);
                         waitTimer += 4;
+                        PC += 1;
+                        break;
+                    case 0x24:
+                        reg_h++;
+                        set_flag(7, (reg_h == 0)); 
+                        set_flag(6, 0);
+                        set_flag(5, (reg_h & 0b111) == 0b000);                 
                         PC += 1;
                         break;
                     case 0x28:
@@ -390,13 +403,7 @@ namespace Gameboy
                         waitTimer += 4;
                         PC += 1;
                         break;
-                    case 0x3D:
-                        reg_a--;
-                        set_flag(7, (reg_a == 0));
-                        set_flag(6, 1);
-                        set_flag(5, (reg_a & 0b111) == 0b111);
-                        PC += 1;
-                        break;
+                    case 0x3D:  op_reg_dec(reg_a);  break;
                     case 0x3E:
                         reg_a = bus -> readByte(PC + 1);
                         waitTimer += 4;
@@ -429,6 +436,14 @@ namespace Gameboy
                         break;
                     case 0x7D:
                         reg_a = reg_l;
+                        PC += 1;
+                        break;
+                    case 0x90:
+                        reg_a -= reg_b;
+                        set_flag(7, (reg_a == 0));
+                        set_flag(6, 1);
+                        set_flag(5, (reg_a & 0b111) < (reg_b & 0b111));
+                        set_flag(4, reg_a  < reg_b);
                         PC += 1;
                         break;
                     case 0xAF:
@@ -522,17 +537,6 @@ namespace Gameboy
         }
         // Sleep
         else {  waitTimer--;  }
-    }
-
-    void CPU::update(double dt)
-    {
-        executionTimer += dt;
-
-        while(executionTimer >= 1.0 / freq)
-        {
-            execute();
-            executionTimer -= 1.0 / freq;
-        }
     }
 
     void CPU::attachBus(Bus* newBus)

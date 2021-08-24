@@ -25,6 +25,9 @@ namespace Gameboy
         bus -> attachROM(rom);
         gpu -> attachBus(bus);
         cpu -> attachBus(bus);
+
+        // Reset execution timer
+        executionTimer = 0;
     }
 
     void Emu::loadBIOS(std::string path)
@@ -55,12 +58,37 @@ namespace Gameboy
 
     void Emu::update(double dt)
     {
-        cpu -> update(dt);
+        executionTimer += dt;
+
+        while(executionTimer >= 1.0 / freq)
+        {
+            // Update the CPU and the GPU
+            cpu -> execute();
+            gpu -> update();
+
+            executionTimer -= 1.0 / freq;
+        }
     }
 
     void Emu::draw()
     {
         Window* window = stateM -> getWindow();
-        SDL_RenderCopy(window -> getRenderer(), output, NULL, NULL);
+
+        // Update the output if needed
+        gpu -> draw(output, window -> getRenderer());
+
+        // Update the screen output (correct the aspect ratio)
+        SDL_Rect* rect = new SDL_Rect();
+        rect -> h = window -> getSize().second;
+        rect -> w = rect -> h * 160 / 144;
+
+        rect -> x = (window -> getSize().first - rect -> w) / 2;
+        rect -> y = 0;
+
+        // Update the screen output
+        SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
+
+        // Delete the allocated rect
+        delete rect;
     }
 }

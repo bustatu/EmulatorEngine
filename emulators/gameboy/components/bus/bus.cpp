@@ -19,23 +19,17 @@ namespace Gameboy
 
     uint8_t Bus::readByte(uint16_t addr)
     {
-        /*// BIOS area
-        if(addr >= 0x0000 && addr <= 0x3FFF)
+        // BIOS area
+        if(addr >= 0x0000 && addr <= 0x00FE)
         {
             // TODO: ROMs load from this area too.
             return bios -> readByte(addr);
         }
         // ROM area
-        else*/
-        
-        if(addr <= 0x7FFF)
-        {
-            return rom -> readByte(addr);       
-        }
+        else if(addr <= 0x7FFF)
+            return rom -> readByte(addr); 
         else
-        {      
             return ram -> readByte(addr);
-        }
 
         // Not implemented
         printf("\033[1;31m{E}: Unimplemented readByte at address %04X\033[0m\n", addr);
@@ -44,15 +38,14 @@ namespace Gameboy
 
     uint16_t Bus::readWord(uint16_t addr)
     {
-        /*// BIOS area
-        if(addr >= 0x0000 && addr <= 0x3FFE)
+        // BIOS area
+        if(addr >= 0x0000 && addr <= 0x00FE)
             return bios -> readWord(addr);
         // ROM area
-        else*/
-        if(addr <= 0x7FFF)
+        else if(addr <= 0x7FFF)
             return rom -> readWord(addr);       
         // RAM area
-        else 
+        else
             return ram -> readWord(addr);
 
         // Not implemented

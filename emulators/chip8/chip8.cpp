@@ -53,7 +53,7 @@ namespace CHIP8
         std::ifstream fin("data/chip8/general.json");
         if(!fin.is_open())
         {
-            printf("\033[1;36m{I}: Default general CHIP8 config not found! Creating a new one...\n\033[0m");
+            printf("\033[1;36m{W}: Default general CHIP8 config not found! Creating a new one...\n\033[0m");
             createDefaultConfig();
             fin.close();
             fin = std::ifstream("data/chip8/general.json");

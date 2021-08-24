@@ -578,7 +578,7 @@ namespace CHIP8
             }
 
             // Execution loop
-            while(execTimer >= 1.0 / frequency)
+            while(execTimer >= 1.0 / frequency && state == 1)
             {
                 // Fetch and move forward
                 opcode = (ram[PC] << 8) | ram[PC + 1];

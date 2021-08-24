@@ -17,6 +17,12 @@ namespace Gameboy
         GPU* gpu = nullptr;
         ROM* rom = nullptr;
 
+        // Set clock frequency (4194304 Hz)
+        uint32_t freq = 4194304;
+
+        // Execution timing
+        double executionTimer;
+
         // Output texture
         SDL_Texture* output;
 
@@ -36,7 +42,7 @@ namespace Gameboy
         // Stop the emulator
         void pause();
 
-        // Main update function
+        // Update function
         void update(double dt);
 
         // Main draw function

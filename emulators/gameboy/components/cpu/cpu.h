@@ -19,12 +19,8 @@ namespace Gameboy
         uint8_t instr_byte;
         bool can_execute = false;
 
-        // Set clock frequency (4194304 Hz)
-        uint32_t freq = 4194304;
-
-        // CPU timers
+        // Execution halting timer
         uint32_t waitTimer;
-        double executionTimer;
 
         // Bus handler
         Bus* bus;
@@ -41,9 +37,6 @@ namespace Gameboy
     public:
         // Constructor
         CPU();
-
-        // Update
-        void update(double dt);
 
         // Executes the next instruction
         void execute();
