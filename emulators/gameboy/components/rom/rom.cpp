@@ -4,11 +4,17 @@ namespace Gameboy
 {
     uint16_t ROM::readWord(uint16_t addr)
     {
+        // Readings return 0xFFFF if nothing is loaded
+        if(data == nullptr)
+            return 0xFFFF;
         return (data[addr + 1] << 8) | data[addr];
     }
 
     uint8_t ROM::readByte(uint16_t addr)
     {
+        // Readings return 0xFF if nothing is loaded
+        if(data == nullptr)
+            return 0xFF;
         return data[addr];
     }
 

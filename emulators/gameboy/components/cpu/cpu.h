@@ -25,8 +25,7 @@ namespace Gameboy
         // Bus handler
         Bus* bus;
 
-        // Opcode handlers
-        void op_xor(uint8_t &a, uint8_t b);
+        // Unknown opcode handler
         void unknown();
 
         // Sets a flag to a value (7 - zero, 6 - sub, 5 - half carry, 4 - carry)

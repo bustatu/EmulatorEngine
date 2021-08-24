@@ -26,7 +26,7 @@ namespace Gameboy
         waitTimer = 0;
 
         // PC = 0x000 for normal boot, 0x100 for skipping the bios
-        PC = 0x000;    // Skips bios
+        PC = 0x000;
         if(PC == 0x100)
         {
             reg_a = 1;
@@ -260,13 +260,6 @@ namespace Gameboy
         return ((reg_f >> who) & 1);
     }
 
-    void CPU::op_xor(uint8_t &a, uint8_t b)
-    {
-        a ^= b;
-        reg_f = 0;
-        set_flag(7, (a == 0));
-    }
-
     void CPU::execute()
     {
         // If allowed to go
@@ -462,11 +455,11 @@ namespace Gameboy
                         PC += 1;
                         break;
                     case 0x86:
-                        set_flag(5, ((reg_a & 0b111) + (bus -> readByte(get_hl()) & 0b111)) > 0b111);
-                        set_flag(4, (reg_a + bus -> readByte(get_hl())) > 0xFFFF);
+                        set_flag(5, (reg_a & 0xf) + ((bus -> readByte(get_hl()) & 0xf) >> 4) & 1);
                         reg_a += bus -> readByte(get_hl());
-                        set_flag(7, (reg_a == 0));
+                        set_flag(7, (reg_a & 0xFF) == 0);
                         set_flag(6, 0);
+                        set_flag(4, (reg_a >> 8) & 1);
                         waitTimer += 4;
                         PC += 1;
                         break;
@@ -479,8 +472,8 @@ namespace Gameboy
                         PC += 1;
                         break;
                     case 0xAF:
+                        reg_a ^= reg_a;
                         reg_f = 0;
-                        op_xor(reg_a, reg_a);
                         set_flag(7, reg_a == 0);
                         PC += 1;
                         break;

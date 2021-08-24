@@ -6,6 +6,7 @@ namespace Gameboy
     {
         // Initialise the RAM
         data = new uint8_t[0x10000];
+        data[0xFF50] = 0;
     }
 
     uint16_t RAM::readWord(uint16_t addr)

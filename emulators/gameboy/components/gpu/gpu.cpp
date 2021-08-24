@@ -115,7 +115,7 @@ namespace Gameboy
 
         // Scrolling values and window values
         uint8_t scrollx = bus -> readByte(0xFF43), scrolly = bus -> readByte(0xFF42);
-        uint8_t windowx = bus -> readByte(0xFF4b) - 7, windowy = bus -> readByte(0xFF4A);
+        uint8_t windowx = bus -> readByte(0xFF4B) - 7, windowy = bus -> readByte(0xFF4A);
 
         bool usingWindow = 0;
 
@@ -153,7 +153,6 @@ namespace Gameboy
         if(usingWindow)
             y -= scrolly + windowy;
 
-
         // Row in the 32x32 sprite matrix
         uint16_t tileRow = (uint8_t)(y / 8);
 
@@ -181,10 +180,11 @@ namespace Gameboy
 
             // Get the tile adress (16 bytes per tile)
             uint16_t tileAdress;
-            if(is_signed)
-                tileAdress = where + (tilenum + 128) * 16;
-            else
+            if(!is_signed)
                 tileAdress = where + tilenum * 16;
+            else
+                tileAdress = where + (tilenum + 128) * 16;
+                
 
             // LNO column
             uint8_t lno = y % 8;

@@ -11,7 +11,7 @@ namespace Gameboy
     {
     private:
         // ROM data
-        uint8_t* data;
+        uint8_t* data = nullptr;
 
     public:
         // Load BIOS from the location

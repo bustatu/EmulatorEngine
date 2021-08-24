@@ -19,13 +19,16 @@ namespace Gameboy
 
     uint8_t Bus::readByte(uint16_t addr)
     {
-        // BIOS area
+        // BIOS and ROM area
         if(addr >= 0x0000 && addr <= 0x00FE)
         {
-            // TODO: ROMs load from this area too.
-            return bios -> readByte(addr);
+            // Cartridge control
+            if(ram -> readByte(0xFF50) == 0x00)
+                return bios -> readByte(addr);
+            else
+                return ram -> readByte(addr - 0x00FE);
         }
-        // ROM area
+        // ROM only area
         else if(addr <= 0x7FFF)
             return rom -> readByte(addr); 
         else
@@ -39,8 +42,14 @@ namespace Gameboy
     uint16_t Bus::readWord(uint16_t addr)
     {
         // BIOS area
-        if(addr >= 0x0000 && addr <= 0x00FE)
-            return bios -> readWord(addr);
+        if(addr >= 0x0000 && addr <= 0x00FD)
+        {
+            // Cartridge control
+            if(ram -> readByte(0xFF50) == 0x00)
+                return bios -> readWord(addr);
+            else
+                return ram -> readWord(addr);
+        }
         // ROM area
         else if(addr <= 0x7FFF)
             return rom -> readWord(addr);       
