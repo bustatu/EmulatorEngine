@@ -10,3 +10,7 @@ data/nes/
 
 # Ignore VSCode workflows
 .vscode/
+
+# Ignore building scripts
+build.bat
+build.sh
