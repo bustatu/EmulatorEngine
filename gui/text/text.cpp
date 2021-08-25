@@ -11,7 +11,9 @@ void Text::render()
         SDL_Surface* textSurface = TTF_RenderText_Solid(font -> getFont(), text.c_str(), color);
 
         result = SDL_CreateTextureFromSurface(renderer, textSurface);
-        SDL_QueryTexture(result, nullptr, nullptr, &width, &height);
+
+        if(result != nullptr)
+            SDL_QueryTexture(result, nullptr, nullptr, &width, &height);
 
         SDL_FreeSurface(textSurface);
     }

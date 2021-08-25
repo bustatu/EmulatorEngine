@@ -26,8 +26,6 @@ namespace CHIP8
             // Apply default config
             void applyDefaultConfig();
 
-            uint8_t volume = 30;
-
         public:
             // Load the ROM from a path
             void load(std::string path);

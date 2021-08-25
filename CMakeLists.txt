@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 project(EmuEngine)
 
-# Set custom module path
-#set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
-
 # Build options
 option(USE_EXTERNAL_JSON "Use an external JSON library" OFF)
 

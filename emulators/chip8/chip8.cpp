@@ -1,6 +1,9 @@
 #include "chip8.h"
 
-#define M_PI 3.141592653589793
+#ifndef M_PI
+    // PI is not standardly defined everywhere
+    #define M_PI 3.14159265358979323846
+#endif
 
 namespace CHIP8
 {
@@ -107,13 +110,12 @@ namespace CHIP8
         wanted.samples = 256;
         wanted.format = AUDIO_S8;
         wanted.channels = 1;
-        wanted.userdata = (void*)volume;
         
         // Sine wave callback function
         wanted.callback = [](void* userdata, uint8_t* stream, int length)
         {
             for(int i = 0; i < length; i++)
-                stream[i] = (127 * ((uint8_t)userdata / 100.0)) * std::sin(i * M_PI * 2 * 450.0 / 44100);
+                stream[i] = (127 * std::sin(i * M_PI * 2 * 450.0 / 44100));
         };
 
         // Prepare audio for usage

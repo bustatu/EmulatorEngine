@@ -26,6 +26,7 @@ void StateManager::quit()
 
     // Close the window as the app has been closed
     window -> close();
+    delete window;
 }
 
 void StateManager::init()
