@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "window.h"
 #include "state.h"
 #include "menus/main_menu.h"

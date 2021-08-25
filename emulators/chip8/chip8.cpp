@@ -1,5 +1,7 @@
 #include "chip8.h"
 
+#define M_PI 3.141592653589793
+
 namespace CHIP8
 {
     void Emu::update(double dt)
@@ -101,15 +103,17 @@ namespace CHIP8
         // Create audio specs for this emu
         SDL_AudioSpec wanted;
         SDL_zero(wanted);
-        wanted.freq = 45500;
+        wanted.freq = 44100;
         wanted.samples = 256;
         wanted.format = AUDIO_S8;
         wanted.channels = 1;
+        wanted.userdata = (void*)volume;
+        
         // Sine wave callback function
         wanted.callback = [](void* userdata, uint8_t* stream, int length)
         {
-            for (int i = 0; i < length; i++)
-                stream[i] = (uint8_t)(127 * sin(2.0 * M_PI * i * 604.1 / 45500));
+            for(int i = 0; i < length; i++)
+                stream[i] = (127 * ((uint8_t)userdata / 100.0)) * std::sin(i * M_PI * 2 * 450.0 / 44100);
         };
 
         // Prepare audio for usage

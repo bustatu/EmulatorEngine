@@ -2,6 +2,7 @@
 #define CHIP8_H
 
 #include <fstream>
+#include <cmath>
 #include "../../state.h"
 #include "../../gui/gui.h"
 #include "components/vm.h"
@@ -24,6 +25,8 @@ namespace CHIP8
 
             // Apply default config
             void applyDefaultConfig();
+
+            uint8_t volume = 30;
 
         public:
             // Load the ROM from a path

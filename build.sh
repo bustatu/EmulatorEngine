@@ -1,5 +1,5 @@
 mkdir build
+cmake -S . -B build -G "Ninja"
+cmake --build build
 cd build
-cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel
-ninja all
 ./EmuEngine

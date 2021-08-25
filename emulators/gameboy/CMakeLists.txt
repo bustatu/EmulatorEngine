@@ -8,4 +8,15 @@ add_library(Gameboy
     "components/rom/rom.cpp"
 )
 
-target_include_directories(Gameboy PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# SDL2 stuff
+find_package(SDL2 REQUIRED)
+
+# Include directories
+target_include_directories(Gameboy PUBLIC ${SDL2_INCLUDE_DIR})
+
+# Link external libraries
+target_link_libraries(
+    Gameboy
+    SDL2::SDL2
+    SDL2::SDL2main
+)

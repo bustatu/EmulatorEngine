@@ -5,4 +5,15 @@ add_library(NES
     "components/rom/rom.cpp"
 )
 
-target_include_directories(NES PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# SDL2 stuff
+find_package(SDL2 REQUIRED)
+
+# Include directories
+target_include_directories(NES PUBLIC ${SDL2_INCLUDE_DIR})
+
+# Link external libraries
+target_link_libraries(
+    NES
+    SDL2::SDL2
+    SDL2::SDL2main
+)

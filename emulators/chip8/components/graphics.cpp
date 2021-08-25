@@ -36,20 +36,22 @@ namespace CHIP8
 
     uint8_t Graphics::xorPixel(uint16_t pos)
     {
-        // Set draw flag
-        draw_flag = true;
+        // Update pixel only in-bounds
+        if(pos >= 0 && pos < screen_w * screen_h)
+        {
+            // Set draw flag
+            draw_flag = true;
 
-        // Update the pixel
-        if(gfx[pos] == 1)
-        {
-            gfx[pos] ^= 1;
-            return 1;
+            // Update the pixel
+            if(gfx[pos] == 1)
+            {
+                gfx[pos] ^= 1;
+                return 1;
+            }
+            else
+                gfx[pos] ^= 1;
         }
-        else
-        {
-            gfx[pos] ^= 1;
-            return 0;
-        }
+        return 0;
     }
 
     void Graphics::clear()

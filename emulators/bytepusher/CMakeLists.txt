@@ -3,4 +3,15 @@ add_library(Bytepusher
     "components/vm.cpp"
 )
 
-target_include_directories(Bytepusher PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# SDL2 stuff
+find_package(SDL2 REQUIRED)
+
+# Include directories
+target_include_directories(Bytepusher PUBLIC ${SDL2_INCLUDE_DIR})
+
+# Link external libraries
+target_link_libraries(
+    Bytepusher
+    SDL2::SDL2
+    SDL2::SDL2main
+)

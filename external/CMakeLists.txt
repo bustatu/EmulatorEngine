@@ -6,9 +6,3 @@ else()
   set(JSON_BuildTests OFF CACHE INTERNAL "")
   add_subdirectory(json)
 endif()
-
-# SDL2
-# From wherever you desire
-find_package(SDL2 REQUIRED)
-find_package(SDL2TTF REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS})

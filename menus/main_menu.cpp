@@ -49,7 +49,7 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
-            state -> load("data/chip8/roms/TETRIS");
+            state -> load("data/chip8/roms/PONG2");
             stateM -> pushState(state);
         }
         else if(index == 2)

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(EmuEngine)
 
 # Set custom module path
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
+#set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
 
 # Build options
 option(USE_EXTERNAL_JSON "Use an external JSON library" OFF)
@@ -27,20 +27,24 @@ add_executable(
     "audio.cpp"
 )
 
-# Link main engine stuff
-target_link_libraries(EmuEngine Menus GUI)
+# SDL2 stuff
+find_package(SDL2 REQUIRED)
+find_package(sdl2-ttf REQUIRED)
 
-# Link currently implemented emulators
-target_link_libraries(EmuEngine NES CHIP8 Gameboy Bytepusher)
+# Include directories
+target_include_directories(EmuEngine PUBLIC ${SDL2_INCLUDE_DIR})
 
 # Link external libraries
 target_link_libraries(
     EmuEngine
+    PRIVATE
+    Menus GUI
+    NES CHIP8 Gameboy Bytepusher
     nlohmann_json::nlohmann_json
-    SDL2 ${SDL2_LIBRARY}
-    ${SDL2TTF_LIBRARY}
+    SDL2::SDL2
+    SDL2::SDL2main
+    SDL2::SDL2_ttf
 )
-
 
 # Copy the data directory to the build path
 if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/data/)
