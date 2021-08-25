@@ -1,9 +1,9 @@
 #ifndef GAMEBOY_BUS_H
 #define GAMEBOY_BUS_H
 
-#include "../bios/bios.h"
-#include "../ram/ram.h"
-#include "../rom/rom.h"
+#include "../bios/bios.hpp"
+#include "../ram/ram.hpp"
+#include "../rom/rom.hpp"
 
 namespace Gameboy
 {

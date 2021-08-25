@@ -1,4 +1,4 @@
-#include "bytepusher.h"
+#include "bytepusher.hpp"
 
 namespace Bytepusher
 {

@@ -1,7 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "window.h"
+#include "window.hpp"
 #include <iostream>
 #include <vector>
 

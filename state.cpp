@@ -1,4 +1,4 @@
-#include "state.h"
+#include "state.hpp"
 
 bool State::isRunning()
 {

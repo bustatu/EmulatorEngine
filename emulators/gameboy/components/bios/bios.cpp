@@ -1,4 +1,4 @@
-#include "bios.h"
+#include "bios.hpp"
 
 namespace Gameboy
 {

@@ -1,4 +1,4 @@
-#include "nes.h"
+#include "nes.hpp"
 
 namespace NES
 {

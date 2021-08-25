@@ -1,7 +1,7 @@
 #define SDL_MAIN_HANDLED
-#include "window.h"
-#include "state.h"
-#include "menus/main_menu.h"
+#include "window.hpp"
+#include "state.hpp"
+#include "menus/main_menu.hpp"
 
 // State manager
 StateManager stateManager;

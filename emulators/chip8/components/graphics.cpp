@@ -1,4 +1,4 @@
-#include "graphics.h"
+#include "graphics.hpp"
 
 namespace CHIP8
 {

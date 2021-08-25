@@ -1,8 +1,8 @@
 #ifndef GAMEBOY_H
 #define GAMEBOY_H
 
-#include "../../state.h"
-#include "components/components.h"
+#include "../../state.hpp"
+#include "components/components.hpp"
 
 namespace Gameboy
 {

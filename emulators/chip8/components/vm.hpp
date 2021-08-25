@@ -1,9 +1,9 @@
 #ifndef CHIP8_VM_H
 #define CHIP8_VM_H
 
-#include "../../../window.h"
-#include "input.h"
-#include "graphics.h"
+#include "../../../window.hpp"
+#include "input.hpp"
+#include "graphics.hpp"
 #include <SDL2/SDL.h>
 #include <cstring>
 #include <sstream>

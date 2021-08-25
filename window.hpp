@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "audio.h"
+#include "audio.hpp"
 #include <map>
 #include <iostream>
 #include <SDL2/SDL.h>

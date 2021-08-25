@@ -2,9 +2,9 @@
 #define MAIN_MENU_H
 
 #include <SDL2/SDL_ttf.h>
-#include "../state.h"
-#include "../gui/gui.h"
-#include "../emulators/emulators.h"
+#include "../state.hpp"
+#include "../gui/gui.hpp"
+#include "../emulators/emulators.hpp"
 
 class MenuState : public State
 {

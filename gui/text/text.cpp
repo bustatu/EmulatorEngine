@@ -1,4 +1,4 @@
-#include "text.h"
+#include "text.hpp"
 
 void Text::render()
 {

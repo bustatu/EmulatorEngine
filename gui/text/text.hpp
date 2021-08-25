@@ -1,7 +1,7 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "font.h"
+#include "font.hpp"
 
 class Text
 {

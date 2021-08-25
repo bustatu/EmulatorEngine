@@ -1,4 +1,4 @@
-#include "cpu.h"
+#include "cpu.hpp"
 
 /// Macros for better usability
 #define op_push(val) \

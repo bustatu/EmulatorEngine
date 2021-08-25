@@ -1,7 +1,7 @@
 #ifndef BYTEPUSHER_VM_H
 #define BYTEPUSHER_VM_H
 
-#include "../../../window.h"
+#include "../../../window.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <cstring>

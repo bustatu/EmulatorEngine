@@ -1,4 +1,4 @@
-#include "ram.h"
+#include "ram.hpp"
 
 namespace Gameboy
 {

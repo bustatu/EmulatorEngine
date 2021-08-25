@@ -1,7 +1,7 @@
 #ifndef GAMEBOY_CPU_H
 #define GAMEBOY_CPU_H
 
-#include "../bus/bus.h"
+#include "../bus/bus.hpp"
 #include <sstream>
 
 namespace Gameboy

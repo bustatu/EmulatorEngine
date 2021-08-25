@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include <cmath>
-#include "../../state.h"
-#include "../../gui/gui.h"
-#include "components/vm.h"
-#include "components/input.h"
+#include "../../state.hpp"
+#include "../../gui/gui.hpp"
+#include "components/vm.hpp"
+#include "components/input.hpp"
 #include "../../external/json/single_include/nlohmann/json.hpp"
 
 namespace CHIP8

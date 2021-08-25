@@ -1,4 +1,4 @@
-#include "vm.h"
+#include "vm.hpp"
 
 #define N000(opcode) ((opcode & 0xF000) >> 12)
 #define NNN(opcode) (opcode & 0xFFF)

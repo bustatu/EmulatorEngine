@@ -2,7 +2,7 @@
 #define CHIP8_INPUT_H
 
 #include <iostream>
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
 namespace CHIP8
 {

@@ -1,4 +1,4 @@
-#include "bus.h"
+#include "bus.hpp"
 
 namespace Gameboy
 {

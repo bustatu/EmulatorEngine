@@ -2,7 +2,7 @@
 #define GAMEBOY_GPU_H
 
 #include <SDL2/SDL.h>
-#include "../bus/bus.h"
+#include "../bus/bus.hpp"
 
 /* Thanks to this for letting me understand what is going on:
    https://github.com/paramsingh/gameboi */

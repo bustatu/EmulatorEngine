@@ -1,4 +1,4 @@
-#include "chip8.h"
+#include "chip8.hpp"
 
 #ifndef M_PI
     // PI is not standardly defined everywhere

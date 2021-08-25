@@ -1,8 +1,8 @@
 #ifndef NES_H
 #define NES_H
 
-#include "../../state.h"
-#include "../../gui/gui.h"
+#include "../../state.hpp"
+#include "../../gui/gui.hpp"
 #include <fstream>
 
 namespace NES

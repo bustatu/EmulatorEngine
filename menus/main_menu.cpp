@@ -1,4 +1,4 @@
-#include "main_menu.h"
+#include "main_menu.hpp"
 
 void MenuState::init()
 {

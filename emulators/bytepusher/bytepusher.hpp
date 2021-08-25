@@ -1,8 +1,8 @@
 #ifndef BYTEPUSHER_H
 #define BYTEPUSHER_H
 
-#include "../../state.h"
-#include "components/vm.h"
+#include "../../state.hpp"
+#include "components/vm.hpp"
 #include <fstream>
 
 namespace Bytepusher
