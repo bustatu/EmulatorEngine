@@ -5,7 +5,9 @@
 Depending on your platform, make a build file called *build.sh* or *build.bat* with the following contents:
 
 > mkdir build
-> cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg>/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=<Release \ Debug>
+
+> cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE= <Path to vcpkg> /scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=<Release \ Debug>
+
 > cmake --build build
 
 After executing this, the executable should be in the */build/* file along with the */build/data/* folder.
