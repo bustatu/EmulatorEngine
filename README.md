@@ -1,14 +1,18 @@
 # Emulator Engine
 
+A CHIP8, Bytepusher and Gameboy (WIP) emulator.
+
 ## How to build
 
-Depending on your platform, make a build file called *build.sh* or *build.bat* with the following contents:
+First you need to install *vcpkg* and download the *sdl2* and *sdl2-ttf* packages from it.
 
-> mkdir build
+Depending on your platform, make a build file called *build.sh* or *build.bat* with the following contents, changing the contents in <> to fit your requirements:
 
-> cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE= <Path to vcpkg> /scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=<Release \ Debug>
-
-> cmake --build build
+```shell
+mkdir build
+cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=<Path to vcpkg>/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=<Release \ Debug>
+cmake --build build
+```
 
 After executing this, the executable should be in the */build/* file along with the */build/data/* folder.
 
