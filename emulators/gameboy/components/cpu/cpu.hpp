@@ -4,6 +4,9 @@
 #include "../bus/bus.hpp"
 #include <sstream>
 
+// Amazing CPU implementation, I liked the register handling.
+// https://github.com/marethyu/noufu/
+
 namespace Gameboy
 {
     class CPU
