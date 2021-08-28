@@ -22,9 +22,7 @@ After executing this, the executable should be in the */build/* file along with 
 - CHIP8 
     - might have some unsuported SCHIP or XOCHIP opcodes, open an issue if so.
 - Gameboy
-    - boot ROM checksum fails.
-    - boot ROM is not displayed properly.
-    - lots of opcodes missing.
+    - lots of opcodes missing. Games can not be run at the moment without crashing.
 - NES (soon)
 
 ## Screenshots from supported platforms:
