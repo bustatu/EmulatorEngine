@@ -2,6 +2,7 @@
 #define GAMEBOY_CPU_H
 
 #include "../bus/bus.hpp"
+#include <cstring>
 #include <sstream>
 
 // Amazing CPU implementation, I liked the register handling so I will use that here, too.
@@ -72,6 +73,9 @@ namespace Gameboy
         uint16_t get_word(uint16_t where);
         void write_byte(uint16_t where, uint8_t what);
         void write_word(uint16_t where, uint16_t what);
+        void shift_right(uint8_t &n, bool logical);
+        void shift_left(uint8_t &n);
+        void rotate_right(uint8_t &n, bool circular, bool resetZ);
         void rotate_left(uint8_t &n, bool circular, bool resetZ);
 
     public:

@@ -20,7 +20,7 @@ namespace Gameboy
     uint8_t Bus::readByte(uint16_t addr)
     {
         // BIOS and ROM area
-        if(addr >= 0x0000 && addr <= 0x00FE)
+        if(addr >= 0x0000 && addr <= 0x00FF)
         {
             // Cartridge control
             if(ram -> readByte(0xFF50) == 0x00)
@@ -42,7 +42,7 @@ namespace Gameboy
     uint16_t Bus::readWord(uint16_t addr)
     {
         // BIOS area
-        if(addr >= 0x0000 && addr <= 0x00FD)
+        if(addr >= 0x0000 && addr <= 0x00FE)
         {
             // Cartridge control
             if(ram -> readByte(0xFF50) == 0x00)

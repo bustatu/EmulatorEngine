@@ -44,6 +44,8 @@ namespace Gameboy
         if(!isOn())
             return;
 
+        //printf("%d\n", bus -> readByte(0xFF50));
+
         // Update the clock
         clock++;
 
