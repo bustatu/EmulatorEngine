@@ -83,8 +83,8 @@ void MenuState::update(double dt)
     if(window -> getKeyPressed(SDLK_w))
         index--;
 
-    index = std::max(1, index);
-    index = std::min(4, index);
+    index = ((1 > index) ? 1 : index);
+    index = ((4 < index) ? 4 : index);
 }
 
 void MenuState::draw()

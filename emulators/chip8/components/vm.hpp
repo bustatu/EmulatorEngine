@@ -7,6 +7,7 @@
 #include <SDL2/SDL.h>
 #include <cstring>
 #include <sstream>
+#include <xbyak/xbyak.h>
 #include <time.h>
 
 namespace CHIP8
@@ -117,9 +118,6 @@ namespace CHIP8
 
         // Draws to a texture using a renderer
         void draw(SDL_Texture* &target, SDL_Renderer* tool);
-
-        // Disassemblies one opcode
-        static std::string disassembly(uint16_t opcode);
 
         // Executes one opcodeweeb art
         void execute(uint16_t opcode);

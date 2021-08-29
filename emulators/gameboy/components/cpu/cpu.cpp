@@ -211,6 +211,218 @@ namespace Gameboy
             // NOP - do nothing
             case 0x00:  break;
 
+            // Load in 8 bit register from 8 bit register
+            case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x47: // Load in B
+            case 0x48: case 0x49: case 0x4A: case 0x4B: case 0x4C: case 0x4D: case 0x4F: // Load in C
+            case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x57: // Load in D
+            case 0x58: case 0x59: case 0x5A: case 0x5B: case 0x5C: case 0x5D: case 0x5F: // Load in E
+            case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x67: // Load in H
+            case 0x68: case 0x69: case 0x6A: case 0x6B: case 0x6C: case 0x6D: case 0x6F: // Load in L
+            case 0x78: case 0x79: case 0x7A: case 0x7B: case 0x7C: case 0x7D: case 0x7F: // Load in A
+                *reg8_group[opcode >> 3 & 7] = *reg8_group[opcode & 7];
+                break;
+
+            // Load in 8 bit register from PC
+            case 0x06: case 0x0E: case 0x16: case 0x1E: case 0x26: case 0x2E: case 0x3E:
+                *reg8_group[(opcode - 6) >> 3] = get_byte(PC++);
+                break;
+
+            // Load in 8 bit register value at adress HL
+            case 0x46: case 0x4E: case 0x56: case 0x5E: case 0x66: case 0x6E: case 0x7E:
+                *reg8_group[(opcode - 70) >> 3] = get_byte(HL);
+                break;
+
+            // Store 8 bit register at adress HL
+            case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x77:
+                write_byte(HL, *reg8_group[opcode - 0x70]);
+                break;
+            
+            // Load byte at adress HL
+            case 0x36:
+                write_byte(HL, get_byte(PC++));
+                break;
+
+            // Load A from adress in 16 bit register - group 2
+            case 0x0A: case 0x1A: case 0x2A: case 0x3A:
+                A = get_byte(*reg16_group2[(opcode - 0x0A) >> 4]);
+                HL += HL_ADD[(opcode - 0x0A) >> 4];
+                break;
+
+            // Store A at 16 bit register address - group 2
+            case 0x02: case 0x12: case 0x22: case 0x32:
+                // Store A
+                write_byte(*reg16_group2[(opcode - 0x02) >> 4], A);
+
+                // If HL needs to be updated
+                HL += HL_ADD[(opcode - 0x02) >> 4];
+                break;
+
+            // Load A from adress at next word
+            case 0xFA:
+                A = get_byte(get_word(PC));
+                PC += 2;
+                break;
+
+            // Store A at adress from next word
+            case 0xEA:
+                write_byte(get_word(PC), A);
+                PC += 2;
+                break;
+
+            // Load A relative to 0xFF00 with byte offset
+            case 0xF0:
+                A = get_byte(0xFF00 + get_byte(PC++));
+                break;
+
+            // Store A relative to 0xFF00 with byte offset
+            case 0xE0:
+                write_byte(0xFF00 + get_byte(PC++), A);
+                break;
+
+            // Load A relative to 0xFF00 with C offset
+            case 0xF2:
+                A = get_byte(0xFF00 + C);
+                break;
+
+            // Store A relative to 0xFF00 with C offset
+            case 0xE2:
+                write_byte(0xFF00 + C, A);
+                break;
+
+            // Load in 16 bit register - group 1
+            case 0x01: case 0x11: case 0x21: case 0x31:
+                *reg16_group1[(opcode - 0x01) >> 4] = get_word(PC);
+                PC += 2;
+                break;
+
+            // Store stack pointer to adress from next word
+            case 0x08:
+                write_word(get_word(PC), SP);
+                PC += 2;
+                break;
+
+            // Store HL in SP
+            case 0xF9:
+                SP = HL;
+                waitTimer += 4;
+                break;
+
+            // Push 16 bit register - group 3
+            case 0xC5: case 0xD5: case 0xE5: case 0xF5:
+                push(*reg16_group3[(opcode - 0xC5) >> 4]);
+                waitTimer += 4;
+                break;
+
+            // Pop 16 bit register - group 3
+            case 0xC1: case 0xD1: case 0xE1: case 0xF1:
+                *reg16_group3[(opcode - 0xC1) >> 4] = pop();
+                // Lower nibble of the flag register should stay untouched after popping
+                if(opcode == 0xF1) F &= 0xF0;
+                break;
+
+            // Add 8 bit register to A with / without carry
+            case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x87: // Without carry
+            case 0x88: case 0x89: case 0x8A: case 0x8B: case 0x8C: case 0x8D: case 0x8F: // With carry
+            {
+                uint8_t reg = *reg8_group[opcode - (opcode <= 0x87 ? 0x80 : 0x88)];
+                int cy = opcode > 0x87 ? get_flag(4) : 0;
+                set_flag(5, HC8(A, reg, cy));
+                set_flag(4, CARRY(A, reg, cy));
+                A += reg + cy;
+                set_flag(7, A == 0);
+                set_flag(6, 0);
+                break;
+            }
+
+            // Add next byte to A with / without carry
+            case 0xC6: case 0xCE:   // Without / With
+            {
+                uint8_t n = get_byte(PC++);
+                int cy = opcode == 0xCE ? get_flag(4) : 0;
+                set_flag(5, HC8(A, n, cy));
+                set_flag(4, CARRY(A, n, cy));
+                A += n + cy;
+                set_flag(7, A == 0);
+                set_flag(6, 0);
+                break;
+            }
+
+            // Add byte at adress HL to A with / without carry
+            case 0x86: case 0x8E:   // Without / With
+            {
+                uint8_t hl = get_byte(HL);
+                int cy = opcode == 0x8E ? get_flag(4) : 0;
+                set_flag(5, HC8(A, hl, cy));
+                set_flag(4, CARRY(A, hl, cy));
+                A += hl + cy;
+                set_flag(7, A == 0);
+                set_flag(6, 0);
+                break;
+            }
+
+            // Subtract 8 bit register from A
+            case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x97: // Without carry
+            case 0x98: case 0x99: case 0x9A: case 0x9B: case 0x9C: case 0x9D: case 0x9F: // With carry
+            {
+                uint8_t reg = *reg8_group[opcode - (opcode <= 0x97 ? 0x90 : 0x98)];
+                int cy = opcode > 0x97 ? get_flag(4) : 0;
+                set_flag(5, HC_SUB(A, reg, cy));
+                set_flag(4, CARRY_SUB(A, reg, cy));
+                A -= reg + cy;
+                set_flag(7, A == 0);
+                set_flag(6, 1);
+                break;
+            }
+
+            // Subtract next byte from A with / without carry
+            case 0xD6: case 0xDE:   // Without / With
+            {
+                uint8_t n = get_byte(PC++);
+                int cy = opcode == 0xDE ? get_flag(4) : 0;
+                set_flag(5, HC_SUB(A, n, cy));
+                set_flag(4, CARRY_SUB(A, n, cy));
+                A -= n + cy;
+                set_flag(7, A == 0);
+                set_flag(6, 1);
+                break;
+            }
+
+            // Subtract byte at adress HL from A with / without carry
+            case 0x96: case 0x9E:   // Without / With
+            {
+                uint8_t hl = get_byte(HL);
+                int cy = opcode == 0x9E ? get_flag(4) : 0;
+                set_flag(5, HC_SUB(A, hl, cy));
+                set_flag(4, CARRY_SUB(A, hl, cy));
+                A -= hl + cy;
+                set_flag(7, A == 0);
+                set_flag(6, 1);
+            }
+
+            // AND A with 8 bit register
+            case 0xA0: case 0xA1: case 0xA2: case 0xA3: case 0xA4: case 0xA5: case 0xA7:
+                A &= *reg8_group[opcode - 0xA0];
+                F = 0;
+                set_flag(7, A == 0);
+                set_flag(5, 1);
+                break;
+
+            // AND A with next byte
+            case 0xE6:
+                A &= get_byte(PC++);
+                F = 0;
+                set_flag(7, A == 0);
+                set_flag(4, 1);
+                break;
+
+            // AND A with adress at HL
+            case 0xA6:
+                A &= get_byte(HL);
+                F = 0;
+                set_flag(7, A == 0);
+                set_flag(4, 1);
+                break;
+
             // XOR A with 8 bit register
             case 0xA8: case 0xA9: case 0xAA: case 0xAB: case 0xAC: case 0xAD: case 0xAF:
                 A ^= *reg8_group[opcode - 0xA8];
@@ -229,7 +441,7 @@ namespace Gameboy
                 set_flag(7, A == 0);
                 break;
 
-            // XOR A with value at adress HL
+            // XOR A with byte at adress HL
             case 0xAE:
                 A ^= get_byte(HL);
 
@@ -247,30 +459,56 @@ namespace Gameboy
                 set_flag(7, A == 0);
                 break;
 
-            // AND A with 8 bit register
-            case 0xA0: case 0xA1: case 0xA2: case 0xA3: case 0xA4: case 0xA5: case 0xA7:
-                A &= *reg8_group[opcode - 0xA0];
+            // OR A with next byte
+            case 0xF6:
+                A |= get_byte(PC++);
+
+                // Reset all flags and set the good one
                 F = 0;
                 set_flag(7, A == 0);
-                set_flag(5, 1);
                 break;
 
-            // AND A with value
-            case 0xE6:
-                A &= get_byte(PC++);
+            // OR A with byte at adress HL
+            case 0xB6:
+                A |= get_byte(HL);
+
+                // Reset all flags and set the good one
                 F = 0;
                 set_flag(7, A == 0);
-                set_flag(4, 1);
-                break;         
-
-            // Store A at 16 bit register address - group 2
-            case 0x02: case 0x12: case 0x22: case 0x32:
-                // Store A
-                write_byte(*reg16_group2[(opcode - 0x02) >> 4], A);
-
-                // If HL needs to be updated
-                HL += HL_ADD[(opcode - 0x02) >> 4];
                 break;
+
+            // Compare A with 8 bit register
+            case 0xB8: case 0xB9: case 0xBA: case 0xBB: case 0xBC: case 0xBD: case 0xBF:
+            {
+                uint8_t reg = *reg8_group[opcode - 0xB8];
+                set_flag(7, A == reg);
+                set_flag(6, 1);
+                set_flag(5, HC_SUB(A, reg, 0));
+                set_flag(4, CARRY_SUB(A, reg, 0));
+                break;
+            }
+
+            // Compare A with next byte
+            case 0xFE:
+            {
+                uint8_t n = get_byte(PC++);
+                set_flag(7, A == n);
+                set_flag(6, 1);
+                set_flag(5, HC_SUB(A, n, 0));
+                set_flag(4, CARRY_SUB(A, n, 0));
+                break;
+            }
+
+            // Compare A with byte at adress HL
+            case 0xBE:
+            {
+                uint8_t n = get_byte(HL);
+                set_flag(7, A == n);
+                set_flag(6, 1);
+                set_flag(5, HC_SUB(A, n, 0));
+                set_flag(4, CARRY_SUB(A, n, 0));
+                break;
+            }
             
             // Increment 8 bit register
             case 0x04: case 0x0C: case 0x14: case 0x1C: case 0x24: case 0x2C: case 0x3C:
@@ -280,6 +518,18 @@ namespace Gameboy
                 set_flag(6, 0);
                 break;
 
+            // Increment byte at adress HL
+            case 0x34:
+            {
+                uint8_t hl = get_byte(HL);
+                set_flag(5, HC8(hl, 1, 0));
+                hl += 1;
+                set_flag(7, hl == 0);
+                write_byte(HL, hl);
+                set_flag(6, 0);
+                break;
+            }
+
             // Decrement 8 bit register
             case 0x05: case 0x0D: case 0x15: case 0x1D: case 0x25: case 0x2D: case 0x3D:
                 set_flag(5, HC_SUB(*reg8_group[(opcode - 0x05) >> 3], 1, 0));
@@ -288,25 +538,17 @@ namespace Gameboy
                 set_flag(6, 1);            
                 break;
 
-            // Load in 8 bit register
-            case 0x06: case 0x0E: case 0x16: case 0x1E: case 0x2E: case 0x3E:
-                *reg8_group[(opcode - 6) >> 3] = get_byte(PC++);
+            // Decrement 8 bit value at adress HL
+            case 0x35:
+            {
+                uint8_t hl = get_byte(HL);
+                set_flag(5, HC_SUB(hl, 1, 0));
+                hl -= 1;
+                set_flag(7, hl == 0);
+                write_byte(HL, hl);
+                set_flag(6, 0);
                 break;
-
-            // Load in 8 bit register from 8 bit register
-            case 0x47: // Load in B
-            case 0x4F: // Load in C
-            case 0x58: case 0x59: case 0x5A: case 0x5B: case 0x5C: case 0x5D: case 0x5F: // Load in E
-            case 0x57: // Load in D
-            case 0x67: // Load in H
-            case 0x78: case 0x79: case 0x7A: case 0x7B: case 0x7C: case 0x7D: case 0x7F: // Load in A
-                *reg8_group[opcode >> 3 & 7] = *reg8_group[opcode & 7];
-                break;
-
-            // Load byte at adress HL
-            case 0x36:
-                write_byte(HL, get_byte(PC++));
-                break;
+            }
 
             // Increment 16 bit register - group 1
             case 0x03: case 0x13: case 0x23: case 0x33:
@@ -320,81 +562,24 @@ namespace Gameboy
                 waitTimer += 4;
                 break;
 
-            // Load in 16 bit register - group 1
-            case 0x01: case 0x11: case 0x21: case 0x31:
-                *reg16_group1[(opcode - 0x01) >> 4] = get_word(PC);
-                PC += 2;
-                break;
-
-            // Load A from next word adress
-            case 0xFA:
-                A = get_byte(get_word(PC));
-                PC += 2;
-                break;
-
-            // Load A from adress in 16 bit register - group 2
-            case 0x1A: case 0x2A:
-                A = get_byte(*reg16_group2[(opcode - 0x0A) >> 4]);
-                HL += HL_ADD[(opcode - 0x0A) >> 4];
-                break;
-
-            // Store A relative to 0xFF00 with C offset
-            case 0xE2:
-                write_byte(0xFF00 + C, A);
-                break;
-
-            // Store A relative to 0xFF00 with byte offset
-            case 0xE0:
-                write_byte(0xFF00 + get_byte(PC++), A);
-                break;
-
-            // Load A relative to 0xFF00 with byte offset
-            case 0xF0:
-                A = get_byte(0xFF00 + get_byte(PC++));
-                break;
-
-            // Store A at adress from memory
-            case 0xEA:
-                write_byte(get_word(PC), A);
-                PC += 2;
-                break;
-
-            // Load register from adress HL
-            case 0x46: case 0x4E: case 0x56: case 0x5E: case 0x66: case 0x6E: case 0x7E:
-                *reg8_group[(opcode - 70) >> 3] = get_byte(HL);
-                break;
-
-            // Store register at adress HL
-            case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x77:
-                write_byte(HL, *reg8_group[opcode - 0x70]);
-                break;
-
-            // Store stack pointer to adress from next word
-            case 0x08:
-                write_word(get_word(PC), SP);
-                PC += 2;
-                break;
-
-            // Subtract register from A
-            case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x97: // Without carry
-            case 0x98: case 0x99: case 0x9A: case 0x9B: case 0x9C: case 0x9D: case 0x9F: // With carry
-            {
-                uint8_t reg = *reg8_group[opcode - (opcode <= 0x97 ? 0x90 : 0x98)];
-                int cy = opcode > 0x97 ? get_flag(4) : 0;
-                set_flag(5, HC_SUB(A, reg, cy));
-                set_flag(4, CARRY_SUB(A, reg, cy));
-                A -= reg + cy;
-                set_flag(7, A == 0);
-                set_flag(6, 1);
-                break;
-            }
-
             // Complement A
             case 0x2F:
                 A ^= 0xFF;
                 set_flag(6, 1);
                 set_flag(5, 1);
                 break;
+
+            // Add to HL a 16 bit register
+            case 0x09: case 0x19: case 0x29: case 0x39:
+            {
+                uint16_t val = *reg16_group1[(opcode - 0x09) >> 4];
+                set_flag(5, HC16(HL, val));
+                set_flag(4, CARRY16(HL, val));
+                HL += val;
+                set_flag(6, 0);
+                waitTimer += 4;
+                break;
+            }
 
             // Relative conditioned jump
             case 0x20: case 0x28: case 0x30: case 0x38:
@@ -430,81 +615,6 @@ namespace Gameboy
                 waitTimer += 4;
                 break;
 
-            // Add to A byte at adress HL
-            case 0x86:
-            {
-                uint8_t hl = get_byte(HL);
-                int cy = opcode == 0x8E ? get_flag(4) : 0;
-                set_flag(5, HC8(A, hl, cy));
-                set_flag(4, CARRY(A, hl, cy));
-                A += hl + cy;
-                set_flag(7, A == 0);
-                set_flag(6, 0);
-                break;
-            }
-
-            // Add register to A with / without carry
-            case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x87: // Without carry
-            case 0x88: case 0x89: case 0x8A: case 0x8B: case 0x8C: case 0x8D: case 0x8F: // With carry
-            {
-                uint8_t reg = *reg8_group[opcode - (opcode <= 0x87 ? 0x80 : 0x88)];
-                int cy = opcode > 0x87 ? get_flag(4) : 0;
-                set_flag(5, HC8(A, reg, cy));
-                set_flag(4, CARRY(A, reg, cy));
-                A += reg + cy;
-                set_flag(7, A == 0);
-                set_flag(6, 0);
-                break;
-            }
-
-            // Add to A next byte with / without carry
-            case 0xC6: case 0xCE:
-            {
-                uint8_t hl = get_byte(PC++);
-                int cy = opcode == 0x8E ? get_flag(4) : 0;
-                set_flag(5, HC8(A, hl, cy));
-                set_flag(4, CARRY(A, hl, cy));
-                A += hl + cy;
-                set_flag(7, A == 0);
-                set_flag(6, 0);
-                break;
-            }
-
-            // Subtract to A next byte with / without carry
-            case 0xD6: case 0xDE:
-            {
-                uint8_t n = get_byte(PC++);
-                int cy = opcode == 0xDE ? get_flag(4) : 0;
-                set_flag(5, HC_SUB(A, n, cy));
-                set_flag(4, CARRY_SUB(A, n, cy));
-                A -= n + cy;
-                set_flag(7, A == 0);
-                set_flag(6, 1);
-                break;
-            }
-
-            // Compare A with byte
-            case 0xFE:
-            {
-                uint8_t n = get_byte(PC++);
-                set_flag(7, A == n);
-                set_flag(6, 1);
-                set_flag(5, HC_SUB(A, n, 0));
-                set_flag(4, CARRY_SUB(A, n, 0));
-                break;
-            }
-
-            // Compare A with byte at adress HL
-            case 0xBE:
-            {
-                uint8_t n = get_byte(HL);
-                set_flag(7, A == n);
-                set_flag(6, 1);
-                set_flag(5, HC_SUB(A, n, 0));
-                set_flag(4, CARRY_SUB(A, n, 0));
-                break;
-            }
-
             // Set carry flag
             case 0x37:
                 set_flag(6, 0);
@@ -534,19 +644,6 @@ namespace Gameboy
                 PC = pop();
                 waitTimer += 4;
                 break;
-            
-            // Push 16 bit register - group 3
-            case 0xC5: case 0xD5: case 0xE5: case 0xF5:
-                push(*reg16_group3[(opcode - 0xC5) >> 4]);
-                waitTimer += 4;
-                break;
-
-            // Pop 16 bit register - group 3
-            case 0xC1: case 0xD1: case 0xE1: case 0xF1:
-                *reg16_group3[(opcode - 0xC1) >> 4] = pop();
-                // Lower nibble of the flag register should stay untouched after popping
-                if(opcode == 0xF1) F &= 0xF0;
-                break;
 
             // Rotate A's bits left
             case 0x07: // Without carry
@@ -559,27 +656,6 @@ namespace Gameboy
             case 0x1F: // With carry
                 rotate_right(A, opcode == 0x0F, true);
                 break;
-
-            // Shift left arithmetic byte at HL
-            case 0x26:
-            {
-                uint8_t hl = get_byte(HL);
-                shift_left(hl);
-                write_byte(HL, hl);
-                break;
-            }
-
-            // Add to HL a 16 bit register
-            case 0x09: case 0x19: case 0x29: case 0x39:
-            {
-                uint16_t val = *reg16_group1[(opcode - 0x09) >> 4];
-                set_flag(5, HC16(HL, val));
-                set_flag(4, CARRY16(HL, val));
-                HL += val;
-                set_flag(6, 0);
-                waitTimer += 4;
-                break;
-            }
 
             // Call from special vector table
             case 0xC7: case 0xCF: case 0xD7: case 0xDF: case 0xE7: case 0xEF: case 0xF7: case 0xFF:

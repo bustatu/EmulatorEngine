@@ -13,6 +13,9 @@ namespace Gameboy
         // ROM data
         uint8_t* data = nullptr;
 
+        // Check if file is actually loaed
+        bool loaded = false;
+
     public:
         // Load BIOS from the location
         void load(std::string path);

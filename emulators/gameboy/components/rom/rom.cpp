@@ -5,7 +5,7 @@ namespace Gameboy
     uint16_t ROM::readWord(uint16_t addr)
     {
         // Readings return 0xFFFF if nothing is loaded
-        if(data == nullptr)
+        if(!loaded)
             return 0xFFFF;
         return (data[addr + 1] << 8) | data[addr];
     }
@@ -13,7 +13,7 @@ namespace Gameboy
     uint8_t ROM::readByte(uint16_t addr)
     {
         // Readings return 0xFF if nothing is loaded
-        if(data == nullptr)
+        if(!loaded)
             return 0xFF;
         return data[addr];
     }
@@ -33,18 +33,18 @@ namespace Gameboy
         data = new uint8_t[fileSize];
 
         if(fileSize == -1)
-        {
             printf("\033[1;31m{E}: File at path %s does not exist!\n\033[0m", path.c_str());
-        }
         else
         {
-            if(data[0x147] != 0x00)
-            {
-                printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", data[0x147]);        
-            }
-            
             // Read the BIOS
             file.read(reinterpret_cast<char*>(data), fileSize);
+
+            // Vibecheck
+            if(data[0x147] != 0x00)
+                printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", data[0x147]);        
+
+            // Mark as loaded
+            loaded = true;
 
             printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
         }

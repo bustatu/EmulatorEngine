@@ -1,7 +1,6 @@
 add_library(CHIP8
     "chip8.cpp"
     "components/vm.cpp"
-    "components/vm-dynarec.cpp"
     "components/input.cpp"
     "components/graphics.cpp"
 )
