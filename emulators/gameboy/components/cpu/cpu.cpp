@@ -81,7 +81,7 @@ namespace Gameboy
         set_flag(4, flag);
     }
 
-    void CPU::rotate_right(uint8_t &n, bool circular, bool rZ = false)
+    void CPU::rotate_right(uint8_t &n, bool circular, bool rZ)
     {
         bool flag = get_bit(n, 0);
         n >>= 1;
@@ -92,7 +92,7 @@ namespace Gameboy
         set_flag(4, flag);
     }
 
-    void CPU::rotate_left(uint8_t &n, bool circular, bool rZ = false)
+    void CPU::rotate_left(uint8_t &n, bool circular, bool rZ)
     {
         bool flag = get_bit(n, 7);
         n <<= 1;
@@ -412,7 +412,7 @@ namespace Gameboy
                 A &= get_byte(PC++);
                 F = 0;
                 set_flag(7, A == 0);
-                set_flag(4, 1);
+                set_flag(5, 1);
                 break;
 
             // AND A with adress at HL
@@ -550,16 +550,10 @@ namespace Gameboy
                 break;
             }
 
-            // Increment 16 bit register - group 1
-            case 0x03: case 0x13: case 0x23: case 0x33:
-                *reg16_group1[(opcode - 0x03) >> 4] += 1;
-                waitTimer += 4;
-                break;
-
-            // Decrement 16 bit register - group 1
-            case 0x0B: case 0x1B: case 0x2B: case 0x3B:
-                *reg16_group1[(opcode - 0x0B) >> 4] -= 1;
-                waitTimer += 4;
+            // DAA - Decimal Adjust Accumulator??
+            case 0x27:
+                // TODO: implement this
+                printf("\033[1;31m{E}: Unhandled DAA opcode!\033[0m\n");
                 break;
 
             // Complement A
@@ -581,14 +575,108 @@ namespace Gameboy
                 break;
             }
 
-            // Relative conditioned jump
-            case 0x20: case 0x28: case 0x30: case 0x38:
+            // Increment 16 bit register - group 1
+            case 0x03: case 0x13: case 0x23: case 0x33:
+                *reg16_group1[(opcode - 0x03) >> 4] += 1;
+                waitTimer += 4;
+                break;
+
+            // Decrement 16 bit register - group 1
+            case 0x0B: case 0x1B: case 0x2B: case 0x3B:
+                *reg16_group1[(opcode - 0x0B) >> 4] -= 1;
+                waitTimer += 4;
+                break;
+
+            // Add next signed byte to SP
+            case 0xE8:
             {
-                int8_t offset = get_byte(PC++);
-                if(get_condition((opcode - 0x20) >> 3))
-                    PC += offset;
+                int8_t dd = get_byte(PC++);
+                set_flag(5, HC8(SP, dd, 0));
+                set_flag(4, CARRY(SP, dd, 0));
+                SP += dd;
+                set_flag(7, 0);
+                set_flag(6, 0);
+                waitTimer += 8;
                 break;
             }
+            
+            // Set HL to SP + next signed byte
+            case 0xF8:
+            {
+                int8_t dd = get_byte(PC++);
+                set_flag(5, HC8(SP, dd, 0));
+                set_flag(4, CARRY(SP, dd, 0));
+                HL = SP + dd;
+                set_flag(7, 0);
+                set_flag(6, 0);
+                waitTimer += 4;
+                break;
+            }
+
+            // Rotate A's bits left
+            case 0x07: case 0x17: // Without / with carry
+                rotate_left(A, opcode == 0x07, true);
+                break;
+
+            // Rotate A's bits right
+            case 0x0F: case 0x1F: // Without / with carry
+                rotate_right(A, opcode == 0x0F, true);
+                break;
+
+            // Complement carry flag
+            case 0x3F:
+                set_flag(6, 0);
+                set_flag(5, 0);
+                set_flag(4, !get_flag(4));
+                break;
+
+            // Set carry flag
+            case 0x37:
+                set_flag(6, 0);
+                set_flag(5, 0);
+                set_flag(4, 1);
+                break;
+
+            // Halt
+            case 0x76:
+                // TODO: implement this
+                printf("\033[1;31m{E}: Unhandled halt opcode!\033[0m\n");
+                break;
+            
+            // Stop
+            case 0x10:
+                // TODO: implement this
+                printf("\033[1;31m{E}: Unhandled stop opcode!\033[0m\n");
+                break;
+
+            // Disable interrupts
+            case 0xF3:
+                // TODO: implement this
+                printf("\033[1;31m{E}: Unhandled disable interrupts opcode!\033[0m\n");
+                break;
+
+            // Enable interrupts
+            case 0xFB:
+                // TODO: implement this
+                printf("\033[1;31m{E}: Unhandled enable interrupts opcode!\033[0m\n");
+                break;
+
+            // Direct jump
+            case 0xC3:
+                PC = get_word(PC);
+                waitTimer += 4;
+                break;
+
+            // Jump to HL
+            case 0xE9:
+                PC = HL;
+                break;
+
+            // Conditioned jump to next byte
+            case 0xC2: case 0xCA: case 0xD2: case 0xDA:
+                if(get_condition((opcode - 0xC2) >> 3))
+                    PC = get_word(PC);
+                break;
 
             // Relative jump
             case 0x18:
@@ -598,29 +686,14 @@ namespace Gameboy
                 break;
             }
 
-            // Disable interrupts
-            case 0xF3:
-                // TODO: implement this
+            // Relative conditioned jump
+            case 0x20: case 0x28: case 0x30: case 0x38:
+            {
+                int8_t offset = get_byte(PC++);
+                if(get_condition((opcode - 0x20) >> 3))
+                    PC += offset;
                 break;
-
-            // Enable interrupts
-            case 0xFB:
-                // TODO: implement this
-                break;
-
-            // Direct jump
-            case 0xC3:
-                PC += 2;
-                PC = get_word(PC - 2);
-                waitTimer += 4;
-                break;
-
-            // Set carry flag
-            case 0x37:
-                set_flag(6, 0);
-                set_flag(5, 0);
-                set_flag(4, 1);
-                break;
+            }
 
             // Call function at next word adress
             case 0xCD:
@@ -645,16 +718,16 @@ namespace Gameboy
                 waitTimer += 4;
                 break;
 
-            // Rotate A's bits left
-            case 0x07: // Without carry
-            case 0x17: // With carry
-                rotate_left(A, opcode == 0x07, true);
+            // Conditional return from function
+            case 0xC0: case 0xC8: case 0xD0: case 0xD8:
+                if(get_condition((opcode - 0xC0) >> 3))
+                    PC = pop();
+                waitTimer += 4;
                 break;
 
-            // Rotate A's bits right
-            case 0x0F: // Without carry
-            case 0x1F: // With carry
-                rotate_right(A, opcode == 0x0F, true);
+            // Return and enable interrupts
+            case 0xD9:
+                printf("\033[1;31m{E}: Unhandled return and enable interrupts opcode!\033[0m\n");
                 break;
 
             // Call from special vector table
@@ -679,13 +752,13 @@ namespace Gameboy
                 
                 // Rotate bits left
                 case 0x11:  // Without carry
-                    rotate_left(*reg8_group[opcode & 7], !((opcode >> 3) & 7));
+                    rotate_left(*reg8_group[opcode & 7], !((opcode >> 3) & 7), false);
                     break;
 
                 // Rotate register bits right
                 case 0x08: case 0x09: case 0x0A: case 0x0B: case 0x0C: case 0x0D: case 0x0F: // With carry
                 case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1F: // Without carry
-                    rotate_right(*reg8_group[(opcode & 0x0F) - 0x08], !((opcode >> 4) & 0x0F));
+                    rotate_right(*reg8_group[(opcode & 0x0F) - 0x08], !((opcode >> 4) & 0x0F), false);
                     break;
 
                 // Shift bits right logical
