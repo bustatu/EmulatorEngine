@@ -31,7 +31,7 @@ namespace Gameboy
         // ROM only area
         else if(addr <= 0x7FFF)
             return rom -> readByte(addr); 
-        else
+        else if(addr <= 0xFFFF)
             return ram -> readByte(addr);
 
         // Not implemented
@@ -54,7 +54,7 @@ namespace Gameboy
         else if(addr <= 0x7FFF)
             return rom -> readWord(addr);       
         // RAM area
-        else
+        else if(addr <= 0xFFFE)
             return ram -> readWord(addr);
 
         // Not implemented
@@ -64,7 +64,7 @@ namespace Gameboy
 
     void Bus::writeByte(uint16_t addr, uint8_t val)
     {
-        if(addr > 0x7FFF)
+        if(addr > 0x7FFF && addr <= 0xFFFF)
             ram -> writeByte(addr, val);
         else
             printf("\033[1;31m{E}: Unimplemented writeByte at address %04X, value %04X \033[0m\n", addr, val);
@@ -72,7 +72,7 @@ namespace Gameboy
 
     void Bus::writeWord(uint16_t addr, uint16_t val)
     {
-        if(addr > 0x7FFF)
+        if(addr > 0x7FFF && addr <= 0xFFFE)
             ram -> writeWord(addr, val);
         else
             printf("\033[1;31m{E}: Unimplemented writeWord at address %04X, value %04X \033[0m\n", addr, val);
