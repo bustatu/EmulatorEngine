@@ -556,11 +556,11 @@ namespace Gameboy
             {
                 uint16_t correction = 0, flagcarry = 0;
 
-                // Correct based on digits
+                // Correct based on digits and operation
                 if(get_flag(5) || (!get_flag(6) && (A & 0xF) > 9))
                     correction |= 0x6;
                 if(get_flag(4) || (!get_flag(6) && A > 0x99))
-                    correction |= 0x66, flagcarry = 1;
+                    correction |= 0x60, flagcarry = 1;
 
                 // Correct the acumulator
                 A += get_flag(6) ? -correction : correction;
