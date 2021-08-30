@@ -550,11 +550,28 @@ namespace Gameboy
                 break;
             }
 
-            // DAA - Decimal Adjust Accumulator??
+            // DAA - Decimal Adjust Accumulator - adjusts the accumulator for BCD operations
+            // Why is this a thing?
             case 0x27:
-                // TODO: implement this
-                printf("\033[1;31m{E}: Unhandled DAA opcode!\033[0m\n");
+            {
+                uint16_t correction = 0, flagcarry = 0;
+
+                // Correct based on digits
+                if(get_flag(5) || (!get_flag(6) && (A & 0xF) > 9))
+                    correction |= 0x6;
+                if(get_flag(4) || (!get_flag(6) && A > 0x99))
+                    correction |= 0x66, flagcarry = 1;
+
+                // Correct the acumulator
+                A += get_flag(6) ? -correction : correction;
+                A &= 0xFF;
+
+                // Set zero flag
+                set_flag(7, A == 0);
+                set_flag(5, 0);
+                set_flag(4, flagcarry);
                 break;
+            }
 
             // Complement A
             case 0x2F:
