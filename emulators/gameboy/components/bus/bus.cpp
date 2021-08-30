@@ -55,6 +55,9 @@ namespace Gameboy
         // Others
         else if(addr <= 0xFFFF)
             return ram -> readByte(addr);
+
+        // Invalid
+        return 0xFF;
     }
 
     uint16_t Bus::readWord(uint16_t addr)
@@ -98,6 +101,6 @@ namespace Gameboy
     {
         // 2 byte writes
         writeByte(addr, val & 0xFF);
-        writeByte(addr + 1, (val & 0xFF00) >> 8);
+        writeByte(addr + 1, val >> 8);
     }
 }

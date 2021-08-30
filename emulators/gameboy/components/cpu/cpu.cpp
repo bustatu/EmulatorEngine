@@ -30,6 +30,10 @@ namespace Gameboy
         // Clear the registers with 0
         memset(reg8, 0, 10);
 
+        // IME flag to true
+        ime_flag = true;
+        ei_delay = 0;
+
         // If skipping BIOS
         if(PC == 0x100)
         {
@@ -127,7 +131,7 @@ namespace Gameboy
     {
         // 2 separate byte writes
         write_byte(where, what & 0xFF);
-        write_byte(where + 1, (what & 0xFF00 >> 8));
+        write_byte(where + 1, what >> 8);
     }
 
     void CPU::call(uint16_t addr)
@@ -195,6 +199,12 @@ namespace Gameboy
 
     void CPU::execute()
     {
+        // If we are still having delay
+        if (ei_delay > 0)
+            // Enable interrupts
+            if(--ei_delay == 0)
+                ime_flag = true;
+
         // If allowed to go
         if(waitTimer == 0)
         {
@@ -549,17 +559,16 @@ namespace Gameboy
             // Why is this a thing?
             case 0x27:
             {
-                uint16_t correction = 0;
+                if(get_flag(6))
+                    A -= 0x60 * get_flag(4) + 0x6 * get_flag(5);
+                else
+                {
+                    if(get_flag(4) || A > 0x99)
+                        A += 0x60, set_flag(4, 1);
 
-                // Correct based on digits and operation
-                if(get_flag(5) || (!get_flag(6) && (A & 0xF) > 9))
-                    correction |= 0x6 , set_flag(4, 0);
-                if(get_flag(4) || (!get_flag(6) && A > 0x99))
-                    correction |= 0x60, set_flag(4, 1);
-
-                // Correct the acumulator
-                A += get_flag(6) ? -correction : correction;
-                A &= 0xFF;
+                    if(get_flag(5) || (A & 0xF) > 0x9)
+                        A += 0x6;
+                }
 
                 // Set zero flag
                 set_flag(7, A == 0);
@@ -662,14 +671,20 @@ namespace Gameboy
 
             // Disable interrupts
             case 0xF3:
-                // TODO: implement this
-                printf("\033[1;31m{E}: Unhandled disable interrupts opcode!\033[0m\n");
+                // If will enable, then disable
+                if(ei_delay > 0)
+                    ei_delay = 0;
+                else
+                    // Disable directly
+                    ime_flag = false;
                 break;
 
             // Enable interrupts
             case 0xFB:
-                // TODO: implement this
-                printf("\033[1;31m{E}: Unhandled enable interrupts opcode!\033[0m\n");
+                // Enable if delay is 0 and not enabled.
+                // Has one instruction delay
+                if(!ime_flag && ei_delay == 0)
+                    ei_delay = 2;
                 break;
 
             // Direct jump
@@ -743,6 +758,7 @@ namespace Gameboy
 
             // Call from special vector table
             case 0xC7: case 0xCF: case 0xD7: case 0xDF: case 0xE7: case 0xEF: case 0xF7: case 0xFF:
+                // TODO: disable interrupts
                 call(RST_ADDR[(opcode - 0xC7) >> 3]);
                 waitTimer += 4;
                 break;

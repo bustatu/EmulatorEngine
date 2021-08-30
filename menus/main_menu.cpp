@@ -62,7 +62,8 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
-            state -> loadROM("data/gameboy/roms/Tetris.gb");
+            // 2, 7, 9, 11
+            state -> loadROM("data/gameboy/roms/02-interrupts.gb");
             stateM -> pushState(state);
         }
         else if(index == 4)

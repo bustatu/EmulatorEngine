@@ -50,6 +50,10 @@ namespace Gameboy
         // Execution halting timer
         uint32_t waitTimer;
 
+        // Interrupt management
+        bool ime_flag;
+        uint8_t ei_delay;
+
         // Bus handler
         Bus* bus;
 

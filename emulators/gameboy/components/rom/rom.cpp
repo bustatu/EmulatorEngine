@@ -78,7 +78,7 @@ namespace Gameboy
             printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
 
             // Delete the loaded memory
-            delete dataFile;
+            delete[] dataFile;
         }
     }
 }
