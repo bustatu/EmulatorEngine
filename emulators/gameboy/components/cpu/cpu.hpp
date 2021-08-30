@@ -6,6 +6,7 @@
 #include <sstream>
 
 // Amazing CPU implementation, I liked the register handling so I will use that here, too.
+// Sorry to hear his head was hurting while making these but I am using them so mine doesn't hurt. (頭いてェー)
 // https://github.com/marethyu/noufu/
 
 namespace Gameboy
