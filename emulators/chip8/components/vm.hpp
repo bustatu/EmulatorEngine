@@ -7,7 +7,6 @@
 #include <SDL2/SDL.h>
 #include <cstring>
 #include <sstream>
-#include <xbyak/xbyak.h>
 #include <time.h>
 
 namespace CHIP8

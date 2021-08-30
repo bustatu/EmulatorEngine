@@ -6,6 +6,7 @@ add_library(Gameboy
     "components/gpu/gpu.cpp"
     "components/ram/ram.cpp"
     "components/rom/rom.cpp"
+    "components/rom/MBCs/mbc0.cpp"
 )
 
 # SDL2 stuff

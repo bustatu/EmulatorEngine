@@ -8,11 +8,6 @@ namespace Gameboy
         data = new uint8_t[0x100];
     }
 
-    uint16_t BIOS::readWord(uint16_t addr)
-    {
-        return (data[addr + 1] << 8) | data[addr];
-    }
-
     uint8_t BIOS::readByte(uint16_t addr)
     {
         return data[addr];

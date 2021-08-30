@@ -107,8 +107,27 @@ namespace Gameboy
     {
         // Update timer
         waitTimer += 4;
-        
         return bus -> readByte(where);
+    }
+
+    uint16_t CPU::get_word(uint16_t where)
+    {
+        // 2 separate byte reads
+        return (get_byte(where + 1) << 8) | get_byte(where);
+    }
+
+    void CPU::write_byte(uint16_t where, uint8_t what)
+    {
+        // Update timer
+        waitTimer += 4;
+        bus -> writeByte(where, what);
+    }
+
+    void CPU::write_word(uint16_t where, uint16_t what)
+    {
+        // 2 separate byte writes
+        write_byte(where, what & 0xFF);
+        write_byte(where + 1, (what & 0xFF00 >> 8));
     }
 
     void CPU::call(uint16_t addr)
@@ -132,30 +151,6 @@ namespace Gameboy
         uint16_t data = get_word(SP);
         SP += 2;
         return data;
-    }
-
-    uint16_t CPU::get_word(uint16_t where)
-    {
-        // Update timer
-        waitTimer += 8;
-        
-        return bus -> readWord(where);
-    }
-
-    void CPU::write_byte(uint16_t where, uint8_t what)
-    {
-        // Update timer
-        waitTimer += 4;
-        
-        bus -> writeByte(where, what);
-    }
-
-    void CPU::write_word(uint16_t where, uint16_t what)
-    {
-        // Update timer
-        waitTimer += 8;
-
-        bus -> writeWord(where, what);
     }
 
     void CPU::set_flag(uint8_t who, uint8_t what)

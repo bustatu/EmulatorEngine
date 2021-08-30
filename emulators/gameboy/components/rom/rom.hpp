@@ -2,8 +2,8 @@
 #define GAMEBOY_ROM_H
 
 #include <fstream>
-
-// TODO: IMPLEMENT MORE MBCs
+#include "MBCs/mbc.hpp"
+#include "MBCs/mbc0.hpp"
 
 namespace Gameboy
 {
@@ -11,7 +11,7 @@ namespace Gameboy
     {
     private:
         // ROM data
-        uint8_t* data = nullptr;
+        MBC *data = nullptr;
 
         // Check if file is actually loaed
         bool loaded = false;
@@ -20,11 +20,8 @@ namespace Gameboy
         // Load BIOS from the location
         void load(std::string path);
 
-        // Reads a byte from the specified offset
         uint8_t readByte(uint16_t addr);
-
-        // Read a word from the specified offset
-        uint16_t readWord(uint16_t addr);
+        void writeByte(uint16_t addr, uint8_t val);
     };
 }
 
