@@ -554,13 +554,13 @@ namespace Gameboy
             // Why is this a thing?
             case 0x27:
             {
-                uint16_t correction = 0, flagcarry = 0;
+                uint16_t correction = 0;
 
                 // Correct based on digits and operation
                 if(get_flag(5) || (!get_flag(6) && (A & 0xF) > 9))
-                    correction |= 0x6;
+                    correction |= 0x6 , set_flag(4, 0);
                 if(get_flag(4) || (!get_flag(6) && A > 0x99))
-                    correction |= 0x60, flagcarry = 1;
+                    correction |= 0x60, set_flag(4, 1);
 
                 // Correct the acumulator
                 A += get_flag(6) ? -correction : correction;
@@ -569,7 +569,6 @@ namespace Gameboy
                 // Set zero flag
                 set_flag(7, A == 0);
                 set_flag(5, 0);
-                set_flag(4, flagcarry);
                 break;
             }
 
