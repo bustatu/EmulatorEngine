@@ -4,6 +4,8 @@ namespace Gameboy
 {
     void Emu::init()
     {
+        Window* window = stateM -> getWindow();
+
         // Initialise components
         if(bios == nullptr)
             bios = new BIOS();
@@ -34,6 +36,9 @@ namespace Gameboy
 
         // Reset execution timer
         executionTimer = 0;
+
+        // Update the screen output (correct the aspect ratio)
+        SDL_RenderSetLogicalSize(window -> getRenderer(), 160, 144);
     }
 
     void Emu::skip_bios()
@@ -99,18 +104,7 @@ namespace Gameboy
         // Update the output if needed
         gpu -> draw(output, window -> getRenderer());
 
-        // Update the screen output (correct the aspect ratio)
-        SDL_Rect* rect = new SDL_Rect();
-        rect -> h = window -> getSize().second;
-        rect -> w = rect -> h * 160 / 144;
-
-        rect -> x = (window -> getSize().first - rect -> w) / 2;
-        rect -> y = 0;
-
         // Update the screen output
-        SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
-
-        // Delete the allocated rect
-        delete rect;
+        SDL_RenderCopy(window -> getRenderer(), output, NULL, NULL);
     }
 }

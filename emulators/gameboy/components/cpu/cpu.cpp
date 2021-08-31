@@ -261,7 +261,7 @@ namespace Gameboy
             // NOP - do nothing
             case 0x00:  break;
 
-            // Load in 8 bit register from 8 bit register
+            // Load in 8 bit register from 8 bit register 
             case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x47: // Load in B
             case 0x48: case 0x49: case 0x4A: case 0x4B: case 0x4C: case 0x4D: case 0x4F: // Load in C
             case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x57: // Load in D

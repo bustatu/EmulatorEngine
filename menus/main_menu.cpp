@@ -49,7 +49,7 @@ void MenuState::update(double dt)
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
-            state -> load("data/chip8/roms/PONG2");
+            state -> load("data/chip8/roms/TETRIS");
             stateM -> pushState(state);
         }
         else if(index == 2)
@@ -64,7 +64,7 @@ void MenuState::update(double dt)
             stateM -> pushState(state);
             //state -> skip_bios();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
-            state -> loadROM("data/gameboy/roms/Tetris.gb");
+            state -> loadROM("data/gameboy/roms/Dragon Slayer I.gb");
         }
         else if(index == 4)
         {

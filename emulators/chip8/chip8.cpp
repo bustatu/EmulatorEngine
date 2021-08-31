@@ -123,6 +123,9 @@ namespace CHIP8
 
         // Pause the sound, only gets resumed when the sound counter is positive
         window -> getAudio() -> pauseAudio();
+
+        // Update the screen output (correct the aspect ratio)
+        SDL_RenderSetLogicalSize(window -> getRenderer(), 128, 64);
     }
 
     void Emu::resume()
@@ -146,30 +149,8 @@ namespace CHIP8
 
         // Update only if the output exists
         if(output != nullptr)
-        {
-            // Update the screen output (correct the aspect ratio)
-            SDL_Rect* rect = new SDL_Rect();
-            rect -> h = window -> getSize().second;
-            rect -> w = rect -> h * 2;
-
-            if(window -> getSize().first >= rect -> w)
-            {
-                rect -> x = (window -> getSize().first - rect -> w) / 2;
-                rect -> y = 0;
-            }
-            else {
-                rect -> w = window -> getSize().first;
-                rect -> h = rect -> w / 2;
-                rect -> y = (window -> getSize().second - rect -> h) / 2;
-                rect -> x = 0;
-            }
-
             // Update the screen output
-            SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
-
-            // Delete the allocated rect
-            delete rect;
-        }
+            SDL_RenderCopy(window -> getRenderer(), output, NULL, NULL);
     }
 
     void Emu::load(std::string path)

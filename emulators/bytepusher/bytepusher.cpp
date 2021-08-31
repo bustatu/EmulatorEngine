@@ -30,25 +30,9 @@ namespace Bytepusher
 
         // Update the VM output
         vm -> draw(output, window -> getRenderer());
-        
-        // Update the screen output (correct the aspect ratio)
-        SDL_Rect* rect = new SDL_Rect();
-        rect -> w = rect -> h = window -> getSize().second;
-        rect -> y = 0;
-        rect -> x = (window -> getSize().first - rect -> w) / 2;
-
-        if(rect -> w > window -> getSize().first)
-        {
-            rect -> w = rect -> h = window -> getSize().first;
-            rect -> x = 0;
-            rect -> y = (window -> getSize().second - rect -> h) / 2;
-        }
 
         // Update the screen output
-        SDL_RenderCopy(window -> getRenderer(), output, NULL, rect);
-
-        // Delete the allocated rect
-        delete rect;
+        SDL_RenderCopy(window -> getRenderer(), output, NULL, NULL);
     }
 
     void Emu::init()
@@ -67,7 +51,10 @@ namespace Bytepusher
         window -> getAudio() -> prepare(wanted);
 
         // Unpause the sound
-        window -> getAudio() -> resumeAudio();    
+        window -> getAudio() -> resumeAudio();
+
+        // Update the screen output (correct the aspect ratio)
+        SDL_RenderSetLogicalSize(window -> getRenderer(), 256, 256);  
     }
 
     void Emu::resume()
