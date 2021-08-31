@@ -14,14 +14,19 @@ namespace Gameboy
         uint8_t *RAM;
         bool enable_ram = false;
         bool mode_flag = false;
-        uint8_t rom_size;
-        uint8_t ram_size;
-        uint8_t rom_bank_mask;
-        uint8_t rom_bank_number;
-        uint8_t ram_bank_number;
+        uint8_t rom_size = 0;
+        uint8_t ram_size = 0;
+        uint8_t rom_bank_number = 1;
+        uint8_t ram_bank_number = 0;
+
+        // Auxiliary functions
+        uint8_t get_bit(uint8_t who, uint8_t which);
+        void set_bit(uint8_t &who, uint8_t which, uint8_t what);
+        uint8_t zerobank();
+        uint8_t highbank();
 
     public:
-        void init(uint8_t* fileContents, uint16_t fileSize);
+        void init(uint8_t* fileContents, uint32_t fileSize);
 
         // 0x0000 - 0x3FFF
         uint8_t readByteFromBank00(uint16_t addr);

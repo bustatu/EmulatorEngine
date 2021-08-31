@@ -9,7 +9,7 @@ namespace Gameboy
     {
     public:
         // Init from file contents
-        virtual void init(uint8_t* fileContents, uint16_t fileSize) = 0;
+        virtual void init(uint8_t* fileContents, uint32_t fileSize) = 0;
 
         // 0x0000 - 0x3FFF
         virtual uint8_t readByteFromBank00(uint16_t addr) = 0;

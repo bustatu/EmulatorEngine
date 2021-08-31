@@ -17,6 +17,10 @@ namespace Gameboy
             rom = new ROM();
         if(gpu == nullptr)
             gpu = new GPU();
+        if(timer == nullptr)
+            timer = new Timer();
+        if(joypad == nullptr)
+            joypad = new Joypad();       
         output = SDL_CreateTexture(stateM -> getWindow() -> getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 160, 144);
 
         // Attach the components to their place
@@ -25,6 +29,8 @@ namespace Gameboy
         bus -> attachROM(rom);
         gpu -> attachBus(bus);
         cpu -> attachBus(bus);
+        timer -> attachBus(bus);
+        joypad -> attachBus(bus);
 
         // Reset execution timer
         executionTimer = 0;
@@ -63,13 +69,23 @@ namespace Gameboy
 
     void Emu::update(double dt)
     {
+        Window* window = stateM -> getWindow();
+
         executionTimer += dt;
 
         while(executionTimer >= 1.0 / freq)
         {
-            // Update the CPU and the GPU
+            // Check inputs
+            for(uint8_t i = 0; i < 6; i++)
+                if(window -> getKey(i))
+                    joypad -> press(i);
+                else
+                    joypad -> release(i);
+
+            // Update the components
             cpu -> execute();
             gpu -> update();
+            timer -> update();
 
             executionTimer -= 1.0 / freq;
         }

@@ -16,7 +16,7 @@ namespace Gameboy
     private:
         // The CPU registers, in order (for low endinan machines):
         // C, B, E, D, L, H, F, A, SP low, SP high
-        uint8_t reg8[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        uint8_t reg8[10];
 
         // C++ pointers are quite amazing
         uint16_t *reg16 = (uint16_t *) reg8;
@@ -54,6 +54,11 @@ namespace Gameboy
         bool ime_flag;
         uint8_t ei_delay;
         uint8_t IE, IF;
+
+        // Halting management
+        uint8_t halt_mode = 3; // Mode 3 = no halt
+        bool halted = false;
+        bool haltbug = false, lock = false;
 
         // Bus handler
         Bus* bus;

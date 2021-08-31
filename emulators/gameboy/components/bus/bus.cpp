@@ -51,7 +51,7 @@ namespace Gameboy
             return ram -> readByte(addr - 0x1000);
         // Unusable
         else if(addr >= 0xFEA0 && addr <= 0xFEFF)
-            return 0xFF;
+            return 0x00;
         // Others
         else if(addr <= 0xFFFF)
             return ram -> readByte(addr);

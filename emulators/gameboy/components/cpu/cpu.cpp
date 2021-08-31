@@ -33,7 +33,8 @@ namespace Gameboy
         // Clear the registers with 0
         memset(reg8, 0, 10);
 
-        // IME flag to truewreg IF,$04
+        // IME flag to true
+        ime_flag = true;
         ei_delay = 0;
     }
 
@@ -205,10 +206,22 @@ namespace Gameboy
         // If allowed to go
         if(waitTimer == 0)
         {
+            // For halt bug
+            lock = false;
+
             // If an interrupt is requested
             IE = bus -> readByte(0xFFFF), IF = bus -> readByte(0xFF0F);
-            if((IE & IF) != 0)
+            if(halt_mode != 2 && (IE & IF) != 0)
             {
+                // If CPU is halted
+                if(halt_mode != 3)
+                {
+                    halt_mode = 3;
+                    halted = false;
+                    // The docs say I need to wait another cycle so be it.
+                    if(!ime_flag) waitTimer += 4;
+                }
+
                 if(ime_flag)
                 {
                     for(int32_t i = 0; i < 5; i++)
@@ -225,6 +238,13 @@ namespace Gameboy
                             waitTimer += 4;
                         }
                 }
+            }
+
+            // If halted
+            if(halted)
+            {
+                waitTimer += 4;
+                return;
             }
 
             // If we are still having delay
@@ -684,14 +704,27 @@ namespace Gameboy
 
             // Halt
             case 0x76:
-                // TODO: implement this
-                printf("\033[1;31m{E}: Unhandled halt opcode!\033[0m\n");
+                if(ime_flag)
+                    halt_mode = 0;
+                else if(!ime_flag && ((IE & IF) == 0))
+                    halt_mode = 1;
+                else if(!ime_flag && ((IE & IF) != 0))
+                    halt_mode = 2;
+
+                if(halt_mode == 2)
+                    haltbug = lock = true;
+                else
+                    halted = true;
                 break;
             
             // Stop
             case 0x10:
                 // TODO: implement this
                 printf("\033[1;31m{E}: Unhandled stop opcode!\033[0m\n");
+                // Second byte is ignored
+                PC++;
+                // TODO: test if this works
+                // halted = true;
                 break;
 
             // Disable interrupts
@@ -725,8 +758,9 @@ namespace Gameboy
 
             // Conditioned jump to next byte
             case 0xC2: case 0xCA: case 0xD2: case 0xDA:
+                PC += 2;
                 if(get_condition((opcode - 0xC2) >> 3))
-                    PC = get_word(PC);
+                    PC = get_word(PC - 2);
                 break;
 
             // Relative jump
@@ -828,7 +862,7 @@ namespace Gameboy
 
                 // Shift 8 bit register bits left arithmetic
                 case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x27:
-                    shift_left(*reg8_group[opcode - 0x38]);
+                    shift_left(*reg8_group[opcode - 0x20]);
                     break;
 
                 // Shift byte at adress HL left arithmetic
@@ -868,7 +902,7 @@ namespace Gameboy
 
                 // Shift 8 bit register bits right arithmetic
                 case 0x28: case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2F:
-                    shift_right(*reg8_group[opcode - 0x38], false);
+                    shift_right(*reg8_group[opcode - 0x28], false);
                     break;
 
                 // Shift byte at adress HL right arithmetic
@@ -963,7 +997,7 @@ namespace Gameboy
                 case 0x86: case 0x8E: case 0x96: case 0x9E: case 0xA6: case 0xAE: case 0xB6: case 0xBE:
                 {
                     uint8_t hl = get_byte(HL);
-                    set_bit(hl, (opcode - 0xC6) >> 3, 0);
+                    set_bit(hl, (opcode - 0x86) >> 3, 0);
                     write_byte(HL, hl);
                     break;
                 }
@@ -979,6 +1013,14 @@ namespace Gameboy
             default:
                 unknown();
                 break;
+            }
+
+            // If halt bugged, execute last instruction again
+            if(!lock && haltbug)
+            {
+                PC = oldPC;
+                haltbug = false;
+                halt_mode = 3;
             }
         }
         // Sleep

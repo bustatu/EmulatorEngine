@@ -64,8 +64,7 @@ void MenuState::update(double dt)
             stateM -> pushState(state);
             //state -> skip_bios();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
-            // 2, 7, 9, 11
-            state -> loadROM("data/gameboy/roms/Dr. Mario.gb");
+            state -> loadROM("data/gameboy/roms/Bubble Bobble.gb");
         }
         else if(index == 4)
         {

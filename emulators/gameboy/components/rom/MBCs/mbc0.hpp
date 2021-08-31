@@ -14,7 +14,7 @@ namespace Gameboy
         uint8_t RAM[0x2000];
 
     public:
-        void init(uint8_t* fileContents, uint16_t fileSize);
+        void init(uint8_t* fileContents, uint32_t fileSize);
 
         // 0x0000 - 0x3FFF
         uint8_t readByteFromBank00(uint16_t addr);

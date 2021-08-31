@@ -64,7 +64,11 @@ namespace Gameboy
                 break;
             case 0x01:
                 data = new MBC1();
-                printf("{W}: MBC1 is incomplete!\n");
+                break;
+            case 0x03:
+                printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);
+                printf("{I}: Defaulting to MBC 1...\n");
+                data = new MBC1();
                 break;
             default:
                 printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);

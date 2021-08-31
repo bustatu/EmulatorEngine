@@ -2,7 +2,7 @@
 
 namespace Gameboy
 {
-    void MBC0::init(uint8_t* fileContents, uint16_t fileSize)
+    void MBC0::init(uint8_t* fileContents, uint32_t fileSize)
     {
         // Copy all the contents in the ROM if the fileSize is small enough
         if(fileSize <= 0x8000)

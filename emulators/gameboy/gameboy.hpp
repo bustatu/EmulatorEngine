@@ -16,6 +16,8 @@ namespace Gameboy
         RAM* ram = nullptr;
         GPU* gpu = nullptr;
         ROM* rom = nullptr;
+        Timer* timer = nullptr;
+        Joypad* joypad = nullptr;
 
         // Set clock frequency (4194304 Hz)
         uint32_t freq = 4194304;
@@ -25,6 +27,9 @@ namespace Gameboy
 
         // Output texture
         SDL_Texture* output;
+
+        // Keys' mapping
+        SDL_Keycode keys[6] = { SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_m, SDLK_k };
 
     public:
         // Load the BIOS
