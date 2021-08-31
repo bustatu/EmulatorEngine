@@ -5,6 +5,9 @@ project(EmuEngine)
 # Build options
 option(USE_EXTERNAL_JSON "Use an external JSON library" OFF)
 
+# Please make use of your brain if you have one, don't be me
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
 # Add external libraries
 add_subdirectory("./external")
 

@@ -274,12 +274,12 @@ namespace Gameboy
 
             // Load in 8 bit register from PC
             case 0x06: case 0x0E: case 0x16: case 0x1E: case 0x26: case 0x2E: case 0x3E:
-                *reg8_group[(opcode - 6) >> 3] = get_byte(PC++);
+                *reg8_group[(opcode - 0x06) >> 3] = get_byte(PC++);
                 break;
 
             // Load in 8 bit register value at adress HL
             case 0x46: case 0x4E: case 0x56: case 0x5E: case 0x66: case 0x6E: case 0x7E:
-                *reg8_group[(opcode - 70) >> 3] = get_byte(HL);
+                *reg8_group[(opcode - 0x46) >> 3] = get_byte(HL);
                 break;
 
             // Store 8 bit register at adress HL
@@ -447,6 +447,7 @@ namespace Gameboy
                 A -= hl + cy;
                 set_flag(7, A == 0);
                 set_flag(6, 1);
+                break;
             }
 
             // AND A with 8 bit register
@@ -470,7 +471,7 @@ namespace Gameboy
                 A &= get_byte(HL);
                 F = 0;
                 set_flag(7, A == 0);
-                set_flag(4, 1);
+                set_flag(5, 1);
                 break;
 
             // XOR A with 8 bit register
@@ -596,7 +597,7 @@ namespace Gameboy
                 hl -= 1;
                 set_flag(7, hl == 0);
                 write_byte(HL, hl);
-                set_flag(6, 0);
+                set_flag(6, 1);
                 break;
             }
 
@@ -946,7 +947,7 @@ namespace Gameboy
                 case 0x46: case 0x4E: case 0x56: case 0x5E: case 0x66: case 0x6E: case 0x76: case 0x7E:
                 {
                     uint8_t hl = get_byte(HL);
-                    set_flag(7, !get_bit(HL, (opcode - 0x46) >> 3));
+                    set_flag(7, !get_bit(hl, (opcode - 0x46) >> 3));
                     set_flag(6, 0);
                     set_flag(5, 1);
                     break;

@@ -94,13 +94,15 @@ namespace Gameboy
     {
         // Enable RAM
         if(addr >= 0x0000 && addr <= 0x1FFF)
-            enable_ram = (what & 0b11111 == 0xA);
+            enable_ram = ((what & 0b11111) == 0xA);
         // ROM bank
         else if(addr >= 0x2000 && addr <= 0x3FFF)
+        {
             if(what & 0b11111)
                 rom_bank_number = what & bit_mask[rom_size];
             else
                 rom_bank_number = 1;
+        }
     }
 
     uint8_t MBC1::readByteFromBankNN(uint16_t addr)
