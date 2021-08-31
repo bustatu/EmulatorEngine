@@ -81,6 +81,7 @@ namespace Gameboy
                     joypad -> press(i);
                 else
                     joypad -> release(i);
+            joypad -> update();
 
             // Update the components
             cpu -> execute();

@@ -19,6 +19,9 @@ namespace Gameboy
         // Attach the bus to the timer
         void attachBus(Bus* newBus);
 
+        // Update the joypad to the bus
+        void update();
+
         // Press a button
         void press(int32_t button);
         

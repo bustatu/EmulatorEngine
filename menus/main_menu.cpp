@@ -64,7 +64,7 @@ void MenuState::update(double dt)
             stateM -> pushState(state);
             //state -> skip_bios();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
-            state -> loadROM("data/gameboy/roms/dmg-acid2.gb");
+            state -> loadROM("data/gameboy/roms/Tetris.gb");
         }
         else if(index == 4)
         {
