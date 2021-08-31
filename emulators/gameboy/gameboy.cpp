@@ -30,6 +30,11 @@ namespace Gameboy
         executionTimer = 0;
     }
 
+    void Emu::skip_bios()
+    {
+        cpu -> skip_bios();
+    }
+
     void Emu::loadBIOS(std::string path)
     {
         if(bios == nullptr)

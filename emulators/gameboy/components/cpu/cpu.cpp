@@ -3,10 +3,13 @@
 namespace Gameboy
 {
     // HL modifiers in the instructions requiring it
-    static const int HL_ADD[] = {0, 0, 1, -1};
+    static const int8_t HL_ADD[] = {0, 0, 1, -1};
 
     // Reset adress for quick RST calls
-    static const int RST_ADDR[] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38};
+    static const uint8_t RST_ADDR[] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38};
+
+    // Interrupt call addresses
+    static const uint16_t INT_ADDR[] = { 0x0040, 0x0048, 0x0050, 0x0058, 0x0060 };
 
     // Macros for better usage
     // https://github.com/marethyu/noufu/blob/main/src/CPUOpcodes.cpp
@@ -30,30 +33,30 @@ namespace Gameboy
         // Clear the registers with 0
         memset(reg8, 0, 10);
 
-        // IME flag to true
-        ime_flag = true;
+        // IME flag to truewreg IF,$04
         ei_delay = 0;
+    }
 
-        // If skipping BIOS
-        if(PC == 0x100)
-        {
-            reg8[0] = 0x13;
-            reg8[1] = 0xFF;
-            reg8[2] = 0xC1;
-            reg8[3] = 0x00;
-            reg8[4] = 0x03;
-            reg8[5] = 0x84;
-            reg8[6] = 0x00;
-            reg8[7] = 0x01;
-            reg8[8] = 0xFE;
-            reg8[9] = 0xFF;
-            bus -> writeByte(0xFF50, 1);
-        }
+    void CPU::skip_bios()
+    {
+        PC = 0x100;
+        SP = 0xFFFE;
+        reg8[0] = 0x13;
+        reg8[1] = 0xFF;
+        reg8[2] = 0xC1;
+        reg8[3] = 0x00;
+        reg8[4] = 0x03;
+        reg8[5] = 0x84;
+        reg8[6] = 0x00;
+        reg8[7] = 0x01;
+        reg8[8] = 0xFE;
+        reg8[9] = 0xFF;
+        bus -> writeByte(0xFF50, 1);
     }
 
     void CPU::unknown_cb()
     {
-        printf("\033[1;31m{E}: Unknown CB instruction byte: %02X at PC: %04X \033[0m\n", opcode, oldPC);
+        printf("\033[1;31m{E}: Unknown CB instruction byte: %02X at PC: %04X \033[0m\n", opcode, oldPC + 1);
         exit(0);
     }
 
@@ -199,15 +202,37 @@ namespace Gameboy
 
     void CPU::execute()
     {
-        // If we are still having delay
-        if (ei_delay > 0)
-            // Enable interrupts
-            if(--ei_delay == 0)
-                ime_flag = true;
-
         // If allowed to go
         if(waitTimer == 0)
         {
+            // If an interrupt is requested
+            IE = bus -> readByte(0xFFFF), IF = bus -> readByte(0xFF0F);
+            if((IE & IF) != 0)
+            {
+                if(ime_flag)
+                {
+                    for(int32_t i = 0; i < 5; i++)
+                        // If there is interrupt I
+                        if(get_bit(IE, i) && get_bit(IF, i))
+                        {
+                            // Disable that interrupt
+                            set_bit(IF, i, 0);
+                            bus -> writeByte(0xFF0F, IF);
+                            // Disable all interrupts
+                            ime_flag = false;
+                            waitTimer += 8;
+                            call(INT_ADDR[i]);
+                            waitTimer += 4;
+                        }
+                }
+            }
+
+            // If we are still having delay
+            if (ei_delay > 0)
+                // Enable interrupts
+                if(--ei_delay == 0)
+                    ime_flag = true;
+
             oldPC = PC;
             opcode = get_byte(PC++);
 
@@ -671,7 +696,7 @@ namespace Gameboy
 
             // Disable interrupts
             case 0xF3:
-                // If will enable, then disable
+                // If will enable, then stop
                 if(ei_delay > 0)
                     ei_delay = 0;
                 else
@@ -753,12 +778,13 @@ namespace Gameboy
 
             // Return and enable interrupts
             case 0xD9:
-                printf("\033[1;31m{E}: Unhandled return and enable interrupts opcode!\033[0m\n");
+                PC = pop();
+                waitTimer += 4;
+                ime_flag = true;
                 break;
 
             // Call from special vector table
             case 0xC7: case 0xCF: case 0xD7: case 0xDF: case 0xE7: case 0xEF: case 0xF7: case 0xFF:
-                // TODO: disable interrupts
                 call(RST_ADDR[(opcode - 0xC7) >> 3]);
                 waitTimer += 4;
                 break;

@@ -44,8 +44,6 @@ namespace Gameboy
         if(!isOn())
             return;
 
-        //printf("%d\n", bus -> readByte(0xFF50));
-
         // Update the clock
         clock++;
 
@@ -64,7 +62,8 @@ namespace Gameboy
                 if(bus -> readByte(lineReg) == 143)
                 {
                     setMode(1);
-                    // TODO: the original says we should request an interrupt here
+                    // Request VBlank interrupt
+                    bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | 1);
                     cnt++;
                     drawFlag = true;
                 }

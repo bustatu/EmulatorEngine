@@ -42,6 +42,9 @@ namespace Gameboy
         // Stop the emulator
         void pause();
 
+        // Skips BIOS
+        void skip_bios();
+
         // Update function
         void update(double dt);
 

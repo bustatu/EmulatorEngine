@@ -22,7 +22,8 @@ After executing this, the executable should be in the */build/* file along with 
 - CHIP8 
     - might have some unsuported SCHIP or XOCHIP opcodes, open an issue if so.
 - Gameboy
-    - lots of opcodes missing. Games can not be run at the moment without crashing.
+    - innacuracies and unimplemented opcodes. Can't pass CPU tests 2, 7, 9, 11.
+    - (new) Dr. Mario goes to menu, hangs because of unimplemented halt opcode.
 - NES (soon)
 
 ## Screenshots from supported platforms:
@@ -38,3 +39,5 @@ After executing this, the executable should be in the */build/* file along with 
 ### Gameboy (work in progress):
 
 ![Gameboy Boot ROM](https://raw.githubusercontent.com/bustatu/EmulatorEngine/main/github-images/gb-bootrom.png?raw=true)
+
+![Gameboy Dr Mario menu](https://raw.githubusercontent.com/bustatu/EmulatorEngine/main/github-images/gb-dr-mario-splash.png?raw=true)

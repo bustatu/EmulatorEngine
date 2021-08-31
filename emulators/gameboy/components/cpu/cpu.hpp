@@ -53,6 +53,7 @@ namespace Gameboy
         // Interrupt management
         bool ime_flag;
         uint8_t ei_delay;
+        uint8_t IE, IF;
 
         // Bus handler
         Bus* bus;
@@ -86,6 +87,9 @@ namespace Gameboy
     public:
         // Constructor
         CPU();
+
+        // Skips the BIOS (use this before you start executing)
+        void skip_bios();
 
         // Executes the next instruction
         void execute();

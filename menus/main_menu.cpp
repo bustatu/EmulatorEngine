@@ -61,10 +61,11 @@ void MenuState::update(double dt)
         else if(index == 3)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
+            stateM -> pushState(state);
+            //state -> skip_bios();
             state -> loadBIOS("data/gameboy/bios/bios.gb");
             // 2, 7, 9, 11
-            state -> loadROM("data/gameboy/roms/02-interrupts.gb");
-            stateM -> pushState(state);
+            state -> loadROM("data/gameboy/roms/Dr. Mario.gb");
         }
         else if(index == 4)
         {

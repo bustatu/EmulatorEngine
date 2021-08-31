@@ -4,6 +4,7 @@
 #include <fstream>
 #include "MBCs/mbc.hpp"
 #include "MBCs/mbc0.hpp"
+#include "MBCs/mbc1.hpp"
 
 namespace Gameboy
 {
