@@ -22,8 +22,8 @@ After executing this, the executable should be in the */build/* file along with 
 - CHIP8 
     - might have some unsuported SCHIP or XOCHIP opcodes, open an issue if so.
 - Gameboy
-    - innacuracies and unimplemented opcodes. Can't pass CPU tests 2, 7, 9, 11.
-    - (new) Dr. Mario goes to menu, hangs because of unimplemented halt opcode.
+    - there are innacuracies especially on the PPU side.
+    - (new) Dr. Mario goes to menu.
 - NES (soon)
 
 ## Screenshots from supported platforms:
