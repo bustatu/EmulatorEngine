@@ -3,6 +3,7 @@
 
 #include "../../state.hpp"
 #include "components/components.hpp"
+#include <SDL2/SDL.h>
 
 namespace Gameboy
 {

@@ -96,6 +96,9 @@ namespace Gameboy
         // Skips the BIOS (use this before you start executing)
         void skip_bios();
 
+        // Requests an interrupt
+        void requestInterrupt(uint8_t what);
+
         // Executes the next instruction
         void execute();
 

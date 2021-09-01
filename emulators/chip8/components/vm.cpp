@@ -395,8 +395,8 @@ namespace CHIP8
 
     void VM::update(double dt)
     {
-        // Do not execute more than 0.5s of delay (2 fps)
-        dt = ((dt < 0.5) ? dt : 0.5);
+        // Do not execute more than 0.25s of delay (4 fps)
+        dt = ((dt < 0.25) ? dt : 0.25);
 
         // If VM is still running
         if(state == 1)

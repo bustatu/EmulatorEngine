@@ -4,30 +4,20 @@
 #include "../bios/bios.hpp"
 #include "../ram/ram.hpp"
 #include "../rom/rom.hpp"
+#include "../timer/timer.hpp"
 #include "../joypad/joypad.hpp"
 
 namespace Gameboy
 {
     class Bus
     {
-    private:
+    public:
+        // Bus components
         BIOS* bios = nullptr;
         RAM* ram = nullptr;
         ROM* rom = nullptr;
         Joypad* joypad = nullptr;
-
-    public:
-        // Attach the RAM to the bus
-        void attachRAM(RAM* newRAM);
-
-        // Attach the ROM to the bus
-        void attachROM(ROM* newRAM);
-
-        // Attach a BIOS to the bus
-        void attachBIOS(BIOS* newBIOS);
-
-        // Attach a joypad to the bus
-        void attachJoypad(Joypad* newJoypad);
+        Timer* timer = nullptr;
 
         // Gets a byte from memory
         uint8_t readByte(uint16_t addr);

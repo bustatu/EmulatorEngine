@@ -2,12 +2,6 @@
 
 namespace Gameboy
 {
-    // Component attaching handling
-    void Bus::attachBIOS(BIOS* newBIOS) { bios = newBIOS; }
-    void Bus::attachRAM(RAM* newRAM) { ram = newRAM; }
-    void Bus::attachROM(ROM* newROM) { rom = newROM; }
-    void Bus::attachJoypad(Joypad* newJoypad) { joypad = newJoypad; }
-
     uint8_t Bus::readByte(uint16_t addr)
     {
         // BIOS and ROM area
@@ -43,6 +37,9 @@ namespace Gameboy
         // Unusable
         else if(addr >= 0xFEA0 && addr <= 0xFEFF)
             return 0x00;
+        // Timer registers
+        else if(addr >= 0xFF04 && addr <= 0xFF07)
+            return timer -> readByte(addr);
         // Others
         else if(addr <= 0xFFFF)
         {
@@ -88,6 +85,9 @@ namespace Gameboy
         // Unusable
         else if(addr >= 0xFEA0 && addr <= 0xFEFF)
             printf("{W}: Write to unusable area at address %04X, value %02X.\n", addr, val);
+        // Timer registers
+        else if(addr >= 0xFF04 && addr <= 0xFF07)
+            return timer -> writeByte(addr, val);
         // Write to the other spaces in RAM
         else if(addr <= 0xFFFF)
         {

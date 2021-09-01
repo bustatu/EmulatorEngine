@@ -38,6 +38,13 @@ namespace Gameboy
         ei_delay = 0;
     }
 
+    void CPU::requestInterrupt(uint8_t what)
+    {
+        uint8_t IF = bus -> readByte(0xFF0F);
+        IF |= (1 << what);
+        bus -> writeByte(0xFF0F, IF);        
+    }
+
     void CPU::skip_bios()
     {
         PC = 0x100;
