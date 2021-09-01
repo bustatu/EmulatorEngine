@@ -31,9 +31,6 @@ add_executable(
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-ttf CONFIG REQUIRED)
 
-# Dynarec stuff
-find_package(xbyak CONFIG REQUIRED)
-
 # Include directories
 target_include_directories(EmuEngine PUBLIC ${SDL2_INCLUDE_DIR})
 
@@ -44,7 +41,6 @@ target_link_libraries(
     Menus GUI
     NES CHIP8 Gameboy Bytepusher
     nlohmann_json::nlohmann_json
-    xbyak::xbyak
     SDL2::SDL2
     SDL2::SDL2main
     SDL2::SDL2_ttf

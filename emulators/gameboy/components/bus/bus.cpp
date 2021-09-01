@@ -87,11 +87,4 @@ namespace Gameboy
         else if(addr <= 0xFFFF)
             ram -> writeByte(addr, val);
     }
-
-    void Bus::writeWord(uint16_t addr, uint16_t val)
-    {
-        // 2 byte writes
-        writeByte(addr, val & 0xFF);
-        writeByte(addr + 1, val >> 8);
-    }
 }

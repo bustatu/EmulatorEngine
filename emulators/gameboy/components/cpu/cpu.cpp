@@ -22,6 +22,16 @@ namespace Gameboy
     #define CARRY_SUB(A, B, cy) ((((A) & 0xFF) - ((B) & 0xFF) - (cy)) < 0x00)
     #define SWAP_NIBBLES(n) n = ((n & 0x0F) << 4) | (n >> 4);
 
+    // Bits instructions
+    #define get_bit(who, which) (((who) >> (which)) & 1)
+    #define set_bit(who, which, what) who = (what) ? ((who) | (1 << (which))) : ((who) & ~(1 << (which)))
+
+    // Sets a flag to a value (7 - zero, 6 - sub / negative, 5 - half carry, 4 - carry)
+    #define set_flag(who, what) set_bit(F, who, what)
+
+    // Gets the value of a flag (7 - zero, 6 - sub / negative, 5 - half carry, 4 - carry)
+    #define get_flag(who) get_bit(F, who)
+    
     CPU::CPU()
     {
         // Initialise everything
@@ -40,7 +50,7 @@ namespace Gameboy
 
     void CPU::requestInterrupt(uint8_t what)
     {
-        uint8_t IF = bus -> readByte(0xFF0F);
+        IF = bus -> readByte(0xFF0F);
         IF |= (1 << what);
         bus -> writeByte(0xFF0F, IF);        
     }
@@ -78,7 +88,6 @@ namespace Gameboy
     {
         bool flag0 = get_bit(n, 0), flag7 = get_bit(n, 7);
         n >>= 1;
-        // The content of bit 7 is unchanged. (see the gameboy programming manual and the original emu refference I used)
         if (!logical && flag7) set_bit(n, 7, 1);
         set_flag(7, n == 0);
         set_flag(6, 0);
@@ -147,10 +156,8 @@ namespace Gameboy
 
     void CPU::call(uint16_t addr)
     {
-        // Push current PC to stack 
+        // Push current PC to stack and jump
         push(PC);
-
-        // Jump
         PC = addr;
     }
 
@@ -168,11 +175,6 @@ namespace Gameboy
         return data;
     }
 
-    void CPU::set_flag(uint8_t who, uint8_t what)
-    {
-        F = (F & ~(1 << who)) | (what << who);
-    }
-
     bool CPU::get_condition(uint8_t what)
     {
         bool result = false;
@@ -188,24 +190,6 @@ namespace Gameboy
         if(result)  waitTimer += 4;
 
         return result;
-    }
-
-    void CPU::set_bit(uint8_t &who, uint8_t which, uint8_t what)
-    {
-        if(what)
-            who |= (1 << which);
-        else
-            who &= ~(1 << which);
-    }
-
-    uint8_t CPU::get_bit(uint8_t who, uint8_t which)
-    {
-        return ((who >> which) & 1);
-    }
-
-    uint8_t CPU::get_flag(uint8_t who)
-    {
-        return get_bit(F, who);
     }
 
     void CPU::execute()
@@ -260,6 +244,7 @@ namespace Gameboy
                 if(--ei_delay == 0)
                     ime_flag = true;
 
+            // Fetch new opcode
             oldPC = PC;
             opcode = get_byte(PC++);
 
@@ -1033,10 +1018,5 @@ namespace Gameboy
         }
         // Sleep
         else {  waitTimer--;  }
-    }
-
-    void CPU::attachBus(Bus* newBus)
-    {
-        bus = newBus;
     }
 }

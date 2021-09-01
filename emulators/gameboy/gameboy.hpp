@@ -11,14 +11,14 @@ namespace Gameboy
     {
     private:
         // Emulator components
-        Bus* bus = nullptr;
-        CPU* cpu = nullptr;
-        BIOS* bios = nullptr;
-        RAM* ram = nullptr;
-        GPU* gpu = nullptr;
-        ROM* rom = nullptr;
-        Timer* timer = nullptr;
-        Joypad* joypad = nullptr;
+        Bus bus;
+        CPU cpu;
+        BIOS bios;
+        RAM ram;
+        GPU gpu;
+        ROM rom;
+        Timer timer;
+        Joypad joypad;
 
         // Set clock frequency (4194304 Hz)
         uint32_t freq = 4194304;

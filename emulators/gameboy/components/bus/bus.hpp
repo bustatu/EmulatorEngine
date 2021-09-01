@@ -24,9 +24,6 @@ namespace Gameboy
 
         // Writes a byte to memory
         void writeByte(uint16_t addr, uint8_t val);
-
-        // Writes 2 bytes to memory
-        void writeWord(uint16_t addr, uint16_t val);
     };
 }
 
