@@ -4,6 +4,7 @@
 #include "../bios/bios.hpp"
 #include "../ram/ram.hpp"
 #include "../rom/rom.hpp"
+#include "../joypad/joypad.hpp"
 
 namespace Gameboy
 {
@@ -13,6 +14,7 @@ namespace Gameboy
         BIOS* bios = nullptr;
         RAM* ram = nullptr;
         ROM* rom = nullptr;
+        Joypad* joypad = nullptr;
 
     public:
         // Attach the RAM to the bus
@@ -23,6 +25,9 @@ namespace Gameboy
 
         // Attach a BIOS to the bus
         void attachBIOS(BIOS* newBIOS);
+
+        // Attach a joypad to the bus
+        void attachJoypad(Joypad* newJoypad);
 
         // Gets a byte from memory
         uint8_t readByte(uint16_t addr);

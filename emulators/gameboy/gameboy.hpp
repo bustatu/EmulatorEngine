@@ -29,7 +29,10 @@ namespace Gameboy
         SDL_Texture* output;
 
         // Keys' mapping
-        SDL_Keycode keys[6] = { SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_m, SDLK_k };
+        SDL_Keycode keys[8] = { SDLK_d, SDLK_a, SDLK_w, SDLK_s, SDLK_n, SDLK_m, SDLK_k, SDLK_l };
+
+        // Auxiliary functions
+        void updateJoypad();
 
     public:
         // Load the BIOS

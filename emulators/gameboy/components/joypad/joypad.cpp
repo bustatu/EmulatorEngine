@@ -2,26 +2,39 @@
 
 namespace Gameboy
 {
-    void Joypad::attachBus(Bus* newBus)
-    {
-        // Attach bus to the timer
-        bus = newBus;
-    }
-
     void Joypad::press(int32_t button)
     {
-        //printf("{I}: Key %d has been pressed!\n", button);
+        bool pressed = !get_bit(state, button);
+
+        set_bit(state, button, 0);
+
+        doInter = ((button > 3 && !get_bit(P1, 5)) || (button <= 3 && !get_bit(P1, 4))) && !pressed;
     }
 
     void Joypad::release(int32_t button)
     {
-        //printf("{I}: Key %d has been released!\n", button);
+        set_bit(state, button, 1);
     }
 
-    void Joypad::update()
+    uint8_t Joypad::getState()
     {
-        // Mark all buttons as released
-        bus -> writeByte(0xFF00, 0xFF);
+        uint8_t jp_reg = P1;
+        jp_reg |= 0xCF;
+
+        // Action buttons
+        if(!get_bit(jp_reg, 5))
+            jp_reg &= 0xF0 | (state >> 4);
+
+        // Directional buttons
+        if(!get_bit(jp_reg, 4))
+            jp_reg &= 0xF0 | (state & 0x0F);
+
+        return jp_reg;
+    }
+
+    void Joypad::handleWrite(uint8_t what)
+    {
+        P1 = what & 0x30;
     }
 
     void Joypad::set_bit(uint8_t &who, uint8_t which, uint8_t what)

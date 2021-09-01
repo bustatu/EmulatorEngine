@@ -2,20 +2,11 @@
 
 namespace Gameboy
 {
-    void Bus::attachBIOS(BIOS* newBIOS)
-    {
-        bios = newBIOS;
-    }
-
-    void Bus::attachRAM(RAM* newRAM)
-    {
-        ram = newRAM;
-    }
-
-    void Bus::attachROM(ROM* newROM)
-    {
-        rom = newROM;
-    }
+    // Component attaching handling
+    void Bus::attachBIOS(BIOS* newBIOS) { bios = newBIOS; }
+    void Bus::attachRAM(RAM* newRAM) { ram = newRAM; }
+    void Bus::attachROM(ROM* newROM) { rom = newROM; }
+    void Bus::attachJoypad(Joypad* newJoypad) { joypad = newJoypad; }
 
     uint8_t Bus::readByte(uint16_t addr)
     {
@@ -54,7 +45,12 @@ namespace Gameboy
             return 0x00;
         // Others
         else if(addr <= 0xFFFF)
+        {
+            // Joypad output
+            if(addr == 0xFF00)
+                return joypad -> getState();
             return ram -> readByte(addr);
+        }
 
         // Invalid
         return 0xFF;
@@ -91,10 +87,15 @@ namespace Gameboy
             ram -> writeByte(addr - 0x1000, val);       
         // Unusable
         else if(addr >= 0xFEA0 && addr <= 0xFEFF)
-            printf("\033[1;31m{E}: Write to unusable area at address %04X, value %04X \033[0m\n", addr, val);
+            printf("{W}: Write to unusable area at address %04X, value %02X.\n", addr, val);
         // Write to the other spaces in RAM
         else if(addr <= 0xFFFF)
+        {
+            // Joypad output
+            if(addr == 0xFF00)
+                joypad -> handleWrite(val);
             ram -> writeByte(addr, val);
+        }
     }
 
     void Bus::writeWord(uint16_t addr, uint16_t val)
