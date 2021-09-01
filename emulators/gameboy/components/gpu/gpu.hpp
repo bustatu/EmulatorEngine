@@ -48,6 +48,9 @@ namespace Gameboy
         // Render the tiles for displaying
         void renderTiles();
 
+        // Reads a word from the bus
+        uint16_t readWord(uint16_t addr);
+
         // Gets color depending on the palette
         int32_t getColor(int32_t id, uint16_t palette);
 

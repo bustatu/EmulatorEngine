@@ -16,12 +16,11 @@ namespace Gameboy
         bool mode_flag = false;
         uint8_t rom_size = 0;
         uint8_t ram_size = 0;
+        uint8_t rom_bank_mask = 0;
         uint8_t rom_bank_number = 1;
         uint8_t ram_bank_number = 0;
 
         // Auxiliary functions
-        uint8_t get_bit(uint8_t who, uint8_t which);
-        void set_bit(uint8_t &who, uint8_t which, uint8_t what);
         uint8_t zerobank();
         uint8_t highbank();
 

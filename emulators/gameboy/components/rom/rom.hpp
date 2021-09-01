@@ -14,13 +14,14 @@ namespace Gameboy
         // ROM data
         MBC *data = nullptr;
 
-        // Check if file is actually loaed
+        // Check if file is actually loaded
         bool loaded = false;
 
     public:
         // Load BIOS from the location
         void load(std::string path);
 
+        // I/O operations
         uint8_t readByte(uint16_t addr);
         void writeByte(uint16_t addr, uint8_t val);
     };

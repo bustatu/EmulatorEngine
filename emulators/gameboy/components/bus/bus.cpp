@@ -51,12 +51,6 @@ namespace Gameboy
         return 0xFF;
     }
 
-    uint16_t Bus::readWord(uint16_t addr)
-    {
-        // 2 byte reads
-        return (readByte(addr + 1) << 8) | readByte(addr);
-    }
-
     void Bus::writeByte(uint16_t addr, uint8_t val)
     {
         // ROM banks

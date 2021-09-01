@@ -22,9 +22,6 @@ namespace Gameboy
         // Gets a byte from memory
         uint8_t readByte(uint16_t addr);
 
-        // Gets 2 bytes from memory
-        uint16_t readWord(uint16_t addr);
-
         // Writes a byte to memory
         void writeByte(uint16_t addr, uint8_t val);
 

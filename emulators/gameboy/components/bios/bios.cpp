@@ -27,15 +27,9 @@ namespace Gameboy
         file.seekg(0, std::ios::beg);
 
         if(fileSize == -1)
-        {
             printf("\033[1;31m{E}: File at path %s does not exist!\n\033[0m", path.c_str());
-            loaded = false;
-        }
         else if(fileSize != 0x100)
-        {
             printf("\033[1;31m{E}: File at path %s does not have the correct size! Excpected %d, got %d!\n\033[0m", path.c_str(), 0x100, fileSize);
-            loaded = false;
-        }
         else
         {
             // Read the BIOS

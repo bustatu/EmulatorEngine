@@ -59,22 +59,22 @@ namespace Gameboy
             // MBC check
             switch(dataFile[0x147])
             {
-            case 0x00:
-                data = new MBC0();
-                break;
-            case 0x01:
-                data = new MBC1();
-                break;
-            case 0x03:
-                printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);
-                printf("{I}: Defaulting to MBC 1...\n");
-                data = new MBC1();
-                break;
-            default:
-                printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);
-                printf("{I}: Defaulting to MBC 0...\n");
-                data = new MBC0();
-                break;
+                case 0x00:
+                    data = new MBC0();
+                    break;
+                case 0x01:
+                    data = new MBC1();
+                    break;
+                case 0x03:
+                    printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);
+                    printf("{I}: Defaulting to MBC 1...\n");
+                    data = new MBC1();
+                    break;
+                default:
+                    printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);
+                    printf("{I}: Defaulting to MBC 0...\n");
+                    data = new MBC0();
+                    break;
             }
 
             // Init the ROM
@@ -82,7 +82,6 @@ namespace Gameboy
 
             // Mark as loaded
             loaded = true;
-
             printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
 
             // Delete the loaded memory

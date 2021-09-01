@@ -14,6 +14,11 @@ namespace Gameboy
         bus -> writeByte(lineReg, 0);
     }
 
+    uint16_t GPU::readWord(uint16_t addr)
+    {
+        return (bus -> readByte(addr + 1) << 8) | bus -> readByte(addr);
+    }
+
     void GPU::setMode(uint8_t newMode)
     {
         // Sets bits in the stat register
@@ -189,8 +194,8 @@ namespace Gameboy
 
             // LNO column
             uint8_t lno = y % 8;
-            uint8_t byte1 = bus -> readWord(tileAdress + lno * 2);
-            uint8_t byte2 = bus -> readWord(tileAdress + lno * 2 + 1);
+            uint8_t byte1 = readWord(tileAdress + lno * 2);
+            uint8_t byte2 = readWord(tileAdress + lno * 2 + 1);
 
             // Byte 1 and 2 contain the data for the line, and bit 7 contains for x = 0
             uint8_t req_bit = 7 - (x % 8);

@@ -1,30 +1,10 @@
 #include "mbc1.hpp"
 
+#define get_bit(who, which) (((who) >> (which)) & 1)
+#define set_bit(who, which, what) who = (what) ? ((who) | (1 << (which))) : ((who) & ~(1 << (which)))
+
 namespace Gameboy
 {
-    static const uint8_t bit_mask[] = {
-        0b00000001,
-        0b00000011,
-        0b00000111,
-        0b00001111,
-        0b00011111,
-        0b00011111,
-        0b00011111
-    };
-
-    uint8_t MBC1::get_bit(uint8_t who, uint8_t which)
-    {
-        return ((who >> which) & 1);
-    }
-
-    void MBC1::set_bit(uint8_t &who, uint8_t which, uint8_t what)
-    {
-        if(what)
-            who |= (1 << which);
-        else
-            who &= ~(1 << which);
-    }
-
     uint8_t MBC1::zerobank()
     {
         uint8_t result = 0;
@@ -76,6 +56,11 @@ namespace Gameboy
                     break;
             }
         }
+
+        // Calculate ROM bank mask
+        rom_bank_mask = 0;
+        for(int32_t i = 0; i < (rom_size < 5 ? rom_size : 5); i++)
+            rom_bank_mask |= (1 << i);
     }
 
     uint8_t MBC1::readByteFromBank00(uint16_t addr)
@@ -99,7 +84,7 @@ namespace Gameboy
         else if(addr >= 0x2000 && addr <= 0x3FFF)
         {
             if(what & 0b11111)
-                rom_bank_number = what & bit_mask[rom_size];
+                rom_bank_number = what & rom_bank_mask;
             else
                 rom_bank_number = 1;
         }

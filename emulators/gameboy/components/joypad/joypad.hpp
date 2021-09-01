@@ -1,7 +1,7 @@
 #ifndef GAMEBOY_JOYPAD_H
 #define GAMEBOY_JOYPAD_H
 
-#include <iostream>
+#include <cstdint>
 
 namespace Gameboy
 {
