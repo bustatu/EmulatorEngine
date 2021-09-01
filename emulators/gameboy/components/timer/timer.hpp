@@ -13,7 +13,7 @@ namespace Gameboy
         uint8_t &DIV = timers[0], &TIMA = timers[1], &TMA = timers[2], &TAC = timers[3];
 
         // TIMA and DIV counters
-        uint8_t timacounter = 0, divcounter = 0;
+        uint32_t timacounter = 0, divcounter = 0;
 
         // TIMA frequency
         uint32_t freq = 1024;
@@ -28,7 +28,7 @@ namespace Gameboy
         // Read byte from timer
         uint8_t readByte(uint16_t addr);
 
-        // Check if needs interrupt
+        // Check if needs interrupt (RESETS THE FLAG)
         bool needsInterrupt();
 
         // Update executed each CPU cycle

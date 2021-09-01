@@ -32,9 +32,6 @@ namespace Gameboy
         // Keys' mapping
         SDL_Keycode keys[8] = { SDLK_d, SDLK_a, SDLK_w, SDLK_s, SDLK_n, SDLK_m, SDLK_k, SDLK_l };
 
-        // Auxiliary functions
-        void updateJoypad();
-
     public:
         // Load the BIOS
         void loadBIOS(std::string path);

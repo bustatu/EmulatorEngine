@@ -1,52 +1,49 @@
 #include "joypad.hpp"
 
+#define get_bit(who, which) (((who) >> (which)) & 1)
+#define set_bit(who, which, what) who = (what) ? ((who) | (1 << (which))) : ((who) & ~(1 << (which)))
+
 namespace Gameboy
 {
-    void Joypad::press(int32_t button)
+    uint8_t Joypad::readByte(uint16_t addr)
     {
-        bool pressed = !get_bit(state, button);
+        if(addr == 0xFF00)
+        {
+            uint8_t jp_reg = P1;
+            jp_reg |= 0xCF;
 
-        set_bit(state, button, 0);
+            // Action buttons
+            if(!get_bit(jp_reg, 5))
+                jp_reg &= 0xF0 | (state >> 4);
 
-        doInter = ((button > 3 && !get_bit(P1, 5)) || (button <= 3 && !get_bit(P1, 4))) && !pressed;
+            // Directional buttons
+            if(!get_bit(jp_reg, 4))
+                jp_reg &= 0xF0 | (state & 0x0F);
+
+            return jp_reg;
+        }
+        return 0xFF;
     }
 
-    void Joypad::release(int32_t button)
+    void Joypad::updateButton(uint8_t button, uint8_t value)
     {
-        set_bit(state, button, 1);
+        // If key has been pressed, decide if that requires an interrupt (has been pressed for the first time)
+        if(value == 1)
+            interrputFlag = ((button > 3 && !get_bit(P1, 5)) || (button <= 3 && !get_bit(P1, 4))) && !get_bit(state, button);
+
+        set_bit(state, button, value);
     }
 
-    uint8_t Joypad::getState()
+    bool Joypad::needsInterrupt()
     {
-        uint8_t jp_reg = P1;
-        jp_reg |= 0xCF;
-
-        // Action buttons
-        if(!get_bit(jp_reg, 5))
-            jp_reg &= 0xF0 | (state >> 4);
-
-        // Directional buttons
-        if(!get_bit(jp_reg, 4))
-            jp_reg &= 0xF0 | (state & 0x0F);
-
-        return jp_reg;
+        bool before = interrputFlag;
+        interrputFlag = false;
+        return before;
     }
 
-    void Joypad::handleWrite(uint8_t what)
+    void Joypad::writeByte(uint16_t addr, uint8_t what)
     {
-        P1 = what & 0x30;
-    }
-
-    void Joypad::set_bit(uint8_t &who, uint8_t which, uint8_t what)
-    {
-        if(what)
-            who |= (1 << which);
-        else
-            who &= ~(1 << which);
-    }
-
-    uint8_t Joypad::get_bit(uint8_t who, uint8_t which)
-    {
-        return ((who >> which) & 1);
+        if(addr == 0xFF00)
+            P1 = what & 0x30;
     }
 }

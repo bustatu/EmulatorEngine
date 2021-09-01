@@ -40,15 +40,13 @@ namespace Gameboy
         // Timer registers
         else if(addr >= 0xFF04 && addr <= 0xFF07)
             return timer -> readByte(addr);
+        // Joypad output
+        else if(addr == 0xFF00)
+            return joypad -> readByte(addr);
         // Others
         else if(addr <= 0xFFFF)
-        {
-            // Joypad output
-            if(addr == 0xFF00)
-                return joypad -> getState();
             return ram -> readByte(addr);
-        }
-
+            
         // Invalid
         return 0xFF;
     }
@@ -88,14 +86,12 @@ namespace Gameboy
         // Timer registers
         else if(addr >= 0xFF04 && addr <= 0xFF07)
             return timer -> writeByte(addr, val);
+        // Joypad output
+        else if(addr == 0xFF00)
+            joypad -> writeByte(addr, val);
         // Write to the other spaces in RAM
         else if(addr <= 0xFFFF)
-        {
-            // Joypad output
-            if(addr == 0xFF00)
-                joypad -> handleWrite(val);
             ram -> writeByte(addr, val);
-        }
     }
 
     void Bus::writeWord(uint16_t addr, uint16_t val)

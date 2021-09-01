@@ -23,7 +23,9 @@ namespace Gameboy
 
     bool Timer::needsInterrupt()
     {
-        return interruptFlag;
+        bool before = interruptFlag;
+        interruptFlag = false;
+        return before;
     }
 
     void Timer::update()

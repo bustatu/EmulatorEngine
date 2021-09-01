@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         window -> update();
 
         // Small delay
-        SDL_Delay(6);
+        SDL_Delay(10);
     }
     
     return EXIT_SUCCESS;

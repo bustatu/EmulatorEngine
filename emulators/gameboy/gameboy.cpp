@@ -72,36 +72,22 @@ namespace Gameboy
         is_running = false;
     }
 
-    void Emu::updateJoypad()
-    {
-        Window* window = stateM -> getWindow();
-
-        // Check inputs
-        for(uint8_t i = 0; i < 8; i++)
-            if(window -> getKey(keys[i]))
-                joypad -> press(i);
-            else
-                joypad -> release(i);
-
-        // IF there is a joypad interrupt required
-        if(joypad -> doInter == true)
-        {
-            joypad -> doInter = false;
-
-            // Do interrupt
-            uint8_t IF = bus -> readByte(0xFF0F);
-            IF |= (1 << 4);
-            bus -> writeByte(0xFF0F, IF);
-        }
-    }
-
     void Emu::update(double dt)
     {
+        // Get window handler
+        Window* window = stateM -> getWindow();
+
         // Do not execute more than 0.25s of delay (4 fps)
         dt = ((dt < 0.25) ? dt : 0.25);
 
         executionTimer += dt;
-        
+
+        // Check inputs and do interrupt if required
+        for(uint8_t i = 0; i < 8; i++)
+            joypad -> updateButton(i, window -> getKey(keys[i]));
+        if(joypad -> needsInterrupt())
+            cpu -> requestInterrupt(4);
+
         while(executionTimer >= 1.0 / freq)
         {
             // Update the components
@@ -111,7 +97,6 @@ namespace Gameboy
 
             cpu -> execute();
             gpu -> update();
-            updateJoypad();
 
             executionTimer -= 1.0 / freq;
         }

@@ -8,29 +8,25 @@ namespace Gameboy
     class Joypad
     {
     private:
-        // Auxiliary functions
-        uint8_t get_bit(uint8_t who, uint8_t which);
-        void set_bit(uint8_t &who, uint8_t which, uint8_t what);
-
         // Joypad handling
         uint8_t state = 0xFF;
         uint8_t P1 = 0xC0;
+    
+        // Interrupt flag
+        bool interrputFlag = false;
 
     public:
         // Get state as byte (used in GB bus)
-        uint8_t getState();
-
-        // If we need to make a joypad interrupt
-        bool doInter = false;
+        uint8_t readByte(uint16_t addr);
 
         // Handles a write to the joypad register (used in GB bus)
-        void handleWrite(uint8_t what);
+        void writeByte(uint16_t addr, uint8_t what);
 
-        // Press a button
-        void press(int32_t button);
-        
-        // Release a button
-        void release(int32_t button);
+        // Check if needs interrupt (RESETS THE FLAG)
+        bool needsInterrupt();
+
+        // Updates a key's value
+        void updateButton(uint8_t button, uint8_t value);
     };
 }
 
