@@ -34,6 +34,6 @@ namespace Gameboy
         // Update executed each CPU cycle
         void update();
     };
-}
+};
 
 #endif

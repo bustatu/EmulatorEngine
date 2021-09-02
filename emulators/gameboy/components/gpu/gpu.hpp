@@ -4,11 +4,15 @@
 #include <SDL2/SDL.h>
 #include "../bus/bus.hpp"
 
-/* Thanks to this for letting me understand what is going on:
-   https://github.com/paramsingh/gameboi */
+/*  Thanks to these 2 for letting me understand what is going on:
+      (using these I also made the pixelFIFO and pixelFetcher)
+          https://hacktixme.ga/GBEDG/ppu/#sprite-fetching
+                https://github.com/marethyu/noufu/                 */
 
 namespace Gameboy
 {
+    class Bus;
+    
     class GPU
     {
     private:
@@ -18,20 +22,35 @@ namespace Gameboy
         // GPU internal clock
         uint32_t clock;
 
-        // Status register adress
-        const uint16_t statReg = 0xFF41;
+        // Registers (FF40 - FF4B)
+        uint8_t regs[0xC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        uint8_t &LCDControl = regs[0x0];
+        uint8_t &STAT = regs[0x1];
+        uint8_t &SCX = regs[0x2];
+        uint8_t &SCY = regs[0x3];
+        uint8_t &LY = regs[0x4];
+        uint8_t &LYC = regs[0x5];
+        uint8_t &DMA = regs[0x6];
+        uint8_t &BGP = regs[0x7];
+        uint8_t &OBP0 = regs[0x8];
+        uint8_t &OBP1 = regs[0x9];
+        uint8_t &WY = regs[0xA];
+        uint8_t &WX = regs[0xB];
 
-        // Line register adress
-        const uint16_t lineReg = 0xFF44;
+        // LY but for the X axis
+        uint8_t LX;
 
-        // LCD control adress
-        const uint16_t LCDControl = 0xFF40;
+        // Window line counter
+        uint32_t WLY;
+
+        // True when LY = WY
+        bool wyTrigger;
 
         // Frame counter
         uint32_t cnt;
 
-        // Bus for reading data
-        Bus* bus;
+        // Pixel counter
+        uint32_t pcnt;
 
         // Changes display mode to a new value
         void setMode(uint8_t newMode);
@@ -45,15 +64,6 @@ namespace Gameboy
         // Gets current display mode
         uint8_t getMode();
 
-        // Render the tiles for displaying
-        void renderTiles();
-
-        // Reads a word from the bus
-        uint16_t readWord(uint16_t addr);
-
-        // Gets color depending on the palette
-        int32_t getColor(int32_t id, uint16_t palette);
-
     public:
         // Constructor
         GPU();
@@ -64,11 +74,17 @@ namespace Gameboy
         // Update
         void update();
 
+        // Read byte
+        uint8_t readByte(uint16_t addr);
+
+        // Write byte
+        void writeByte(uint16_t addr, uint8_t val);
+
         // Draw to the output texture
         void draw(SDL_Texture* output, SDL_Renderer* tool);
 
-        // Attach a bus for reading data
-        void attachBus(Bus* newBus);
+        // Bus for reading data
+        Bus* bus;
     };
 }
 

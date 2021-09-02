@@ -6,9 +6,12 @@
 #include "../rom/rom.hpp"
 #include "../timer/timer.hpp"
 #include "../joypad/joypad.hpp"
+#include "../gpu/gpu.hpp"
 
 namespace Gameboy
 {
+    class GPU;
+
     class Bus
     {
     public:
@@ -18,6 +21,7 @@ namespace Gameboy
         ROM* rom = nullptr;
         Joypad* joypad = nullptr;
         Timer* timer = nullptr;
+        GPU* gpu = nullptr;
 
         // Gets a byte from memory
         uint8_t readByte(uint16_t addr);
@@ -25,6 +29,6 @@ namespace Gameboy
         // Writes a byte to memory
         void writeByte(uint16_t addr, uint8_t val);
     };
-}
+};
 
 #endif

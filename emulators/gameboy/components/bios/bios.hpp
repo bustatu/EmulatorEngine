@@ -27,6 +27,6 @@ namespace Gameboy
         // Reads a byte from the specified offset
         uint8_t readByte(uint16_t addr);
     };
-}
+};
 
 #endif

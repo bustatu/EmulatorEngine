@@ -14,8 +14,9 @@ namespace Gameboy
         bus.rom = &rom;
         bus.joypad = &joypad;
         bus.timer = &timer;
+        bus.gpu = &gpu;
         cpu.bus = &bus;
-        gpu.attachBus(&bus);
+        gpu.bus = &bus;
 
         // Reset execution timer
         executionTimer = 0;

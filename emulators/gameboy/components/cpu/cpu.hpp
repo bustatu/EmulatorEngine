@@ -16,9 +16,9 @@ namespace Gameboy
     private:
         // The CPU registers, in order (for low endinan machines):
         // C, B, E, D, L, H, F, A, SP low, SP high
-        uint8_t reg8[10];
+        uint8_t reg8[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        // C++ pointers are quite amazing
+        // What the fuck
         uint16_t *reg16 = (uint16_t *) reg8;
 
         // Mirror those values (didn't know about this before)

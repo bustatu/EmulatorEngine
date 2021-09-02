@@ -1,46 +1,71 @@
 #include "gpu.hpp"
 
+#define get_bit(who, which) (((who) >> (which)) & 1)
+#define set_bit(who, which, what) who = (what) ? ((who) | (1 << (which))) : ((who) & ~(1 << (which)))
+
 namespace Gameboy
 {
-    void GPU::attachBus(Bus* newBus)
+    uint8_t GPU::readByte(uint16_t addr)
     {
-        // Update the bus
-        bus = newBus;
-
-        // Set the display mode to 1
-        setMode(1);
-
-        // Reset values in the memory
-        bus -> writeByte(lineReg, 0);
+        return regs[addr - 0xFF40];
     }
 
-    uint16_t GPU::readWord(uint16_t addr)
+    void GPU::writeByte(uint16_t addr, uint8_t val)
     {
-        return (bus -> readByte(addr + 1) << 8) | bus -> readByte(addr);
+        if(addr != 0xFF44)
+            regs[addr - 0xFF40] = val;
     }
 
     void GPU::setMode(uint8_t newMode)
     {
         // Sets bits in the stat register
-        if(newMode & 1)
-            bus -> writeByte(statReg, bus -> readByte(statReg) | 1);
-        else
-            bus -> writeByte(statReg, bus -> readByte(statReg) & (~1));
+        set_bit(STAT, 1, get_bit(newMode, 1));
+        set_bit(STAT, 2, get_bit(newMode, 2));
 
-        if((newMode >> 1) & 1)
-            bus -> writeByte(statReg, bus -> readByte(statReg) | (1 << 1));
-        else
-            bus -> writeByte(statReg, bus -> readByte(statReg) & (~(1 << 1)));           
+        // Check if there needs to be an interrupt made
+        bool irq = false;
+
+        switch(newMode)
+        {
+            // HBlank
+            case 0x00:
+                irq = get_bit(STAT, 3);
+                break;
+
+            // VBlank
+            case 0x01:
+                irq = get_bit(STAT, 4);
+
+                // Request VBlank interrupt
+                bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | 1);
+                break;
+
+            // OAM search
+            case 0x02:
+                irq = get_bit(STAT, 5);
+                // TODO: clear OAM buffer
+                break;
+
+            // Pixel transfer (or drawing mode)
+            case 0x03:
+                // TODO: init pixel fetcher
+                break;
+        }
+
+        // If we got an interrupt
+        if(irq)
+            // Request stat interrupt
+            bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | (1 << 1));
     }
 
     bool GPU::isOn()
     {
-        return (bus -> readByte(LCDControl) >> 7) & 1;
+        return (LCDControl >> 7) & 1;
     }
 
     uint8_t GPU::getMode()
     {
-        return bus -> readByte(statReg) & 0b11;
+        return STAT & 0b11;
     }
 
     void GPU::update()
@@ -53,178 +78,112 @@ namespace Gameboy
         clock++;
 
         // Do stuff depending on the mode
-        switch (getMode())
+        switch(getMode())
         {
-        // HBlank mode
-        case 0:
-            // HBlank over
-            if(clock >= 204)
+            // HBlank
+            case 0x00:
             {
-                clock -= 204;
-                changeScanline();
+                // If line actually ended
+                if(++pcnt == 456)
+                {
+                    pcnt = 0;
+                    LY++;
 
-                // We are going in the vertical blank mode
-                if(bus -> readByte(lineReg) == 143)
-                {
-                    setMode(1);
-                    // Request VBlank interrupt
-                    bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | 1);
-                    cnt++;
-                    drawFlag = true;
-                }
-                else
-                    setMode(2);
-            }
-            break;
-        // VBlank mode
-        case 1:
-            if(clock >= 456)
-            {
-                clock -= 456;
-                if(bus -> readByte(lineReg) == 0)
-                    setMode(2);
-                else
-                {
-                    changeScanline();
-                    if(bus -> readByte(lineReg) == 0)
+                    // TODO: check if still inside the window
+
+                    // We have entered VBlank
+                    if(LY == 144)
+                        setMode(1);
+                    else
                         setMode(2);
                 }
+                break;
             }
-            break;
-        
-        // For accessing VRAM
-        case 2:
-            if(clock >= 172)
+
+            // VBlank
+            case 0x01:
             {
-                clock -= 172;
-                setMode(0);
-                renderTiles();
+                // Can't be true anymore
+                wyTrigger = false;
+
+                // If at the end of the line
+                if(++pcnt == 456)
+                {
+                    pcnt = 0;
+                    LY++;
+
+                    // Go in OAM search mode
+                    if (LY > 153)
+                        LY = WLY = 0, setMode(2);
+
+                    // Interrupt check
+                    set_bit(STAT, 2, (LY == LYC));
+
+                    // Request stat interrupt
+                    if(get_bit(STAT, 6))
+                        bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | (1 << 1));
+                }
+                break;
             }
-            break;
-        default:
-            printf("\033[1;31m{E}: Unsuported GPU display mode %d.\n\033[0m", getMode());
-            break;
-        }
-    }
 
-    void GPU::renderTiles()
-    {
-        // We are not allowed to render outside the screen
-        if(bus -> readByte(lineReg) >= 144)
-            return;
-
-        // Tile location depending on LCD register
-        uint16_t where;
-
-        // If location is signed
-        bool is_signed;
-
-        // Scrolling values and window values
-        uint8_t scrollx = bus -> readByte(0xFF43), scrolly = bus -> readByte(0xFF42);
-        uint8_t windowx = bus -> readByte(0xFF4B) - 7, windowy = bus -> readByte(0xFF4A);
-
-        bool usingWindow = 0;
-
-        // Get control register
-        uint8_t control = bus -> readByte(LCDControl);
-
-        // If we are using windows
-        if((control >> 5) & 1)
-        {
-            if(bus -> readByte(lineReg) >= windowy)
-                usingWindow = 1;
-        }
-
-        // Test bit for adressing locations
-        if((control >> 4) & 1)
-        {
-            where = 0x8000;
-            is_signed = false;
-        }
-        else
-        {
-            where = 0x8800;
-            is_signed = true;
-        }
-
-        // Get tilemap location
-        uint16_t tilemap;
-        if(!usingWindow)
-            tilemap = ((control >> 3) & 1) ? 0x9C00 : 0x9800;
-        else
-            tilemap = ((control >> 6) & 1) ? 0x9C00 : 0x9800;
-
-        // Get background y location
-        uint8_t y = scrolly + bus -> readByte(lineReg);
-        if(usingWindow)
-            y -= scrolly + windowy;
-
-        // Row in the 32x32 sprite matrix
-        uint16_t tileRow = (uint8_t)(y / 8);
-
-        for(int i = 0; i < 160; i++)
-        {
-            uint8_t x = i + scrollx;
-            if(usingWindow)
+            // OAM search
+            case 0x02:
             {
-                if(i >= windowx)
-                    x -= scrollx + windowx;
+                if (!wyTrigger && pcnt == 0)
+                    wyTrigger = (LY == WY);
+
+                // Can only do transfers on even clock counts (they take time you know)
+                if(pcnt % 2 == 0)
+                {
+                    uint16_t address = 0xFE00 + (pcnt / 2) * 4;
+
+                    uint8_t YPos = bus -> readByte(address);
+                    uint8_t XPos = bus -> readByte(address + 1);
+                    uint8_t tileIndex = bus -> readByte(address + 2);
+                    uint8_t attributes = bus -> readByte(address + 3);
+
+                    uint8_t spriteHeight = get_bit(LCDControl, 2) ? 16 : 8;
+
+                    if(XPos > 0 && (LY + 16) >= YPos && (LY + 16) < (YPos + spriteHeight))
+                    {
+                        if(spriteHeight == 16)
+                        {
+                            if ((LY + 16) < (YPos - 8))
+                                tileIndex |= 0x01;
+                            else
+                                tileIndex &= 0xFE;
+                        }
+
+                        // TODO: push sprite to the OAM buffer
+                    }
+
+                    if (++pcnt == 80)
+                    {
+                        // Sort the buffer and start the pixel transfer
+                        // TODO: sort the buffer
+                        setMode(3);
+                    }
+                }
+                break;
             }
 
-            // Get column with the X tile
-            uint16_t tileColumn = x / 8;
-
-            // Get the adress
-            uint16_t addr = tilemap + tileRow * 32 + tileColumn;
-            
-            // Get the tile number from that
-            int16_t tilenum;
-            if(is_signed)
-                tilenum = (int8_t) bus -> readByte(addr);
-            else
-                tilenum = bus -> readByte(addr);
-
-            // Get the tile adress (16 bytes per tile)
-            uint16_t tileAdress;
-            if(!is_signed)
-                tileAdress = where + tilenum * 16;
-            else
-                tileAdress = where + (tilenum + 128) * 16;
+            // Pixel transfer (or drawing mode)
+            case 0x03:
+            {
+                // Screen will be updated
+                drawFlag = true;
                 
+                // Update pixel counter
+                pcnt++;
 
-            // LNO column
-            uint8_t lno = y % 8;
-            uint8_t byte1 = readWord(tileAdress + lno * 2);
-            uint8_t byte2 = readWord(tileAdress + lno * 2 + 1);
+                // TODO: do pixel drawing to the screen after fetching from the fetcher
 
-            // Byte 1 and 2 contain the data for the line, and bit 7 contains for x = 0
-            uint8_t req_bit = 7 - (x % 8);
-            uint8_t bit1 = (byte1 >> req_bit) & 1;
-            uint8_t bit2 = (byte2 >> req_bit) & 1;
-            uint8_t colorid = (bit1 << 1) | bit2;
-
-            // Save the color
-            pixels[i][bus -> readByte(lineReg)] = getColor(colorid, 0xFF47);
+                // If at the end of the line
+                if(++LX == 160)
+                    setMode(0);
+                break;
+            }
         }
-    }
-
-    int32_t GPU::getColor(int32_t id, uint16_t palette)
-    {
-        uint8_t data = bus -> readByte(palette);
-        int hi = 2 * id + 1, lo = 2 * id;
-        int bit1 = (data >> hi) & 1;
-        int bit0 = (data >> lo) & 1;
-        return (bit1 << 1) | bit0;
-    }
-
-    void GPU::changeScanline()
-    {
-        // If we can't go further, reset
-        if(bus -> readByte(lineReg) == 153)
-            bus -> writeByte(lineReg, 0);
-        // Otherwise increment the line register
-        else
-            bus -> writeByte(lineReg, bus -> readByte(lineReg) + 1);
     }
 
     void GPU::draw(SDL_Texture* output, SDL_Renderer* tool)
@@ -276,7 +235,5 @@ namespace Gameboy
         // Reset everything
         clock = 0;
         cnt = 0;
-
-        memset(pixels, 0, 160 * 144);
     }
 }

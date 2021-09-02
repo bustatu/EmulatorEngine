@@ -62,7 +62,7 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> pushState(state);
-            state -> loadROM("data/gameboy/roms/Tetris.gb");
+            state -> loadROM("data/gameboy/roms/tests/individual/01-read_timing.gb");
         }
         else if(index == 4)
         {
