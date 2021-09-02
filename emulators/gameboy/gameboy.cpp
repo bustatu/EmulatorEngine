@@ -22,16 +22,54 @@ namespace Gameboy
 
         // Update the screen output (correct the aspect ratio)
         SDL_RenderSetLogicalSize(window -> getRenderer(), 160, 144);
+
+        // Apply default config
+        applyDefaultConfig();
     }
 
-    void Emu::skip_bios()
+    void Emu::createDefaultConfig()
     {
-        cpu.skip_bios();
+        // Open output file
+        std::ofstream fout("data/gameboy/general.json");
+
+        // The JSON data
+        nlohmann::json j_file;
+
+        // Set bios as not found
+        j_file["bios"]["disabled"] = true;
+        j_file["bios"]["path"] = "UNDEFINED";
+
+        // Write the JSON to the file
+        fout << j_file;
+
+        // Close the file
+        fout.close();
     }
 
-    void Emu::loadBIOS(std::string path)
+    void Emu::applyDefaultConfig()
     {
-        bios.load(path);
+        // Read configs
+        std::ifstream fin("data/gameboy/general.json");
+        if(!fin.is_open())
+        {
+            printf("\033[1;36m{W}: Default general Gameboy config not found! Creating a new one...\n\033[0m");
+            createDefaultConfig();
+            fin.close();
+            fin = std::ifstream("data/gameboy/general.json");
+        }
+
+        nlohmann::json j_file;
+
+        fin >> j_file;
+        
+        // Load the BIOS from the config file
+        if(!j_file["bios"]["disabled"])
+        {
+            bios.load(j_file["bios"]["path"]);
+            if(!bios.isLoaded())
+                printf("\033[1;36m{W}: BIOS loading failed! Booting with no BIOS...\n\033[0m"), cpu.skip_bios();
+        }
+        else cpu.skip_bios();
     }
 
     void Emu::loadROM(std::string path)
@@ -63,7 +101,7 @@ namespace Gameboy
 
         // Check inputs and do interrupt if required
         for(uint8_t i = 0; i < 8; i++)
-            joypad.updateButton(i, window -> getKey(keys[i]));
+            joypad.updateButton(i, !window -> getKey(keys[i]));
         if(joypad.needsInterrupt())
             cpu.requestInterrupt(4);
 

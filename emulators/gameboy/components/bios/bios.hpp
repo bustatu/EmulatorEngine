@@ -21,6 +21,9 @@ namespace Gameboy
         // Load BIOS from the location
         void load(std::string path);
 
+        // Returns loaded state
+        bool isLoaded();
+
         // Reads a byte from the specified offset
         uint8_t readByte(uint16_t addr);
     };

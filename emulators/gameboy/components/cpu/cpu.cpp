@@ -69,7 +69,9 @@ namespace Gameboy
         reg8[7] = 0x01;
         reg8[8] = 0xFE;
         reg8[9] = 0xFF;
-        bus -> writeByte(0xFF50, 1);
+        bus -> writeByte(0xFF00, 0xCF);
+        bus -> writeByte(0xFF50, 0x01);
+        bus -> writeByte(0xFFFF, 0x00);
     }
 
     void CPU::unknown_cb()

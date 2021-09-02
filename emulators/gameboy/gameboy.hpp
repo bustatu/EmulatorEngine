@@ -1,9 +1,10 @@
 #ifndef GAMEBOY_H
 #define GAMEBOY_H
 
+#include <SDL2/SDL.h>
 #include "../../state.hpp"
 #include "components/components.hpp"
-#include <SDL2/SDL.h>
+#include "../../external/json/single_include/nlohmann/json.hpp"
 
 namespace Gameboy
 {
@@ -32,9 +33,13 @@ namespace Gameboy
         // Keys' mapping
         SDL_Keycode keys[8] = { SDLK_d, SDLK_a, SDLK_w, SDLK_s, SDLK_n, SDLK_m, SDLK_k, SDLK_l };
 
+        // Create default json file config
+        static void createDefaultConfig();
+
+        // Apply the default config to the curent state
+        void applyDefaultConfig();
+
     public:
-        // Load the BIOS
-        void loadBIOS(std::string path);
 
         // Load the ROM
         void loadROM(std::string path);
@@ -47,9 +52,6 @@ namespace Gameboy
 
         // Stop the emulator
         void pause();
-
-        // Skips BIOS
-        void skip_bios();
 
         // Update function
         void update(double dt);

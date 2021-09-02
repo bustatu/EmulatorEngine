@@ -62,9 +62,7 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> pushState(state);
-            //state -> skip_bios();
-            state -> loadBIOS("data/gameboy/bios/bios.gb");
-            state -> loadROM("data/gameboy/roms/Dragon Slayer I.gb");
+            state -> loadROM("data/gameboy/roms/Tetris.gb");
         }
         else if(index == 4)
         {

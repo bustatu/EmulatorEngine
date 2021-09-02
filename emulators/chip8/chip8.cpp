@@ -100,9 +100,6 @@ namespace CHIP8
     {
         Window* window = stateM -> getWindow();
 
-        // Apply default config
-        applyDefaultConfig();
-
         // Create audio specs for this emu
         SDL_AudioSpec wanted;
         SDL_zero(wanted);
@@ -126,6 +123,9 @@ namespace CHIP8
 
         // Update the screen output (correct the aspect ratio)
         SDL_RenderSetLogicalSize(window -> getRenderer(), 128, 64);
+
+        // Apply default config
+        applyDefaultConfig();
     }
 
     void Emu::resume()

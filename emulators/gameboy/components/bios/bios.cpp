@@ -13,6 +13,11 @@ namespace Gameboy
         return data[addr];
     }
 
+    bool BIOS::isLoaded()
+    {
+        return loaded;
+    }
+
     void BIOS::load(std::string path)
     {
         // Open file for reading
