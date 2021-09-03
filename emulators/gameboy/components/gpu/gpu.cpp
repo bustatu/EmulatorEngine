@@ -122,6 +122,8 @@ namespace Gameboy
 
                 addr = tileData + offset1 + offset2;
                 tileLo = bus -> readByte(addr);
+                //if(tileNo != 0)
+                    //printf("%04X %04X\n", addr, tileLo);
 
                 pf_state1 = 0x02;
                 break;
@@ -131,6 +133,8 @@ namespace Gameboy
             case 0x02:
             {
                 tileHi = bus -> readByte(addr + 1);
+                //if(tileNo != 0)
+                    //printf("%04X %04X\n", addr + 1, tileHi);
                 pf_state1 = 0x03;
                 break;
             }
@@ -284,7 +288,6 @@ namespace Gameboy
                 break;
             }
 
-
             // OAM search
             case 0x02:
             {
@@ -322,6 +325,9 @@ namespace Gameboy
 
     void GPU::update()
     {
+        // Update the clock
+        clock++;
+
         // If not on
         if(!get_bit(LCDControl, 7))
         {
@@ -340,9 +346,6 @@ namespace Gameboy
             setMode(0x02);
             resetFlag = false;
         }
-
-        // Update the clock
-        clock++;
 
         // Do stuff depending on the mode
         switch(getMode())
@@ -373,6 +376,9 @@ namespace Gameboy
             // VBlank
             case 0x01:
             {
+                // Screen will be updated
+                drawFlag = true;
+                
                 // Can't be true anymore
                 wyTrigger = false;
 
@@ -443,9 +449,6 @@ namespace Gameboy
             // Pixel transfer (or drawing mode)
             case 0x03:
             {
-                // Screen will be updated
-                drawFlag = true;
-                
                 // Update pixel counter and fetcher
                 pcnt++;
                 tickFetcher();

@@ -8,15 +8,17 @@ namespace Gameboy
         {
             // BIOS and ROM area
             case 0x0000 ... 0x00FF:
+            {
                 // Cartridge control
                 if(readByte(0xFF50) == 0x00)
                     return bios -> readByte(addr);
                 else
                     return rom -> readByte(addr);
                 break;
+            }
             
             // ROM only area
-            case 0x1000 ... 0x7FFF:
+            case 0x0100 ... 0x7FFF:
                 return rom -> readByte(addr); 
                 break;
             
@@ -47,7 +49,7 @@ namespace Gameboy
 
             // OAM
             case 0xFE00 ... 0xFE9F:
-                return ram -> readByte(addr - 0x1000);
+                return ram -> readByte(addr);
                 break;
 
             // Unusable
@@ -113,7 +115,7 @@ namespace Gameboy
 
             // OAM
             case 0xFE00 ... 0xFE9F:
-                ram -> writeByte(addr - 0x1000, val);
+                ram -> writeByte(addr, val);
                 break;
 
             // Unusable area

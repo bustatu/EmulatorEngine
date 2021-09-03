@@ -118,6 +118,20 @@ namespace Gameboy
 
             executionTimer -= 1.0 / freq;
         }
+
+        // Dump VRAM to file (test only)
+        if(window -> getKeyPressed(SDLK_SPACE))
+        {
+            std::ofstream fout("vram.log");
+            for(int i = 0x8000; i <= 0x9FFF; i++)
+            {
+                uint32_t val = bus.readByte(i);
+                if(val != 0)
+                {
+                    fout << std::hex << i << " " << val << "\n";
+                }
+            }
+        }
     }
 
     void Emu::draw()
