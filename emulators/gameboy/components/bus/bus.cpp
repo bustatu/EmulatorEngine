@@ -115,6 +115,7 @@ namespace Gameboy
 
             // OAM
             case 0xFE00 ... 0xFE9F:
+                printf("%04X %02X\n", addr, val);
                 ram -> writeByte(addr, val);
                 break;
 

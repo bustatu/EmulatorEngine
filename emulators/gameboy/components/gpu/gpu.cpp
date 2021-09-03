@@ -29,9 +29,7 @@ namespace Gameboy
             // Fetch data low
             case 0x01:
             {
-                uint16_t tileMap = 0x8000;
-                uint16_t offset1 = sTileNo * 16;
-                uint16_t offset2 = 0;
+                uint16_t tileMap = 0x8000, offset1 = sTileNo * 16, offset2 = 0;
 
                 if(get_bit(cur_sprite.attr, 6))
                     offset2 = (get_bit(LCDControl, 2) ? 30 : 14) - 2 * (LY - (cur_sprite.y - 16));
@@ -88,9 +86,7 @@ namespace Gameboy
             // Fetch tile no.
             case 0x00:
             {
-                uint16_t tileMap;
-                uint16_t xOffset;
-                uint16_t yOffset;
+                uint16_t tileMap, xOffset, yOffset;
 
                 if (fetchingWindow)
                 {
@@ -190,6 +186,7 @@ namespace Gameboy
 
         if (fetchingSprites)
         {
+            exit(0);
             tickSpriteFetcher();
             return;
         }
@@ -303,7 +300,9 @@ namespace Gameboy
                 fetcherX = 0;
                 LX = -(SCX % 8);
                 pf_state1 = 0x00;
+                pf_state2 = 0x00;
                 bgf_ticks = 0;
+                spf_ticks = 0;
                 fetchingSprites = false;
                 fetchingWindow = false;
                 bgFIFO.clear();
@@ -325,9 +324,6 @@ namespace Gameboy
 
     void GPU::update()
     {
-        // Update the clock
-        clock++;
-
         // If not on
         if(!get_bit(LCDControl, 7))
         {
@@ -385,10 +381,11 @@ namespace Gameboy
                 // If at the end of the line
                 if(++pcnt == 456)
                 {
+                    // Go to the next one
                     pcnt = 0;
                     LY++;
 
-                    // Go in OAM search mode
+                    // Reset and go in OAM search mode
                     if (LY > 153)
                         LY = WLY = 0, setMode(2);
 
@@ -424,6 +421,7 @@ namespace Gameboy
 
                     if(XPos > 0 && (LY + 16) >= YPos && (LY + 16) < (YPos + spriteHeight) && oamBuffer.size() < 10)
                     {
+                        printf("%02X %02X", YPos, XPos);
                         if(spriteHeight == 16)
                         {
                             if ((LY + 16) < (YPos - 8))
@@ -490,7 +488,7 @@ namespace Gameboy
 
             for (int i = 0; i < 144; i++)
             {
-                for (int j = 0; j < 160; j++)
+                for (int j = 8; j < 168; j++)
                 {
                     uint8_t color = 0x00;
                     switch (pixels[j][i])
@@ -527,7 +525,6 @@ namespace Gameboy
     GPU::GPU()
     {
         // Reset everything
-        clock = 0;
         cnt = 0;
 
         SCX = 0;

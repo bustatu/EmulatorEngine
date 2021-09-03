@@ -122,8 +122,8 @@ namespace Gameboy
         // Dump VRAM to file (test only)
         if(window -> getKeyPressed(SDLK_SPACE))
         {
-            std::ofstream fout("vram.log");
-            for(int i = 0x8000; i <= 0x9FFF; i++)
+            std::ofstream fout("oam.log");
+            for(int i = 0xFE00; i <= 0xFE9F; i++)
             {
                 uint32_t val = bus.readByte(i);
                 if(val != 0)

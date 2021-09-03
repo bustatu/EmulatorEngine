@@ -59,8 +59,8 @@ namespace Gameboy
 
         // Calculate ROM bank mask
         rom_bank_mask = 0;
-        for(int32_t i = 0; i < (rom_size < 5 ? rom_size : 5); i++)
-            rom_bank_mask |= (1 << i);
+        for(int32_t i = 0; i <= (rom_size < 5 ? rom_size : 5); i++)
+            set_bit(rom_bank_mask, i, 1);
     }
 
     uint8_t MBC1::readByteFromBank00(uint16_t addr)

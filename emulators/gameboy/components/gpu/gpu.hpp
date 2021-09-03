@@ -67,10 +67,7 @@ namespace Gameboy
     {
     private:
         // Framebuffer for an easier life
-        uint8_t pixels[160][144];
-
-        // GPU internal clock
-        uint32_t clock;
+        uint8_t pixels[168][144];
 
         // Registers (FF40 - FF4B)
         uint8_t regs[0xC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
