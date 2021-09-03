@@ -151,9 +151,6 @@ namespace Gameboy
         // Gets current display mode
         uint8_t getMode();
 
-        // Gets if the GPU is currently on
-        bool isOn();
-
         // Finds out if pixel fetcher is ready
         bool isPFReady();
 

@@ -7,22 +7,7 @@ namespace Gameboy
 {
     uint8_t GPU::get_colour(uint8_t colourNum, uint8_t palette)
     {
-        switch (colourNum)
-        {
-            case 0:
-                return (get_bit(palette, 1) << 1) | get_bit(palette, 0);
-                break;
-            case 1:
-                return (get_bit(palette, 3) << 1) | get_bit(palette, 2);
-                break;
-            case 2:
-                return (get_bit(palette, 5) << 1) | get_bit(palette, 4);
-                break;
-            case 3:
-                return (get_bit(palette, 7) << 1) | get_bit(palette, 6);
-                break;
-        }
-        return 0;
+        return (get_bit(palette, 2 * colourNum + 1) << 1) | get_bit(palette, 2 * colourNum);
     }
 
     void GPU::tickSpriteFetcher()
@@ -274,8 +259,8 @@ namespace Gameboy
     void GPU::setMode(uint8_t newMode)
     {
         // Sets bits in the stat register
-        set_bit(STAT, 0, get_bit(newMode, 0));
-        set_bit(STAT, 1, get_bit(newMode, 1));
+        STAT &= 0b11111100;
+        STAT |= newMode;
 
         // Check if there needs to be an interrupt made
         bool irq = false;
@@ -332,7 +317,7 @@ namespace Gameboy
 
     uint8_t GPU::getMode()
     {
-        return (get_bit(STAT, 1) << 1) | get_bit(STAT, 0);
+        return STAT & 0b11;
     }
 
     void GPU::update()
