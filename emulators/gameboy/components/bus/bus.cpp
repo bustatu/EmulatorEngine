@@ -115,11 +115,10 @@ namespace Gameboy
 
             // OAM
             case 0xFE00 ... 0xFE9F:
-                printf("%04X %02X\n", addr, val);
                 ram -> writeByte(addr, val);
                 break;
 
-            // Unusable area
+            // Unusable
             case 0xFEA0 ... 0xFEFF:
                 printf("{W}: Write to unusable area at address %04X, value %02X.\n", addr, val);
                 break;

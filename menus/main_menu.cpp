@@ -62,7 +62,7 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> pushState(state);
-            state -> loadROM("data/gameboy/roms/Super Mario Land.gb");
+            state -> loadROM("data/gameboy/roms/tests/dmg-acid2.gb");
         }
         else if(index == 4)
         {

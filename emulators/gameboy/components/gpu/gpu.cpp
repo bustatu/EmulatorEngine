@@ -118,8 +118,6 @@ namespace Gameboy
 
                 addr = tileData + offset1 + offset2;
                 tileLo = bus -> readByte(addr);
-                //if(tileNo != 0)
-                    //printf("%04X %04X\n", addr, tileLo);
 
                 pf_state1 = 0x02;
                 break;
@@ -129,8 +127,6 @@ namespace Gameboy
             case 0x02:
             {
                 tileHi = bus -> readByte(addr + 1);
-                //if(tileNo != 0)
-                    //printf("%04X %04X\n", addr + 1, tileHi);
                 pf_state1 = 0x03;
                 break;
             }
@@ -186,7 +182,6 @@ namespace Gameboy
 
         if (fetchingSprites)
         {
-            exit(0);
             tickSpriteFetcher();
             return;
         }
@@ -253,7 +248,17 @@ namespace Gameboy
 
     void GPU::writeByte(uint16_t addr, uint8_t val)
     {
-        if(addr != 0xFF44)
+        // Do DMA transfer
+        if(addr == 0xFF46)
+        {
+            if(val >= 0 && val <= 0xDF)
+            {
+                regs[0x6] = val;
+                for(int32_t i = 0x00; i < 0xA0; i++)
+                    bus -> writeByte(0xFE00 | i, bus -> readByte((val << 8) | i));
+            }
+        }
+        else if(addr != 0xFF44)
             regs[addr - 0xFF40] = val;
     }
 
@@ -365,6 +370,13 @@ namespace Gameboy
                         setMode(1);
                     else
                         setMode(2);
+
+                    // Interrupt check
+                    set_bit(STAT, 2, (LY == LYC));
+
+                    // Request stat interrupt
+                    if(LY == LYC && get_bit(STAT, 6))
+                        bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | (1 << 1));
                 }
                 break;
             }
@@ -393,7 +405,7 @@ namespace Gameboy
                     set_bit(STAT, 2, (LY == LYC));
 
                     // Request stat interrupt
-                    if(get_bit(STAT, 6))
+                    if(LY == LYC && get_bit(STAT, 6))
                         bus -> writeByte(0xFF0F, bus -> readByte(0xFF0F) | (1 << 1));
                 }
                 break;
@@ -421,7 +433,6 @@ namespace Gameboy
 
                     if(XPos > 0 && (LY + 16) >= YPos && (LY + 16) < (YPos + spriteHeight) && oamBuffer.size() < 10)
                     {
-                        printf("%02X %02X", YPos, XPos);
                         if(spriteHeight == 16)
                         {
                             if ((LY + 16) < (YPos - 8))
@@ -457,14 +468,14 @@ namespace Gameboy
                     // We can fetch the pixel
                     Pixel pix = bgFIFO.pop();
 
-                    if (!pix.bgEnable)
+                    if(!pix.bgEnable)
                     {
                         if (!spFIFO.isEmpty())
                             pix = spFIFO.pop();
                         else
                             pix.colour = 0;
                     }
-                    else if (!spFIFO.isEmpty())
+                    else if(!spFIFO.isEmpty())
                         pix = mixPixels(pix, spFIFO.pop());
 
                     pixels[LX][LY] = pix.colour;
