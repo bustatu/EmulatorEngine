@@ -8,6 +8,7 @@ add_library(Gameboy
     "components/rom/rom.cpp"
     "components/rom/MBCs/mbc0.cpp"
     "components/rom/MBCs/mbc1.cpp"
+    "components/rom/MBCs/mbc5.cpp"
     "components/timer/timer.cpp"
     "components/joypad/joypad.cpp"
 )

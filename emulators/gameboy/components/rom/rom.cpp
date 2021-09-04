@@ -59,16 +59,19 @@ namespace Gameboy
             // MBC check
             switch(dataFile[0x147])
             {
-                case 0x00:
+                case 00:
                     data = new MBC0();
                     break;
-                case 0x01:
+                case 01:
                     data = new MBC1();
                     break;
-                case 0x03:
+                case 03:
                     printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);
                     printf("{I}: Defaulting to MBC 1...\n");
                     data = new MBC1();
+                    break;
+                case 19:
+                    data = new MBC5();
                     break;
                 default:
                     printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %d\n\033[0m", dataFile[0x147]);

@@ -29,12 +29,18 @@ namespace Gameboy
             // Fetch data low
             case 0x01:
             {
-                uint16_t tileMap = 0x8000, offset1 = sTileNo * 16, offset2 = 0;
+                uint16_t tileMap = 0x8000;
+                uint16_t offset1 = sTileNo * 16;
+                uint16_t offset2 = 0;
 
                 if(get_bit(cur_sprite.attr, 6))
+                {
                     offset2 = (get_bit(LCDControl, 2) ? 30 : 14) - 2 * (LY - (cur_sprite.y - 16));
+                }
                 else
+                {
                     offset2 = 2 * (LY - (cur_sprite.y - 16));
+                }
 
                 addr = tileMap + offset1 + offset2;
                 sTileLo = bus -> readByte(addr);
@@ -54,19 +60,28 @@ namespace Gameboy
             // Push to FIFO
             case 0x03:
             {
-                for(int32_t bit = 7, i = 0; bit >= 0; bit--, i++)
+                for(int bit = 7, i = 0; bit >= 0; bit--, i++)
                 {
-                    if((cur_sprite.x + i) < 8)
+                    if ((cur_sprite.x + i) < 8)
+                    {
                         continue;
+                    }
 
-                    int32_t effectiveBit = get_bit(cur_sprite.attr, 5) ? 7 - bit : bit;
+                    int effectiveBit = get_bit(cur_sprite.attr, 5) ? 7 - bit : bit;
                     uint8_t colourNum = (get_bit(sTileHi, effectiveBit) << 1) | get_bit(sTileLo, effectiveBit);
-                    Pixel pix{get_colour(colourNum, get_bit(cur_sprite.attr, 4) ? OBP1 : OBP0), colourNum == 0, false, get_bit(cur_sprite.attr, 7) != 0};
+                    Pixel pix{get_colour(colourNum, get_bit(cur_sprite.attr, 4) ? OBP1 : OBP0), colourNum == 0, false, (bool)get_bit(cur_sprite.attr, 7)};
 
                     if(i >= spFIFO.getSize())
+                    {
                         spFIFO.push(pix);
-                    else if(spFIFO[i].transparent)
-                        spFIFO[i] = pix;
+                    }
+                    else
+                    {
+                        if(spFIFO[i].transparent)
+                        {
+                            spFIFO[i] = pix;
+                        }
+                    }
                 }
 
                 fetchingSprites = false;
@@ -86,17 +101,19 @@ namespace Gameboy
             // Fetch tile no.
             case 0x00:
             {
-                uint16_t tileMap, xOffset, yOffset;
+                uint16_t tileMap;
+                uint16_t xOffset;
+                uint16_t yOffset;
 
                 if (fetchingWindow)
                 {
-                    tileMap = (get_bit(LCDControl, 6) != 0) ? 0x9C00 : 0x9800;
+                    tileMap = get_bit(LCDControl, 6) ? 0x9C00 : 0x9800;
                     xOffset = fetcherX;
                     yOffset = (WLY / 8) * 32;
                 }
                 else
                 {
-                    tileMap = (get_bit(LCDControl, 3) != 0) ? 0x9C00 : 0x9800;
+                    tileMap = get_bit(LCDControl, 3) ? 0x9C00 : 0x9800;
                     xOffset = (fetcherX + (SCX / 8)) % 32;
                     yOffset = (((LY + SCY) % 256) / 8) * 32;
                 }
@@ -139,23 +156,26 @@ namespace Gameboy
                     for (int bit = 7; bit >= 0; --bit)
                     {
                         uint8_t colourNum = (get_bit(tileHi, bit) << 1) | get_bit(tileLo, bit);
-                        bgFIFO.push(Pixel{get_colour(colourNum, BGP), colourNum == 0, get_bit(LCDControl, 0) != 0, false});
+                        bgFIFO.push(Pixel{get_colour(colourNum, BGP), colourNum == 0, (bool)get_bit(LCDControl, 0), false});
                     }
 
                     fetcherX++;
                     pf_state1 = 0x00;
                 }
-
+                else
+                {
+                    pf_state1 = 0x03;
+                }
                 break;
             }
         }
     }
 
-    Pixel GPU::mixPixels(const Pixel &bg, const Pixel &sp)
+    Pixel GPU::mixPixels(Pixel bg, Pixel sp)
     {
-        if (!sp.transparent)
+        if(!sp.transparent)
         {
-            if (sp.bgPriority && !bg.transparent)
+            if(sp.bgPriority && !bg.transparent)
                 return bg;
             return sp;
         }
@@ -249,11 +269,11 @@ namespace Gameboy
         // Do DMA transfer
         if(addr == 0xFF46)
         {
-            if(val >= 0 && val <= 0xDF)
+            if(val >= 0x00 && val <= 0xDF)
             {
-                regs[0x6] = val;
+                DMA = val;
                 for(int32_t i = 0x00; i < 0xA0; i++)
-                    bus -> writeByte(0xFE00 | i, bus -> readByte((val << 8) | i));
+                    bus -> writeByte(0xFE00 | i, bus -> readByte((DMA << 8) | i));
             }
         }
         else if(addr != 0xFF44)
@@ -303,9 +323,7 @@ namespace Gameboy
                 fetcherX = 0;
                 LX = -(SCX % 8);
                 pf_state1 = 0x00;
-                pf_state2 = 0x00;
                 bgf_ticks = 0;
-                spf_ticks = 0;
                 fetchingSprites = false;
                 fetchingWindow = false;
                 bgFIFO.clear();
@@ -431,7 +449,7 @@ namespace Gameboy
 
                     if(XPos > 0 && (LY + 16) >= YPos && (LY + 16) < (YPos + spriteHeight) && oamBuffer.size() < 10)
                     {
-                        if(spriteHeight == 16)
+                        if(get_bit(LCDControl, 2))
                         {
                             if ((LY + 16) < (YPos - 8))
                                 tileIndex |= 0x01;
@@ -468,7 +486,7 @@ namespace Gameboy
 
                     if(!pix.bgEnable)
                     {
-                        if (!spFIFO.isEmpty())
+                        if(!spFIFO.isEmpty())
                             pix = spFIFO.pop();
                         else
                             pix.colour = 0;

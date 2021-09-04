@@ -131,7 +131,7 @@ namespace Gameboy
         uint8_t get_colour(uint8_t colourNum, uint8_t palette);
 
         // Mix 2 pixels
-        Pixel mixPixels(const Pixel &bg, const Pixel &sp);
+        Pixel mixPixels(Pixel bg, Pixel sp);
 
         // Changes display mode to a new value
         void setMode(uint8_t newMode);

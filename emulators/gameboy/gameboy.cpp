@@ -26,6 +26,9 @@ namespace Gameboy
 
         // Apply default config
         applyDefaultConfig();
+
+        // Start
+        is_running = true;
     }
 
     void Emu::createDefaultConfig()
@@ -86,7 +89,7 @@ namespace Gameboy
 
     void Emu::pause()
     {
-        printf("{I}: Gameboy emulator has been stopped!\n");
+        printf("{I}: Gameboy emulator has been paused!\n");
         is_running = false;
     }
 
@@ -95,42 +98,52 @@ namespace Gameboy
         // Get window handler
         Window* window = stateM -> getWindow();
 
-        // Do not execute more than 0.25s of delay (4 fps)
-        dt = ((dt < 0.25) ? dt : 0.25);
-
-        executionTimer += dt;
-
-        // Check inputs and do interrupt if required
-        for(uint8_t i = 0; i < 8; i++)
-            joypad.updateButton(i, !window -> getKey(keys[i]));
-        if(joypad.needsInterrupt())
-            cpu.requestInterrupt(4);
-
-        while(executionTimer >= 1.0 / freq)
+        if(is_running)
         {
-            // Update the components
-            timer.update();
-            if(timer.needsInterrupt())
-                cpu.requestInterrupt(2);
+            // Do not execute more than 0.25s of delay (4 fps)
+            dt = ((dt < 0.25) ? dt : 0.25);
 
-            cpu.execute();
-            gpu.update();
+            executionTimer += dt;
 
-            executionTimer -= 1.0 / freq;
-        }
+            // Check inputs and do interrupt if required
+            for(uint8_t i = 0; i < 8; i++)
+                joypad.updateButton(i, !window -> getKey(keys[i]));
+            if(joypad.needsInterrupt())
+                cpu.requestInterrupt(4);
 
-        // Dump VRAM to file (test only)
-        if(window -> getKeyPressed(SDLK_SPACE))
-        {
-            std::ofstream fout("oam.log");
-            for(int i = 0xFE00; i <= 0xFE9F; i++)
+            while(executionTimer >= 1.0 / freq)
             {
-                uint32_t val = bus.readByte(i);
-                if(val != 0)
+                // Update the components
+                timer.update();
+                if(timer.needsInterrupt())
+                    cpu.requestInterrupt(2);
+
+                cpu.execute();
+                gpu.update();
+
+                executionTimer -= 1.0 / freq;
+            }
+
+            // Dump VRAM to file (test only)
+            if(window -> getKeyPressed(SDLK_SPACE))
+            {
+                std::ofstream fout("oam.log");
+                for(int i = 0xFE00; i <= 0xFE9F; i++)
                 {
-                    fout << std::hex << i << " " << val << "\n";
+                    uint32_t val = bus.readByte(i);
+                    if(val != 0)
+                    {
+                        fout << std::hex << i << " " << val << "\n";
+                    }
                 }
             }
+        }
+
+        // Toggle pause
+        if(window -> getKeyPressed(SDLK_ESCAPE))
+        {
+            if(is_running)  pause();
+            else            resume();
         }
     }
 
