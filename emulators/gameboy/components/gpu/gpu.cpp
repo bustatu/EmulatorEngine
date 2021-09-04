@@ -90,13 +90,13 @@ namespace Gameboy
 
                 if (fetchingWindow)
                 {
-                    tileMap = get_bit(LCDControl, 6) ? 0x9C00 : 0x9800;
+                    tileMap = (get_bit(LCDControl, 6) != 0) ? 0x9C00 : 0x9800;
                     xOffset = fetcherX;
                     yOffset = (WLY / 8) * 32;
                 }
                 else
                 {
-                    tileMap = get_bit(LCDControl, 3) ? 0x9C00 : 0x9800;
+                    tileMap = (get_bit(LCDControl, 3) != 0) ? 0x9C00 : 0x9800;
                     xOffset = (fetcherX + (SCX / 8)) % 32;
                     yOffset = (((LY + SCY) % 256) / 8) * 32;
                 }
@@ -111,7 +111,7 @@ namespace Gameboy
             // Fetch data low
             case 0x01:
             {
-                bool useSigned = !get_bit(LCDControl, 4);
+                bool useSigned = (get_bit(LCDControl, 4) == 0);
                 uint16_t tileData = useSigned ? 0x9000 : 0x8000;
                 uint16_t offset1 = (useSigned ? int8_t(tileNo) : tileNo) * 16;
                 uint16_t offset2 = fetchingWindow ? (WLY % 8) * 2 : ((LY + SCY) % 8) * 2;
@@ -145,8 +145,6 @@ namespace Gameboy
                     fetcherX++;
                     pf_state1 = 0x00;
                 }
-                else
-                    pf_state1 = 0x03;
 
                 break;
             }
@@ -478,7 +476,7 @@ namespace Gameboy
                     else if(!spFIFO.isEmpty())
                         pix = mixPixels(pix, spFIFO.pop());
 
-                    pixels[LX][LY] = pix.colour;
+                    pixels[LY * 160 + LX] = pix.colour;
                 }
 
                 // If at the end of the line
@@ -502,7 +500,7 @@ namespace Gameboy
                 for (int j = 8; j < 168; j++)
                 {
                     uint8_t color = 0x00;
-                    switch (pixels[j][i])
+                    switch (pixels[i * 160 + j])
                     {
                     case 0:
                         color = 0xFF;
