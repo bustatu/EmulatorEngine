@@ -10,14 +10,10 @@ namespace Gameboy
     {
     private:
         // ROM data and RAM data
-        uint8_t *ROM;
-        uint8_t *RAM;
-        bool enable_ram = false;
-        bool rtc_flag = false;
-        uint8_t rom_size = 0;
-        uint8_t ram_size = 0;
-        uint8_t rom_bank_number = 1;
-        uint8_t ram_bank_number = 0;
+        uint8_t *ROM, *RAM;
+        uint8_t rom_size, ram_size;
+        uint8_t rom_bank = 0x01;
+        bool ram_enabled = false;
 
     public:
         void init(uint8_t* fileContents, uint32_t fileSize);

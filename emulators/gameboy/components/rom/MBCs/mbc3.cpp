@@ -36,83 +36,39 @@ namespace Gameboy
     {
         if(addr >= 0x0000 && addr <= 0x3FFF)
             return ROM[addr];
-        return 0xFF;       
+        return 0xFF;
     }
 
     void MBC3::writeByteToBank00(uint16_t addr, uint8_t what)
     {
-        // Enable RAM
-        if(addr >= 0x0000 && addr <= 0x1FFF)
-            enable_ram = ((what & 0b1111) == 0xA);
-        // ROM bank
-        else if(addr >= 0x2000 && addr <= 0x3FFF)
+        if(addr >= 0x2000 && addr <= 0x3FFF)
         {
-            if(what & 0b1111111)
-                rom_bank_number = what & 0b1111111;
+            if(what == 0x00)
+                rom_bank = 0x01;
             else
-                rom_bank_number = 1;
+                rom_bank = what & 0b1111111;
         }
     }
 
     uint8_t MBC3::readByteFromBankNN(uint16_t addr)
     {
         if(addr >= 0x4000 && addr <= 0x7FFF)
-            return ROM[0x4000 * rom_bank_number + (addr - 0x4000)];
-        return 0xFF; 
+            return ROM[0x4000 * (rom_bank - 1) + addr];
+        return 0xFF;
     }
 
     void MBC3::writeByteToBankNN(uint16_t addr, uint8_t what)
     {
-        // RAM Bank
-        if(addr >= 0x4000 && addr <= 0x5FFF)
-        {
-            if(what >= 0x00 && what <= 0x03)
-                rtc_flag = false, ram_bank_number = what;
-            else if(what >= 0x08 && what <= 0x0C)
-                rtc_flag = true;
-        }
-        // RTC data
-        else if(addr >= 0x6000 && addr <= 0x7FFF)
-        {
-            // Stop register updates
-            if(what == 0x00)
-            {
 
-            }
-            // Update the registers
-            else if(what == 0x01)
-            {
-
-            }
-        }
     }
 
     uint8_t MBC3::readByteFromERAM(uint16_t addr)
     {
-        if(enable_ram)
-        {
-            if(rtc_flag)
-                return 0xFF;
-            else
-            {
-                if(ram_size)
-                    return RAM[0x2000 * ram_bank_number + (addr - 0xA000)];
-                else
-                    return 0xFF;
-            }
-        }
-        else if(rtc_flag) {
-            return 0xFF;
-        }
-        return 0xFF;
+        return 0xFF;       
     }
 
     void MBC3::writeByteToERAM(uint16_t addr, uint8_t what)
     {
-        if(enable_ram && ram_size)
-        {
-            if(ram_size)
-                RAM[0x2000 * ram_bank_number + (addr - 0xA000)] = what;
-        }
+
     }
 }
