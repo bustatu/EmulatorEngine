@@ -1,21 +1,22 @@
-#ifndef GAMEBOY_MBC_5_H
-#define GAMEBOY_MBC_5_H
+#ifndef GAMEBOY_MBC_3_H
+#define GAMEBOY_MBC_3_H
 
 #include "mbc.hpp"
 #include <cstring>
 
 namespace Gameboy
 {
-    class MBC5 : public MBC
+    class MBC3 : public MBC
     {
     private:
         // ROM data and RAM data
         uint8_t *ROM;
         uint8_t *RAM;
         bool enable_ram = false;
+        bool rtc_flag = false;
         uint8_t rom_size = 0;
         uint8_t ram_size = 0;
-        uint16_t rom_bank_number = 0;
+        uint8_t rom_bank_number = 1;
         uint8_t ram_bank_number = 0;
 
     public:

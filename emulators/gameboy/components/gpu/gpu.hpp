@@ -67,7 +67,7 @@ namespace Gameboy
     {
     private:
         // Framebuffer for an easier life
-        uint8_t pixels[168 * 144];
+        uint8_t pixels[161 * 144];
 
         // Registers (FF40 - FF4B)
         uint8_t regs[0xC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

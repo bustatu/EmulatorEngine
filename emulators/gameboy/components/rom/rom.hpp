@@ -5,6 +5,7 @@
 #include "MBCs/mbc.hpp"
 #include "MBCs/mbc0.hpp"
 #include "MBCs/mbc1.hpp"
+#include "MBCs/mbc3.hpp"
 #include "MBCs/mbc5.hpp"
 
 namespace Gameboy
