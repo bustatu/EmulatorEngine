@@ -85,7 +85,7 @@ namespace Gameboy
         uint8_t &WX = regs[0xB];
 
         // LY but for the X axis
-        uint8_t LX = 0;
+        int16_t LX = 0;
 
         // OAM buffer
         std::deque<Sprite> oamBuffer;
