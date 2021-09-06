@@ -95,8 +95,9 @@ namespace Gameboy
 
     void Emu::update(double dt)
     {
-        // Get window handler
+        // Get window handlers
         Window* window = stateM -> getWindow();
+        GamepadManager* gamepad = window -> getGamepadManager();
 
         if(is_running)
         {
@@ -106,8 +107,19 @@ namespace Gameboy
             executionTimer += dt;
 
             // Check inputs and do interrupt if required
-            for(uint8_t i = 0; i < 8; i++)
-                joypad.updateButton(i, !window -> getKey(keys[i]));
+            if(gamepad -> getGamepadCount() == 0) 
+                for(uint8_t i = 0; i < 8; i++)
+                    joypad.updateButton(i, !window -> getKey(keys[i]));
+            else
+            {
+                joypad.updateButton(0, gamepad -> getXDir(0) == 1);
+                joypad.updateButton(1, gamepad -> getXDir(0) == -1);
+                joypad.updateButton(2, gamepad -> getYDir(0) == 1);
+                joypad.updateButton(3, gamepad -> getYDir(0) == -1);
+                for(uint8_t i = 4; i < 8; i++)
+                    joypad.updateButton(i, !window -> getKey(keys[i]));
+            }
+
             if(joypad.needsInterrupt())
                 cpu.requestInterrupt(4);
 

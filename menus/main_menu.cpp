@@ -22,10 +22,6 @@ void MenuState::init()
     textArray[3].setFont(&menuFont);
     textArray[3].setRenderer(window -> getRenderer());
     textArray[3].setText("3. Gameboy");
-
-    textArray[4].setFont(&menuFont);
-    textArray[4].setRenderer(window -> getRenderer());
-    textArray[4].setText("4. NES");
 }
 
 void MenuState::resume()
@@ -62,28 +58,27 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> pushState(state);
-            state -> loadROM("data/gameboy/roms/Pokemon - Red Version.gb");
-        }
-        else if(index == 4)
-        {
-            NES::Emu* state = new NES::Emu();
-            state -> load("data/nes/roms/nestest.nes");
-            stateM -> pushState(state);
+            state -> loadROM("data/gameboy/roms/Tetris.gb");
         }
     }
     
-    for(int32_t i = 1; i <= 4; i++)
+    for(int32_t i = 1; i <= 3; i++)
         textArray[i].setColor({255, 255, 255});
-    if(index >= 1 && index <= 4)
+    if(index >= 1 && index <= 3)
         textArray[index].setColor({255, 0, 0});
 
-    if(window -> getKeyPressed(SDLK_s))
-        index++;
-    if(window -> getKeyPressed(SDLK_w))
-        index--;
+    if(window -> getGamepadManager() -> getGamepadCount())
+        index += window -> getGamepadManager() -> getYDir(0);
+    else
+    {
+        if(window -> getKeyPressed(SDLK_s))
+            index++;
+        if(window -> getKeyPressed(SDLK_w))
+            index--;
+    }
 
     index = ((1 > index) ? 1 : index);
-    index = ((4 < index) ? 4 : index);
+    index = ((3 < index) ? 3 : index);
 }
 
 void MenuState::draw()
@@ -116,12 +111,6 @@ void MenuState::draw()
     rect -> w = textArray[3].getSize().first / 2;
     rect -> h = textArray[3].getSize().second / 2;
     SDL_RenderCopy(window -> getRenderer(), textArray[3].getTexture(), NULL, rect);
-
-    rect -> x = 60;
-    rect -> y = 190;
-    rect -> w = textArray[4].getSize().first / 2;
-    rect -> h = textArray[4].getSize().second / 2;
-    SDL_RenderCopy(window -> getRenderer(), textArray[4].getTexture(), NULL, rect);
 
     delete rect;
 }

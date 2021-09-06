@@ -10,7 +10,7 @@ class MenuState : public State
 {
 private:
     Font menuFont;
-    Text textArray[5];
+    Text textArray[4];
     int32_t index = 0;
 public:
     // Init the menu

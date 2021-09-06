@@ -45,7 +45,7 @@ namespace Gameboy
 
         // Get file size
         file.seekg(0, std::ios::end);
-        uint32_t fileSize = file.tellg();
+        int32_t fileSize = file.tellg();
         file.seekg(0, std::ios::beg);
         uint8_t *dataFile = new uint8_t[fileSize];
 

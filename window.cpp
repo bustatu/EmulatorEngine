@@ -3,7 +3,7 @@
 Window::Window()
 {
     // Init SDL
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
+    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("\033[1;31m{E}: An error occured while initialising SDL! %s\n\033[0m", SDL_GetError());
         exit(0);
@@ -39,20 +39,26 @@ Window::Window()
     // Start timing
     now = SDL_GetPerformanceCounter();
 
+    // Mark window as open
     is_open = true;
+
+    // Init gamepads
+    gamepads.init();
 }
 
 void Window::updateInput(SDL_Event event)
 {
-    if(event.type == SDL_KEYDOWN)
+    switch(event.type)
     {
-        state[event.key.keysym.sym] = true;
-        pressed[event.key.keysym.sym] = true;
-    }
-    else if(event.type == SDL_KEYUP)
-    {
-        state[event.key.keysym.sym] = false;
-        released[event.key.keysym.sym] = true;
+        case SDL_KEYDOWN:
+            state[event.key.keysym.sym] = true;
+            pressed[event.key.keysym.sym] = true;
+            break;
+
+        case SDL_KEYUP:
+            state[event.key.keysym.sym] = false;
+            released[event.key.keysym.sym] = true;
+            break;
     }
 }
 
@@ -129,6 +135,11 @@ void Window::updateDelta()
     last = now;
     now = SDL_GetPerformanceCounter();
     delta_time = ((now - last) * 1.0) / SDL_GetPerformanceFrequency();
+}
+
+GamepadManager* Window::getGamepadManager()
+{
+    return &gamepads;
 }
 
 double Window::getDelta()

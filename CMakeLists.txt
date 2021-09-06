@@ -25,6 +25,7 @@ add_executable(
     "state.cpp"
     "window.cpp"
     "audio.cpp"
+    "gamepad.cpp"
 )
 
 # SDL2 stuff
@@ -39,7 +40,7 @@ target_link_libraries(
     EmuEngine
     PRIVATE
     Menus GUI
-    NES CHIP8 Gameboy Bytepusher
+    CHIP8 Gameboy Bytepusher
     nlohmann_json::nlohmann_json
     SDL2::SDL2
     SDL2::SDL2main

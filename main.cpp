@@ -56,6 +56,13 @@ int main(int argc, char* argv[])
                     window -> updateInput(event);
                     break;
 
+                // Gamepad events
+                case SDL_JOYAXISMOTION:
+                case SDL_JOYBUTTONUP:
+                case SDL_JOYBUTTONDOWN:
+                    window -> getGamepadManager() -> updateInput(event);
+                    break;
+
                 // Quit events
                 case SDL_QUIT:
                     stateManager.quit();

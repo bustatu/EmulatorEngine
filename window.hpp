@@ -1,11 +1,12 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "audio.hpp"
 #include <map>
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include "audio.hpp"
+#include "gamepad.hpp"
 
 class Window
 {
@@ -15,6 +16,9 @@ private:
 
     // SDL renderer
     SDL_Renderer* renderer;
+
+    // SDL Gamepad Manager
+    GamepadManager gamepads;
 
     // Window state flag
     bool is_open = false;
@@ -41,6 +45,9 @@ public:
 
     // Sets the title of the window
     void setTitle(std::string what);
+
+    // Get gamepad manager
+    GamepadManager* getGamepadManager();
 
     // Clears the contents of the window
     void clear();
