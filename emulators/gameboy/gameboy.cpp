@@ -112,12 +112,14 @@ namespace Gameboy
                     joypad.updateButton(i, !window -> getKey(keys[i]));
             else
             {
-                joypad.updateButton(0, gamepad -> getXDir(0) == 1);
-                joypad.updateButton(1, gamepad -> getXDir(0) == -1);
-                joypad.updateButton(2, gamepad -> getYDir(0) == 1);
-                joypad.updateButton(3, gamepad -> getYDir(0) == -1);
-                for(uint8_t i = 4; i < 8; i++)
-                    joypad.updateButton(i, !window -> getKey(keys[i]));
+                joypad.updateButton(0, !gamepad -> getDPAD(1));
+                joypad.updateButton(1, !gamepad -> getDPAD(3));
+                joypad.updateButton(2, !gamepad -> getDPAD(0));
+                joypad.updateButton(3, !gamepad -> getDPAD(2));
+                joypad.updateButton(4, !gamepad -> getButton(0));
+                joypad.updateButton(5, !gamepad -> getButton(1));
+                joypad.updateButton(6, !gamepad -> getButton(6));
+                joypad.updateButton(7, !gamepad -> getButton(7));
             }
 
             if(joypad.needsInterrupt())

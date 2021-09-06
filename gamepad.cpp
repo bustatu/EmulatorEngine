@@ -1,6 +1,7 @@
 #include "gamepad.hpp"
 
 #define sign(x) (x > 0) ? 1 : ((x < 0) ? -1 : 0)
+#define get_bit(who, which) (((who) >> (which)) & 1)
 
 void GamepadManager::init()
 {
@@ -28,18 +29,22 @@ void GamepadManager::updateInput(SDL_Event event)
                 xDir[event.jaxis.which] = sign(event.jaxis.value / deadZone);
             else if(event.jaxis.axis == 1)
                 yDir[event.jaxis.which] = sign(event.jaxis.value / deadZone);
-            printf("{I}: Controller %d, XDir: %d, YDir: %d\n", event.jaxis.which, xDir[event.jaxis.which], yDir[event.jaxis.which]);
+            //printf("{I}: Controller %d, XDir: %d, YDir: %d\n", event.jaxis.which, xDir[event.jaxis.which], yDir[event.jaxis.which]);
             break;
         }
 
         case SDL_JOYBUTTONUP:
         case SDL_JOYBUTTONDOWN:
         {
-            /*if(event.jaxis.axis == 0)
-                xDir[event.jaxis.which] = sign(event.jaxis.value / deadZone);
-            else if(event.jaxis.axis == 1)
-                yDir[event.jaxis.which] = sign(event.jaxis.value / deadZone);*/
-            printf("{I}: Controller %d, button: %d, state: %d\n", event.jbutton.which, event.jbutton.button, event.jbutton.state);
+            buttons[event.jbutton.button] = event.jbutton.state;
+            //printf("{I}: Controller %d, button: %d, state: %d\n", event.jbutton.which, event.jbutton.button, event.jbutton.state);
+            break;
+        }
+
+        case SDL_JOYHATMOTION:
+        {
+            dpad = event.jhat.value;
+            //printf("{I}: Controller %d, hat: %d, value: %d\n", event.jhat.which, event.jhat.hat, event.jhat.value);
             break;
         }
     }
@@ -55,9 +60,14 @@ int32_t GamepadManager::getYDir(int8_t who)
     return yDir[who];
 }
 
-int32_t GamepadManager::getdpad(int8_t who)
+int32_t GamepadManager::getDPAD(int8_t who)
 {
-    return dpad[who];
+    return get_bit(dpad, who);
+}
+
+int32_t GamepadManager::getButton(int8_t who)
+{
+    return buttons[who];
 }
 
 uint32_t GamepadManager::getGamepadCount()

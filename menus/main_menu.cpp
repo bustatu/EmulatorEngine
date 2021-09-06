@@ -39,6 +39,7 @@ void MenuState::pause()
 void MenuState::update(double dt)
 {
     Window* window = stateM -> getWindow();
+    GamepadManager* gamepad = window -> getGamepadManager();
 
     if(window -> getKeyPressed(SDLK_SPACE))
     {
@@ -67,8 +68,8 @@ void MenuState::update(double dt)
     if(index >= 1 && index <= 3)
         textArray[index].setColor({255, 0, 0});
 
-    if(window -> getGamepadManager() -> getGamepadCount())
-        index += window -> getGamepadManager() -> getYDir(0);
+    if(gamepad -> getGamepadCount())
+        index += gamepad -> getDPAD(2) - gamepad -> getDPAD(0);
     else
     {
         if(window -> getKeyPressed(SDLK_s))

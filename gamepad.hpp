@@ -9,14 +9,16 @@ class GamepadManager
 private:
     int32_t deadZone = 8080;
     std::map<int32_t, SDL_Joystick*> joysticks;
-    std::map<int32_t, int8_t> xDir, yDir, dpad;
+    std::map<int32_t, int8_t> xDir, yDir, buttons;
+    uint8_t dpad;
     uint32_t gamepadCount;
 public:
     void init();
     void updateInput(SDL_Event event);
     int32_t getXDir(int8_t who);
     int32_t getYDir(int8_t who);
-    int32_t getdpad(int8_t who);
+    int32_t getDPAD(int8_t who);
+    int32_t getButton(int8_t who);
     uint32_t getGamepadCount();
 };
 
