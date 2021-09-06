@@ -12,11 +12,10 @@ void GamepadManager::init()
     for(int32_t i = 0; i < SDL_NumJoysticks(); i++)
     {
         joysticks[i] = SDL_JoystickOpen(i);
-        gamepadCount++;
         if(joysticks[i] == NULL)
             printf("{W}: Unable to open game controller %d! SDL Error: %s.\n", i, SDL_GetError()), gamepadCount--;
     }
-    printf("{I}: Loaded %d game controllers!\n", gamepadCount);
+    printf("{I}: Loaded %d game controllers!\n", SDL_NumJoysticks());
 }
 
 void GamepadManager::updateInput(SDL_Event event)
@@ -40,6 +39,25 @@ void GamepadManager::updateInput(SDL_Event event)
             //printf("{I}: Controller %d, button: %d, state: %d\n", event.jbutton.which, event.jbutton.button, event.jbutton.state);
             break;
         }
+
+        case SDL_JOYDEVICEADDED:
+        {
+            gamepadCount++;
+            printf("{I}: Added gamepad %d!\n", event.jdevice.which);
+            joysticks[event.jdevice.which] = SDL_JoystickOpen(event.jdevice.which);
+            break;
+        }
+
+
+        case SDL_JOYDEVICEREMOVED:
+        {
+            gamepadCount--;
+            printf("{I}: Removed gamepad %d!\n", event.jdevice.which);
+            SDL_JoystickClose(joysticks[event.jdevice.which]);
+            joysticks[event.jdevice.which] = nullptr;
+            break;
+        }
+
 
         case SDL_JOYHATMOTION:
         {

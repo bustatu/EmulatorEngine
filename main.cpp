@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
                 case SDL_JOYBUTTONUP:
                 case SDL_JOYBUTTONDOWN:
                 case SDL_JOYHATMOTION:
+                case SDL_JOYDEVICEADDED:
+                case SDL_JOYDEVICEREMOVED:
                     window -> getGamepadManager() -> updateInput(event);
                     break;
 

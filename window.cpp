@@ -3,7 +3,7 @@
 Window::Window()
 {
     // Init SDL
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK) != 0)
     {
         printf("\033[1;31m{E}: An error occured while initialising SDL! %s\n\033[0m", SDL_GetError());
         exit(0);

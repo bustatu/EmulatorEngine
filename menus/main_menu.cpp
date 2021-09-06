@@ -59,7 +59,7 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> changeState(state);
-            state -> loadROM("data/gameboy/roms/Link's Awakening.gb");
+            state -> loadROM("data/gameboy/roms/Pokemon - Red Version.gb");
         }
     }
     

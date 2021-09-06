@@ -74,6 +74,19 @@ namespace Gameboy
 
     MBC3::~MBC3()
     {
-        
+        // If should save RAM state
+        if(get_bit(typeflag, 1))
+        {
+            printf("{I}: Saving ROM data...\n");
+            std::ofstream fout("data/gameboy/saves/" + rom_name + ".sav", std::ios::binary);
+            if(!fout.is_open())
+                printf("{E}: An error occured while trying to save ROM data: file could not be opened!\n");
+            else
+            {
+                fout.write(reinterpret_cast<char*>(RAM), ramByteSize);
+                printf("{I}: File saved successfully!\n");
+            }
+            fout.close();
+        }
     }
 }
