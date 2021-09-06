@@ -44,7 +44,7 @@ namespace Gameboy
 
             // Mirror of WRAM 1 and WRAM 2
             case 0xE000 ... 0xFDFF:
-                return ram -> readByte(addr - 0x1000);
+                return ram -> readByte(addr - 0x2000);
                 break;
 
             // OAM
@@ -110,7 +110,7 @@ namespace Gameboy
 
             // Mirror of WRAM 1 and WRAM 2
             case 0xE000 ... 0xFDFF:
-                ram -> writeByte(addr - 0x1000, val);
+                ram -> writeByte(addr - 0x2000, val);
                 break;
 
             // OAM
