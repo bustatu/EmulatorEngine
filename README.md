@@ -22,22 +22,6 @@ After executing this, the executable should be in the */build/* file along with 
 - CHIP8 
     - might have some unsuported SCHIP or XOCHIP opcodes, open an issue if so.
 - Gameboy
-    - there are innacuracies especially on the PPU side.
-    - (new) Dr. Mario goes to menu.
+    - no APU is implemented.
+    - only MBC1, MBC3 (partially) and MBC5 are implemented.
 - NES (soon)
-
-## Screenshots from supported platforms:
-
-### CHIP8:
-
-![CHIP8 Tetris](https://raw.githubusercontent.com/bustatu/EmulatorEngine/main/github-images/chip8-tetris.png?raw=true)
-
-### Bytepusher:
-
-![Bytepusher Nyan Cat](https://raw.githubusercontent.com/bustatu/EmulatorEngine/main/github-images/bp-nyan.png?raw=true)
-
-### Gameboy (work in progress):
-
-![Gameboy Boot ROM](https://raw.githubusercontent.com/bustatu/EmulatorEngine/main/github-images/gb-bootrom.png?raw=true)
-
-![Gameboy Dr Mario menu](https://raw.githubusercontent.com/bustatu/EmulatorEngine/main/github-images/gb-dr-mario-splash.png?raw=true)

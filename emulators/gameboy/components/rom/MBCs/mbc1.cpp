@@ -63,7 +63,7 @@ namespace Gameboy
             if(fin.is_open())
             {
                 printf("{I}: Found save at path: data/gameboy/saves/%s.sav\n", rom_name.c_str());
-                fin.read(reinterpret_cast<char*>(RAM), ramByteSize / 2);
+                fin.read(reinterpret_cast<char*>(RAM), ramByteSize);
             }
         }
 

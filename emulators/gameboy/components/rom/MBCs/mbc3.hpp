@@ -3,6 +3,7 @@
 
 #include "mbc.hpp"
 #include <cstring>
+#include <fstream>
 
 namespace Gameboy
 {
@@ -12,8 +13,10 @@ namespace Gameboy
         // ROM data and RAM data
         uint8_t *ROM, *RAM;
         uint8_t rom_size, ram_size;
-        uint8_t rom_bank = 0x01;
-        bool ram_enabled = false;
+        uint8_t rom_bank = 0x01, ram_bank = 0x00;
+        uint32_t ramByteSize;
+        std::string rom_name;
+        bool flag_enabled = false;
 
     public:
         void init(uint8_t* fileContents, uint32_t fileSize, std::string fileName);
