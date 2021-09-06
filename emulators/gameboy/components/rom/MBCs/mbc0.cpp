@@ -2,7 +2,7 @@
 
 namespace Gameboy
 {
-    void MBC0::init(uint8_t* fileContents, uint32_t fileSize)
+    void MBC0::init(uint8_t* fileContents, uint32_t fileSize, std::string fileName)
     {
         // Copy all the contents in the ROM if the fileSize is small enough
         if(fileSize <= 0x8000)
@@ -52,5 +52,10 @@ namespace Gameboy
         addr -= 0xA000;
         if(addr >= 0x0000 && addr <= 0x1FFF)
             RAM[addr] = what;
+    }
+
+    MBC0::~MBC0()
+    {
+        
     }
 }

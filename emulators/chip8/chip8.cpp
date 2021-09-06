@@ -203,4 +203,9 @@ namespace CHIP8
         // Close the file
         file.close();
     }
+
+    void Emu::destroy()
+    {
+        printf("{I}: Destroying chip8 state!\n");
+    }
 };

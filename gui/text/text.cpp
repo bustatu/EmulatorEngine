@@ -6,7 +6,7 @@ void Text::render()
     if(font != nullptr && renderer != nullptr)
     {
         if(result != nullptr)
-            SDL_DestroyTexture(result);
+            SDL_DestroyTexture(result), result = nullptr;
 
         SDL_Surface* textSurface = TTF_RenderText_Solid(font -> getFont(), text.c_str(), color);
 

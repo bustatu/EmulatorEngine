@@ -86,6 +86,9 @@ int main(int argc, char* argv[])
         // Small delay
         SDL_Delay(8);
     }
+
+    SDL_Quit();
+    TTF_Quit();
     
     return EXIT_SUCCESS;
 }

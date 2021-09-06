@@ -61,21 +61,32 @@ namespace Gameboy
             {
                 case 0x00:
                     data = new MBC0();
+                    data -> typeflag = 0x00;
+                    printf("{I}: Supported MBC0 found!\n");
                     break;
                 case 0x01:
                     data = new MBC1();
+                    data -> typeflag = 0x00;
+                    printf("{I}: Supported MBC1 found!\n");
+                    break;
+                case 0x02:
+                    data = new MBC1();
+                    data -> typeflag = 0x01;
+                    printf("{I}: Supported MBC1 + RAM found!\n");               
                     break;
                 case 0x03:
-                    printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %02X\n\033[0m", dataFile[0x147]);
-                    printf("{I}: Defaulting to MBC 1...\n");
                     data = new MBC1();
+                    data -> typeflag = 0x03;
+                    printf("{I}: Supported MBC1 + RAM + BATTERY found!\n");  
                     break;
                 case 0x13:
                     data = new MBC3();
-                    printf("{I}: MBC3 is incomplete!\n");
+                    data -> typeflag = 0x03;
+                    printf("\033[1;31m{I}: MBC3 + RAM + BATTERY is incomplete!\n\033[0m");
                     break;
                 case 0x19:
                     data = new MBC5();
+                    printf("{I}: Supported MBC5 found!\n");
                     break;
                 default:
                     printf("\033[1;31m{E}: Unsupported MBC! ROM might not work properly! MBC: %02X\n\033[0m", dataFile[0x147]);
@@ -84,8 +95,18 @@ namespace Gameboy
                     break;
             }
 
+            // Get file name from the path (if required)
+            uint8_t pos = path.find_last_of('/');
+            if(pos != std::string::npos)
+                path = path.substr(pos + 1, path.size() - pos);
+
+            // Remove extension (if any)
+            pos = path.find_last_of('.');
+            if(pos != std::string::npos)
+                path = path.substr(0, pos);
+
             // Init the ROM
-            data -> init(dataFile, fileSize);
+            data -> init(dataFile, fileSize, path);
 
             // Mark as loaded
             loaded = true;
@@ -94,5 +115,11 @@ namespace Gameboy
             // Delete the loaded memory
             delete[] dataFile;
         }
+    }
+
+    void ROM::destroy()
+    {
+        loaded = false;
+        delete data;
     }
 }

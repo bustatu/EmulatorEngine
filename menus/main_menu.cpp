@@ -41,25 +41,25 @@ void MenuState::update(double dt)
     Window* window = stateM -> getWindow();
     GamepadManager* gamepad = window -> getGamepadManager();
 
-    if(window -> getKeyPressed(SDLK_SPACE))
+    if((gamepad -> getGamepadCount() && gamepad -> getButtonPressed(0)) || window -> getKeyPressed(SDLK_SPACE))
     {
         if(index == 1)
         {
             CHIP8::Emu* state = new CHIP8::Emu();
+            stateM -> changeState(state);
             state -> load("data/chip8/roms/TETRIS");
-            stateM -> pushState(state);
         }
         else if(index == 2)
         {
             Bytepusher::Emu* state = new Bytepusher::Emu();
+            stateM -> changeState(state);
             state -> load("data/bytepusher/roms/nyan.bp");
-            stateM -> pushState(state);
         }
         else if(index == 3)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
-            stateM -> pushState(state);
-            state -> loadROM("data/gameboy/roms/Tetris.gb");
+            stateM -> changeState(state);
+            state -> loadROM("data/gameboy/roms/Link's Awakening.gb");
         }
     }
     
@@ -69,14 +69,9 @@ void MenuState::update(double dt)
         textArray[index].setColor({255, 0, 0});
 
     if(gamepad -> getGamepadCount())
-        index += gamepad -> getDPAD(2) - gamepad -> getDPAD(0);
+        index += gamepad -> getDPADPressed(2) - gamepad -> getDPADPressed(0);
     else
-    {
-        if(window -> getKeyPressed(SDLK_s))
-            index++;
-        if(window -> getKeyPressed(SDLK_w))
-            index--;
-    }
+        index += window -> getKeyPressed(SDLK_s) - window -> getKeyPressed(SDLK_w);
 
     index = ((1 > index) ? 1 : index);
     index = ((3 < index) ? 3 : index);
@@ -114,4 +109,8 @@ void MenuState::draw()
     SDL_RenderCopy(window -> getRenderer(), textArray[3].getTexture(), NULL, rect);
 
     delete rect;
+}
+
+void MenuState::destroy()
+{
 }

@@ -57,9 +57,9 @@ public:
 class State
 {
 protected:
-    // Constructor does nothing
+    // Constructor and destructors do nothing
     State() {}
-
+    
     // Running state
     bool is_running = false;
 
@@ -84,6 +84,9 @@ public:
 
     // Update
     virtual void update(double dt) = 0;
+
+    // Destroy
+    virtual void destroy() = 0;
 
     // Change the state to another state
     void changeState(State* state);

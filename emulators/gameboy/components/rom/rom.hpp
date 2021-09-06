@@ -1,6 +1,7 @@
 #ifndef GAMEBOY_ROM_H
 #define GAMEBOY_ROM_H
 
+#include <string>
 #include <fstream>
 #include "MBCs/mbc.hpp"
 #include "MBCs/mbc0.hpp"
@@ -26,6 +27,9 @@ namespace Gameboy
         // I/O operations
         uint8_t readByte(uint16_t addr);
         void writeByte(uint16_t addr, uint8_t val);
+
+        // Destroys the ROM
+        void destroy();
     };
 }
 

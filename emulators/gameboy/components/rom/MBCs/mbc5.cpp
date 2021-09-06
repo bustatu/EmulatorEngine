@@ -5,7 +5,7 @@
 
 namespace Gameboy
 {
-    void MBC5::init(uint8_t* fileContents, uint32_t fileSize)
+    void MBC5::init(uint8_t* fileContents, uint32_t fileSize, std::string fileName)
     {
         // Get ROM size in banks, same for RAM size
         rom_size = fileContents[0x148];
@@ -80,5 +80,10 @@ namespace Gameboy
     {
         if(enable_ram && ram_size)
             RAM[0x2000 * ram_bank_number + (addr - 0xA000)] = what;
+    }
+
+    MBC5::~MBC5()
+    {
+        
     }
 }

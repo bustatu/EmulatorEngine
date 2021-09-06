@@ -137,20 +137,6 @@ namespace Gameboy
 
                 executionTimer -= 1.0 / freq;
             }
-
-            // Dump VRAM to file (test only)
-            if(window -> getKeyPressed(SDLK_SPACE))
-            {
-                std::ofstream fout("oam.log");
-                for(int i = 0xFE00; i <= 0xFE9F; i++)
-                {
-                    uint32_t val = bus.readByte(i);
-                    if(val != 0)
-                    {
-                        fout << std::hex << i << " " << val << "\n";
-                    }
-                }
-            }
         }
 
         // Toggle pause
@@ -170,5 +156,10 @@ namespace Gameboy
 
         // Update the screen output
         SDL_RenderCopy(window -> getRenderer(), output, NULL, NULL);
+    }
+
+    void Emu::destroy()
+    {
+        rom.destroy();
     }
 }

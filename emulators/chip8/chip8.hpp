@@ -44,6 +44,9 @@ namespace CHIP8
 
             // Main draw function
             void draw();
+
+            // Destroy the emulator after execution ended
+            void destroy();
     };
 }
 

@@ -19,7 +19,7 @@ namespace Gameboy
         uint8_t ram_bank_number = 0;
 
     public:
-        void init(uint8_t* fileContents, uint32_t fileSize);
+        void init(uint8_t* fileContents, uint32_t fileSize, std::string fileName);
 
         // 0x0000 - 0x3FFF
         uint8_t readByteFromBank00(uint16_t addr);
@@ -32,6 +32,9 @@ namespace Gameboy
         // 0xA000 - 0xBFFF
         uint8_t readByteFromERAM(uint16_t addr);
         void writeByteToERAM(uint16_t addr, uint8_t what);
+
+        // Destructor
+        ~MBC5();
     };
 }
 

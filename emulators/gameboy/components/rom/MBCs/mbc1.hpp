@@ -2,6 +2,7 @@
 #define GAMEBOY_MBC_1_H
 
 #include "mbc.hpp"
+#include <fstream>
 #include <cstring>
 
 namespace Gameboy
@@ -12,6 +13,8 @@ namespace Gameboy
         // ROM data and RAM data
         uint8_t *ROM;
         uint8_t *RAM;
+        uint32_t ramByteSize;
+        std::string rom_name;
         bool enable_ram = false;
         bool mode_flag = false;
         uint8_t rom_size = 0;
@@ -25,7 +28,7 @@ namespace Gameboy
         uint8_t highbank();
 
     public:
-        void init(uint8_t* fileContents, uint32_t fileSize);
+        void init(uint8_t* fileContents, uint32_t fileSize, std::string fileName);
 
         // 0x0000 - 0x3FFF
         uint8_t readByteFromBank00(uint16_t addr);
@@ -38,6 +41,9 @@ namespace Gameboy
         // 0xA000 - 0xBFFF
         uint8_t readByteFromERAM(uint16_t addr);
         void writeByteToERAM(uint16_t addr, uint8_t what);
+
+        // Destructor
+        ~MBC1();
     };
 }
 

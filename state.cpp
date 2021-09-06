@@ -27,6 +27,10 @@ void StateManager::quit()
     // Close the window as the app has been closed
     window -> close();
     delete window;
+
+    // Destroy all states
+    for(auto x : states)
+        x -> destroy();
 }
 
 void StateManager::init()
@@ -85,7 +89,7 @@ void StateManager::changeState(State* newState)
     if(states.size() != 0)
     {
         // Delete the old state and save the new one
-        delete states[states.size() - 1];
+        states[states.size() - 1] -> destroy();
         states[states.size() - 1] = newState;
         newState -> attachStateManager(this);
         newState -> init();

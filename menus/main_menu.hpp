@@ -14,19 +14,22 @@ private:
     int32_t index = 0;
 public:
     // Init the menu
-    virtual void init();
+    void init();
 
     // Resume the menu
-    virtual void resume();
+    void resume();
 
     // Stop the menu
-    virtual void pause();
+    void pause();
 
     // Main update function
-    virtual void update(double dt);
+    void update(double dt);
 
     // Main draw function
-    virtual void draw();
+    void draw();
+
+    // Destroy the menu after execution ended
+    void destroy();
 };
 
 #endif

@@ -9,7 +9,7 @@ namespace Gameboy
     {
     public:
         // Init from file contents
-        virtual void init(uint8_t* fileContents, uint32_t fileSize) = 0;
+        virtual void init(uint8_t* fileContents, uint32_t fileSize, std::string fileName) = 0;
 
         // 0x0000 - 0x3FFF
         virtual uint8_t readByteFromBank00(uint16_t addr) = 0;
@@ -22,6 +22,12 @@ namespace Gameboy
         // 0xA000 - 0xBFFF
         virtual uint8_t readByteFromERAM(uint16_t addr) = 0;
         virtual void writeByteToERAM(uint16_t addr, uint8_t what) = 0;
+
+        // Virtual destructor
+        virtual ~MBC() {};
+
+        // Typeflag (interpreted by the actual MBC)
+        uint8_t typeflag;
     };
 }
 

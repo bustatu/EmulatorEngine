@@ -5,7 +5,7 @@
 
 namespace Gameboy
 {
-    void MBC3::init(uint8_t* fileContents, uint32_t fileSize)
+    void MBC3::init(uint8_t* fileContents, uint32_t fileSize, std::string fileName)
     {
         // Get ROM size in banks, same for RAM size
         rom_size = fileContents[0x148];
@@ -70,5 +70,10 @@ namespace Gameboy
     void MBC3::writeByteToERAM(uint16_t addr, uint8_t what)
     {
 
+    }
+
+    MBC3::~MBC3()
+    {
+        
     }
 }

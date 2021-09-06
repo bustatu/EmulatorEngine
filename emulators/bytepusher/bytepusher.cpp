@@ -121,4 +121,9 @@ namespace Bytepusher
             delete[] data;
         }
     }
+    
+    void Emu::destroy()
+    {
+        printf("{I}: Destroying bytepusher state!\n");
+    }
 }

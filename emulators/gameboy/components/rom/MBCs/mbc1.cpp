@@ -31,11 +31,12 @@ namespace Gameboy
         return result;
     }
 
-    void MBC1::init(uint8_t* fileContents, uint32_t fileSize)
+    void MBC1::init(uint8_t* fileContents, uint32_t fileSize, std::string fileName)
     {
         // Get ROM size in banks (1 << (rom_size + 1)), same for RAM size
         rom_size = fileContents[0x148];
         ram_size = fileContents[0x149];
+        rom_name = fileName;
 
         // Allocate ROM and RAM
         ROM = new uint8_t[fileSize];
@@ -46,14 +47,23 @@ namespace Gameboy
             switch(ram_size)
             {
                 case 0x1:
-                    RAM = new uint8_t[2048];
+                    ramByteSize = 2048;
                     break;
                 case 0x2:
-                    RAM = new uint8_t[8192];
+                    ramByteSize = 8192;
                     break;
                 case 0x3:
-                    RAM = new uint8_t[32768];
+                    ramByteSize = 32768;
                     break;
+            }
+            RAM = new uint8_t[ramByteSize];
+
+            // Check for save existence
+            std::ifstream fin("data/gameboy/saves/" + rom_name + ".sav", std::ios::binary);
+            if(fin.is_open())
+            {
+                printf("{I}: Found save at path: data/gameboy/saves/%s.sav\n", rom_name.c_str());
+                fin.read(reinterpret_cast<char*>(RAM), ramByteSize / 2);
             }
         }
 
@@ -79,7 +89,7 @@ namespace Gameboy
     {
         // Enable RAM
         if(addr >= 0x0000 && addr <= 0x1FFF)
-            enable_ram = ((what & 0b11111) == 0xA);
+            enable_ram = get_bit(typeflag, 0) ? ((what & 0b11111) == 0xA) : false;
         // ROM bank
         else if(addr >= 0x2000 && addr <= 0x3FFF)
         {
@@ -135,6 +145,24 @@ namespace Gameboy
                 RAM[addr - 0xA000] = what;
             else
                 RAM[(addr - 0xA000) % ((ram_size == 0x01) ? 2048 : 8192)] = what;
+        }
+    }
+
+    MBC1::~MBC1()
+    {
+        // If should save RAM state
+        if(get_bit(typeflag, 1))
+        {
+            printf("{I}: Saving ROM data...\n");
+            std::ofstream fout("data/gameboy/saves/" + rom_name + ".sav", std::ios::binary);
+            if(!fout.is_open())
+                printf("{E}: An error occured while trying to save ROM data: file could not be opened!\n");
+            else
+            {
+                fout.write(reinterpret_cast<char*>(RAM), ramByteSize);
+                printf("{I}: File saved successfully!\n");
+            }
+            fout.close();
         }
     }
 }

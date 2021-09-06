@@ -50,6 +50,14 @@ void GamepadManager::updateInput(SDL_Event event)
     }
 }
 
+void GamepadManager::updateInput()
+{
+    lastdpad = dpad;
+
+    for(auto i : buttons)
+        lastButtons[i.first] = i.second;
+}
+
 int32_t GamepadManager::getXDir(int8_t who)
 {
     return xDir[who];
@@ -65,9 +73,29 @@ int32_t GamepadManager::getDPAD(int8_t who)
     return get_bit(dpad, who);
 }
 
+int32_t GamepadManager::getDPADPressed(int8_t who)
+{
+    return !get_bit(dpad, who) && get_bit(lastdpad, who);
+}
+
+int32_t GamepadManager::getDPADReleased(int8_t who)
+{
+    return get_bit(dpad, who) && !get_bit(lastdpad, who);
+}
+
 int32_t GamepadManager::getButton(int8_t who)
 {
     return buttons[who];
+}
+
+int32_t GamepadManager::getButtonPressed(int8_t who)
+{
+    return buttons[who] && !lastButtons[who];
+}
+
+int32_t GamepadManager::getButtonReleased(int8_t who)
+{
+    return !buttons[who] && lastButtons[who];
 }
 
 uint32_t GamepadManager::getGamepadCount()

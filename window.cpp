@@ -86,6 +86,7 @@ void Window::updateInput()
 {
     released.clear();
     pressed.clear();
+    gamepads.updateInput();
 }
 
 void Window::setTitle(std::string what)
