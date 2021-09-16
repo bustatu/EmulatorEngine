@@ -8,7 +8,7 @@ namespace Gameboy
     {
         // DIV is always reset to 0 when written
         if(addr - 0xFF04 == 0)
-            DIV = 0, divcounter = timacounter = 0;
+            resetDIV(), divcounter = timacounter = 0;
         else
             timers[addr - 0xFF04] = val;
     }
@@ -26,6 +26,11 @@ namespace Gameboy
         bool before = interruptFlag;
         interruptFlag = false;
         return before;
+    }
+
+    void Timer::resetDIV()
+    {
+        DIV = 0;
     }
 
     void Timer::update()

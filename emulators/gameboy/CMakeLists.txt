@@ -11,6 +11,7 @@ add_library(Gameboy
     "components/rom/MBCs/mbc3.cpp"
     "components/rom/MBCs/mbc5.cpp"
     "components/timer/timer.cpp"
+    "components/sound/sound.cpp"
     "components/joypad/joypad.cpp"
 )
 

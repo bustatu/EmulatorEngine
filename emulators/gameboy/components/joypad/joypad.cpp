@@ -25,6 +25,11 @@ namespace Gameboy
         return 0xFF;
     }
 
+    bool Joypad::isButtonPressed()
+    {
+        return !(state == 0xFF);
+    }
+
     void Joypad::updateButton(uint8_t button, uint8_t value)
     {
         // If key has been pressed, decide if that requires an interrupt (has been pressed for the first time)

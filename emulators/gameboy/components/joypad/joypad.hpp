@@ -25,6 +25,9 @@ namespace Gameboy
         // Check if needs interrupt (RESETS THE FLAG)
         bool needsInterrupt();
 
+        // Check if button has been pressed
+        bool isButtonPressed();
+
         // Updates a key's value
         void updateButton(uint8_t button, uint8_t value);
     };

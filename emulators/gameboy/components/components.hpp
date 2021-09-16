@@ -9,5 +9,6 @@
 #include "bios/bios.hpp"
 #include "timer/timer.hpp"
 #include "joypad/joypad.hpp"
+#include "sound/sound.hpp"
 
 #endif

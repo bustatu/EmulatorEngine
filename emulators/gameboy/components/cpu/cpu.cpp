@@ -714,13 +714,45 @@ namespace Gameboy
             
             // Stop
             case 0x10:
-                // TODO: implement this
-                printf("\033[1;31m{E}: Unhandled stop opcode!\033[0m\n");
-                // Second byte is ignored
-                PC++;
-                // TODO: test if this works
-                // halted = true;
+            {
+                // https://gbdev.io/pandocs/imgs/gb_stop.png
+
+                // TODO: somehow find a way to test this
+
+                // Button pressed and interrupt not pending
+                if(bus -> joypad -> isButtonPressed() && (IE & IF) == 0)
+                {
+                    PC++;
+                    halted = true;
+                    printf("{I}: CPU Stop: button pressed and no interrupts!\n");
+                }
+                // If there wasn't a speed switch requested in KEY1
+                else if(!(bus -> readByte(0xFF4D) & 1))
+                {
+                    PC += (IE & IF) == 0;
+                    bus -> timer -> resetDIV();
+                    printf("{W}: Unimplemented CPU STOP mode!\n");
+                }
+                // Interrupt not pending    
+                else if((IE & IF) == 0)
+                {
+                    // TODO: find out a way to stop halting after 0x20000 T-cycles
+                    PC++;
+                    halted = true;
+                    bus -> timer -> resetDIV();
+                    printf("{W}: Unimplemented CPU halting stop speed increase!\n");
+                }
+                // If IME not enabled
+                else if(!ime_flag)
+                {
+                    // TODO: actually increase CPU speed
+                    bus -> timer -> resetDIV();
+                    printf("{W}: Unimplemented CPU speed increase!\n");
+                }
+                else 
+                    printf("{W}: Non-deterministic CPU glitching ignored!\n");
                 break;
+            }
 
             // Disable interrupts
             case 0xF3:

@@ -59,7 +59,7 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> changeState(state);
-            state -> loadROM("data/gameboy/roms/Pokemon Red.gb");
+            state -> loadROM("data/gameboy/roms/Bubble Bobble.gb");
         }
     }
     
@@ -113,4 +113,5 @@ void MenuState::draw()
 
 void MenuState::destroy()
 {
+    
 }

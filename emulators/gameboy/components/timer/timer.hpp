@@ -31,6 +31,9 @@ namespace Gameboy
         // Check if needs interrupt (RESETS THE FLAG)
         bool needsInterrupt();
 
+        // Forcefully resets DIV
+        void resetDIV();
+
         // Update executed each CPU cycle
         void update();
     };
