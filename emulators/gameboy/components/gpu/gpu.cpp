@@ -462,7 +462,12 @@ namespace Gameboy
                 if (++pcnt == 80)
                 {
                     // Sort the buffer and start the pixel transfer
-                    std::sort(oamBuffer.begin(), oamBuffer.end());
+                    for(uint32_t i = 0; i < oamBuffer.size(); i++)
+                    {
+                        for(uint32_t j = i + 1; j < oamBuffer.size(); j++)
+                            if(oamBuffer[j] < oamBuffer[i])
+                                std::swap(oamBuffer[i], oamBuffer[j]);
+                    }
                     setMode(0x03);
                 }
                 break;

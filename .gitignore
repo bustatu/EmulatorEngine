@@ -1,5 +1,6 @@
 # Ignore built files
 build/
+build-android/
 
 # Ignore ROMs and stuff
 data/bytepusher/
@@ -13,4 +14,5 @@ data/nes/
 
 # Ignore building scripts
 build.bat
+build-android.sh
 build.sh

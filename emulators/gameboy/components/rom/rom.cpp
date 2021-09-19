@@ -96,7 +96,7 @@ namespace Gameboy
             }
 
             // Get file name from the path (if required)
-            uint8_t pos = path.find_last_of('/');
+            uint32_t pos = path.find_last_of('/');
             if(pos != std::string::npos)
                 path = path.substr(pos + 1, path.size() - pos);
 
