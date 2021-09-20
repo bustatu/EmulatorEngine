@@ -59,7 +59,7 @@ void MenuState::update(double dt)
         {
             Gameboy::Emu* state = new Gameboy::Emu();
             stateM -> changeState(state);
-            state -> loadROM("data/gameboy/roms/tests/dmg-acid2.gb");
+            state -> loadROM("data/gameboy/roms/Tetris.gb");
         }
     }
     
