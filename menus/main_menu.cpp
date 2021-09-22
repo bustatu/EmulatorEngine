@@ -22,6 +22,10 @@ void MenuState::init()
     textArray[3].setFont(&menuFont);
     textArray[3].setRenderer(window -> getRenderer());
     textArray[3].setText("3. Gameboy");
+
+    textArray[4].setFont(&menuFont);
+    textArray[4].setRenderer(window -> getRenderer());
+    textArray[4].setText("4. PlayStation 1");
 }
 
 void MenuState::resume()
@@ -63,9 +67,9 @@ void MenuState::update(double dt)
         }
     }
     
-    for(int32_t i = 1; i <= 3; i++)
+    for(int32_t i = 1; i <= 4; i++)
         textArray[i].setColor({255, 255, 255});
-    if(index >= 1 && index <= 3)
+    if(index >= 1 && index <= 4)
         textArray[index].setColor({255, 0, 0});
 
     if(gamepad -> getGamepadCount())
@@ -74,7 +78,7 @@ void MenuState::update(double dt)
         index += window -> getKeyPressed(SDLK_s) - window -> getKeyPressed(SDLK_w);
 
     index = ((1 > index) ? 1 : index);
-    index = ((3 < index) ? 3 : index);
+    index = ((4 < index) ? 4 : index);
 }
 
 void MenuState::draw()
@@ -107,6 +111,12 @@ void MenuState::draw()
     rect -> w = textArray[3].getSize().first / 2;
     rect -> h = textArray[3].getSize().second / 2;
     SDL_RenderCopy(window -> getRenderer(), textArray[3].getTexture(), NULL, rect);
+
+    rect -> x = 60;
+    rect -> y = 190;
+    rect -> w = textArray[4].getSize().first / 2;
+    rect -> h = textArray[4].getSize().second / 2;
+    SDL_RenderCopy(window -> getRenderer(), textArray[4].getTexture(), NULL, rect);
 
     delete rect;
 }
