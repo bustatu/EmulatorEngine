@@ -6,7 +6,7 @@ project(EmuEngine)
 option(USE_EXTERNAL_JSON "Use an external JSON library" OFF)
 
 # Please make use of your brain if you have one, don't be me
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fno-operator-names")
 
 # Add external libraries
 add_subdirectory("./external")
@@ -32,6 +32,9 @@ add_executable(
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-ttf CONFIG REQUIRED)
 
+# Dynarec stuff
+find_package(xbyak CONFIG REQUIRED)
+
 # Include directories
 target_include_directories(EmuEngine PUBLIC ${SDL2_INCLUDE_DIR})
 
@@ -42,6 +45,7 @@ target_link_libraries(
     Menus GUI
     CHIP8 Gameboy Bytepusher
     nlohmann_json::nlohmann_json
+    xbyak::xbyak
     SDL2::SDL2
     SDL2::SDL2main
     SDL2::SDL2_ttf

@@ -1,9 +1,9 @@
 #ifndef CHIP8_VM_H
 #define CHIP8_VM_H
 
-#include "../../../window.hpp"
-#include "input.hpp"
-#include "graphics.hpp"
+#include "../../../../window.hpp"
+#include "../input.hpp"
+#include "../graphics.hpp"
 #include <SDL2/SDL.h>
 #include <cstring>
 #include <sstream>
@@ -14,11 +14,9 @@ namespace CHIP8
     class VM
     {
     private:
-        // Input handler
-        Input input;
-
-        // Graphics handler
-        Graphics graphics;
+        // Outside pointers
+        Input* input = nullptr;
+        Graphics* graphics = nullptr;
 
         // 4096 bytes of storage
         uint16_t ram_size = 0x1000;
@@ -71,10 +69,6 @@ namespace CHIP8
 
         // Update VM
         void update(double dt);
-
-        // Set colors
-        void setForeground(SDL_Color color);
-        void setBackground(SDL_Color color);
 
         // Returns state
         uint8_t get_state();

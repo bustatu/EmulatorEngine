@@ -18,7 +18,7 @@ namespace CHIP8
         user_flags = new uint8_t[0x10];
 
         // Set the default screen size
-        graphics.resize(64, 32);
+        graphics -> resize(64, 32);
 
         // Reset timers
         deltaTimer = execTimer = 0;
@@ -32,17 +32,7 @@ namespace CHIP8
 
     std::pair<int, int> VM::getSize()
     {
-        return graphics.getSize();
-    }
-
-    void VM::setForeground(SDL_Color color)
-    {
-        graphics.setForegroundColor(color);
-    }
-
-    void VM::setBackground(SDL_Color color)
-    {
-        graphics.setBackgroundColor(color);
+        return graphics -> getSize();
     }
 
     VM::~VM()
@@ -59,7 +49,7 @@ namespace CHIP8
 
     void VM::draw(SDL_Texture* &target, SDL_Renderer* tool)
     {
-        graphics.draw(target, tool);
+        graphics -> draw(target, tool);
     }
 
     uint8_t VM::get_state()
@@ -93,8 +83,8 @@ namespace CHIP8
         memset(ram, 0, ram_size);
         memset(V, 0, 0x10);
         memset(user_flags, 0, 0x10);
-        input.resetKeys();
-        graphics.clear();
+        input -> resetKeys();
+        graphics -> clear();
 
         // Load font
         uint8_t font[] = {
@@ -150,7 +140,7 @@ namespace CHIP8
     {
         uint16_t pixel;
         uint8_t offset = 1;
-        std::pair<uint8_t, uint8_t> size = graphics.getSize();
+        std::pair<uint8_t, uint8_t> size = graphics -> getSize();
 
         // 0 height means 16 height
         if(vc == 0)
@@ -158,7 +148,7 @@ namespace CHIP8
             vc = 16;
         
             // If in SCHIP8, sprites are double the normal size
-            if(graphics.getState() == 1)
+            if(graphics -> getState() == 1)
                 offset = 2;
         }
 
@@ -177,7 +167,7 @@ namespace CHIP8
                 //If the pixel needs to be set
                 if((pixel & ((1 << 15) >> xline)) != 0)
                     // Update the pixel and update V[0xF] if necessary
-                    V[0xF] = graphics.xorPixel(va + xline + ((vb + yline) * size.first)) % (size.first * size.second) ? 1 : V[0xF];
+                    V[0xF] = graphics -> xorPixel(va + xline + ((vb + yline) * size.first)) % (size.first * size.second) ? 1 : V[0xF];
         }
     }
 
@@ -199,14 +189,14 @@ namespace CHIP8
                 switch(NN(opcode))
                 {
                     case 0xE0:
-                        graphics.clear();
+                        graphics -> clear();
                         break;
                     case 0xEE:
                         PC = stack[sp--];
                         break;
                     case 0xFF:
-                        graphics.resize(128, 64);
-                        graphics.setState(1);
+                        graphics -> resize(128, 64);
+                        graphics -> setState(1);
                         break;
                     default:
                         unknown(opcode);
@@ -313,11 +303,11 @@ namespace CHIP8
                 switch(NN(opcode))
                 {
                     case 0x9E:
-                        if(input.getKey(V[N00(opcode)]))
+                        if(input -> getKey(V[N00(opcode)]))
                             PC += 2;
                         break;
                     case 0xA1:
-                        if(!input.getKey(V[N00(opcode)]))
+                        if(!input -> getKey(V[N00(opcode)]))
                             PC += 2;
                         break;
                     default:
@@ -332,9 +322,9 @@ namespace CHIP8
                         V[N00(opcode)] = get_timer(0);
                         break;
                     case 0x0A:
-                        if(input.getKeyCounter() != 0)
-                            V[N00(opcode)] = input.getLastPressed();
-                        PC -= 2 * (input.getKeyCounter() == 0);
+                        if(input -> getKeyCounter() != 0)
+                            V[N00(opcode)] = input -> getLastPressed();
+                        PC -= 2 * (input -> getKeyCounter() == 0);
                         break;
                     case 0x15:
                         set_timer(0, V[N00(opcode)]);
@@ -390,7 +380,7 @@ namespace CHIP8
     {
         // Update keys
         for(uint32_t i = 0; i < 0x10; i++)
-            input.setKey(i, win -> getKey(input.getMappedKey(i)));
+            input -> setKey(i, win -> getKey(input -> getMappedKey(i)));
     }
 
     void VM::update(double dt)

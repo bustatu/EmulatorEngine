@@ -19,12 +19,12 @@ namespace CHIP8
         resize_flag = true;
     }
 
-    void Graphics::setForegroundColor(SDL_Color color)
+    void Graphics::setForeground(SDL_Color color)
     {
         foreground = color;
     }
 
-    void Graphics::setBackgroundColor(SDL_Color color)
+    void Graphics::setBackground(SDL_Color color)
     {
         background = color;
     }

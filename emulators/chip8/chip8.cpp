@@ -14,36 +14,39 @@ namespace CHIP8
         // If the emulator didn't stop
         if(is_running)
         {
-            // Update the VM
-            if(vm -> get_state() == 1)
+            if(!use_dynarec)
             {
-                vm -> updateKeys(window);
-                vm -> update(dt);
-
-                if(vm -> get_timer(1) > 0)
-                    window -> getAudio() -> resumeAudio();
-                else
-                    window -> getAudio() -> pauseAudio();
-            }
-            else
-            {
-                // Execution ended
-                is_running = false;
-
-                // Do diagnostics
-                printf("\033[1;31m");
-                switch(vm -> get_state())
+                // Update the VM
+                if(vm -> get_state() == 1)
                 {
-                    case 2:
-                        printf("{E}: Execution ended because PC got out of bounds.\n");
-                        break;
-                    case 3:
-                        printf("{E}: Execution ended because the VM encountered an unknown opcode.\n");
-                        break;
-                }
-                printf("\033[0m");
+                    vm -> updateKeys(window);
+                    vm -> update(dt);
 
-                printf("{I}: Error code: %d\n", vm -> get_state());
+                    if(vm -> get_timer(1) > 0)
+                        window -> getAudio() -> resumeAudio();
+                    else
+                        window -> getAudio() -> pauseAudio();
+                }
+                else
+                {
+                    // Execution ended
+                    is_running = false;
+
+                    // Do diagnostics
+                    printf("\033[1;31m");
+                    switch(vm -> get_state())
+                    {
+                        case 2:
+                            printf("{E}: Execution ended because PC got out of bounds.\n");
+                            break;
+                        case 3:
+                            printf("{E}: Execution ended because the VM encountered an unknown opcode.\n");
+                            break;
+                    }
+                    printf("\033[0m");
+
+                    printf("{I}: Error code: %d\n", vm -> get_state());
+                }
             }
         }
 
@@ -58,9 +61,9 @@ namespace CHIP8
         std::ifstream fin("data/chip8/general.json");
         if(!fin.is_open())
         {
+            fin.close();
             printf("\033[1;36m{W}: Default general CHIP8 config not found! Creating a new one...\n\033[0m");
             createDefaultConfig();
-            fin.close();
             fin = std::ifstream("data/chip8/general.json");
         }
 
@@ -69,11 +72,11 @@ namespace CHIP8
         fin >> j_file;
 
         if(j_file["color"]["r"] != nullptr && j_file["color"]["g"] != nullptr && j_file["color"]["b"] != nullptr)
-            vm -> setForeground({j_file["color"]["r"], j_file["color"]["g"], j_file["color"]["b"], 0xFF});
+            graphics.setForeground({j_file["color"]["r"], j_file["color"]["g"], j_file["color"]["b"], 0xFF});
 
         if(j_file["background"]["r"] != nullptr && j_file["background"]["g"] != nullptr && j_file["background"]["b"] != nullptr)
-            vm -> setBackground({j_file["background"]["r"], j_file["background"]["g"], j_file["background"]["b"], 0xFF});
-
+            graphics.setBackground({j_file["background"]["r"], j_file["background"]["g"], j_file["background"]["b"], 0xFF});
+        
         fin.close();
     }
 
@@ -99,6 +102,7 @@ namespace CHIP8
     void Emu::init()
     {
         Window* window = stateM -> getWindow();
+        Audio* audio = window -> getAudio();
 
         // Create audio specs for this emu
         SDL_AudioSpec wanted;
@@ -116,16 +120,13 @@ namespace CHIP8
         };
 
         // Prepare audio for usage
-        window -> getAudio() -> prepare(wanted);
+        audio -> prepare(wanted);
 
         // Pause the sound, only gets resumed when the sound counter is positive
-        window -> getAudio() -> pauseAudio();
+        audio -> pauseAudio();
 
         // Update the screen output (correct the aspect ratio)
         SDL_RenderSetLogicalSize(window -> getRenderer(), 128, 64);
-
-        // Apply default config
-        applyDefaultConfig();
     }
 
     void Emu::resume()
@@ -145,7 +146,8 @@ namespace CHIP8
         Window* window = stateM -> getWindow();
 
         // Do the drawing internally
-        vm -> draw(output, window -> getRenderer());
+        if(!use_dynarec)
+            vm -> draw(output, window -> getRenderer());
 
         // Update only if the output exists
         if(output != nullptr)
@@ -156,15 +158,30 @@ namespace CHIP8
     void Emu::load(std::string path)
     {
         // Create new VM
-        if(vm != nullptr)
-            delete vm;
-        vm = new VM();
+        if(!use_dynarec)
+        {
+            if(vm != nullptr)
+                delete vm;
+            
+            exit(0);
+            // TODO: THIS BREAKS
+            vm = new VM();
+       
+            // Start VM
+            vm -> boot();
+        }
 
-        // Start VM
-        vm -> boot();
+        // Apply default config
+        applyDefaultConfig();
 
         // Open file for reading
         std::ifstream file(path.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+
+        if(!file.is_open())
+        {
+            printf("\033[1;31m{E}: File at path %s does not exist!\n\033[0m", path.c_str());
+            return;
+        }
 
         // Write info
         printf("{I}: ROM %s is being loaded...\n", path.c_str());
@@ -185,15 +202,22 @@ namespace CHIP8
             // Attempt to write the data into the VM
             // Most files start at 0x200 in memory
             // TODO: Implement non-standard offsets
-            if(vm -> writeBuffer(vm -> get_rom_start(), data, fileSize) != 0)
+            if(!use_dynarec)
             {
-                printf("\033[1;31m{E}: An error occured while loading the ROM!\n\033[0m");
-                is_running = false;
+                if(vm -> writeBuffer(vm -> get_rom_start(), data, fileSize) != 0)
+                {
+                    printf("\033[1;31m{E}: An error occured while loading the ROM!\n\033[0m");
+                    is_running = false;
+                }
+                else
+                {
+                    printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
+                    is_running = true;
+                }
             }
             else
             {
-                printf("{I}: ROM with size %d loaded successfully!\n", fileSize);
-                is_running = true;
+                printf("{I}: Dynarec ROM loading here...\n");
             }
 
             // Deallocate data from memory
@@ -206,6 +230,6 @@ namespace CHIP8
 
     void Emu::destroy()
     {
-        printf("{I}: Destroying chip8 state!\n");
+        printf("{I}: Destroying CHIP8 state!\n");
     }
 };

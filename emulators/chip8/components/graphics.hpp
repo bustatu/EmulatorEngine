@@ -32,10 +32,10 @@ namespace CHIP8
         void resize(uint16_t newX, uint16_t newY);
 
         // Set foreground color
-        void setForegroundColor(SDL_Color color);
+        void setForeground(SDL_Color color);
 
         // Set background color
-        void setBackgroundColor(SDL_Color color);
+        void setBackground(SDL_Color color);
 
         // Clear the display
         void clear();
